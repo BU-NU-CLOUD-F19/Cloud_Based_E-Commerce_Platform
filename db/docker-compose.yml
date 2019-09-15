@@ -1,0 +1,26 @@
+version: "3"
+services:
+  postgres:
+    image: "postgres:12-alpine"
+    container_name: "postgres"
+    environment:
+      POSTGRES_PASSWORD: northeastern
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+    restart: unless-stopped
+  pgadmin:
+    image: "dpage/pgadmin4"
+    depends_on:
+      - postgres
+    container_name: "pgadmin"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
