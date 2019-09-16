@@ -12,21 +12,24 @@ The platform would enable shopper event data, unlock insights across sales chann
 
 The high-level goals include:
 
-* A simple, intuitive, straightforward, and easy-to-use UI for all users
-<!-- Is the UI really a goal, or is the back-end our main focus?-->
 * End-to-end user experience, from product selection to payment
 * Enabling entrepreneurs to host their own businesses using this platform and create an e-commerce store
 * Complete flexibility, modularity, and scalability
 * Independence of front-end and back-end code
 * Open-source code and transparency
+* A simple UI to demonstrate the core functionality
 
 ## 2. Users/Personas Of The Project:
 The e-commerce platform will be used by:
 
 * Entrepreneurs hosting their business on the platform, who will use either the full stack of offered functionality, or specific modules
+* Businesses who would want to further customize the open-source code for their specific needs
+* Sales and marketing teams for analytics and to improve sales
 * End-users of the business created by an entrepreneur, who will use the e-commerce system for orders and payment.
 
 It does not target developers directly, although the modular nature of the system will make it easier for developers to integrate its services in other applications.
+
+Furthermore, the system provides hooks to support different languages, so it would be region-independent and could be deployed in different languages.
 
 ## 3. Scope and Features Of The Project:
 The main goal of this project is to develop a robust back-end which can support multiple front-ends; in particular any front-end development will be solely for testing.
