@@ -2,7 +2,7 @@ Cloud-Based E-Commerce Platform
 ====================================
 
 ## 1. Vision and Goals Of The Project:
-This project is a cloud based e-commerce solution that enables entrepreneurs to leverage this platform for individual or business purposes.
+This project is an open-source, cloud based e-commerce solution that enables entrepreneurs to leverage this platform for individual or business purposes.
 The vision for this project is one of headless design, with the front-end and back-end entirely independent from each other.
 This would make the system more flexible for developers and for business operators alike, compared to the currently available alternatives.
 
@@ -18,6 +18,7 @@ The high-level goals include:
 * Enabling entrepreneurs to host their own businesses using this platform and create an e-commerce store
 * Complete flexibility, modularity, and scalability
 * Independence of front-end and back-end code
+* Open-source code and transparency
 
 ## 2. Users/Personas Of The Project:
 The e-commerce platform will be used by:
@@ -68,14 +69,21 @@ A short description of the system components that are building blocks of the arc
 * implemented using React.JS/ Next.JS
 * End-points: Maintains all service endpoints using GraphQL/REST APIs
 * Load testing: Probably Loadtest
-* Deployment: Application deployment on cloud using Docker containers with Kubernetes
+* Deployment: Application deployment on cloud using Docker containers, with Kubernetes for scaling and management
 * Server Host: Server framework on which the application runs - Nginx/ Express.JS
 * Message Queues: Handling email notifications like order status, payment details etc.
 * using Apache Kafka
 * Database: Data storage and retrieval system - PostgreSQL
 
 ## 5. Acceptance Criteria
-TBD.
+
+The acceptance criteria are as follows:
+
+1. Backend and frontend stack deployed on Kubernetes.
+2. All code documented and checked in on Github repo, with orchestration scripts for deployment.
+3. User is able to perform a purchase/transaction from the frontend.
+4. Micro-services failover demonstration.
+5. Backend microservices auto-scaling on increased workload.
 
 ## 6. Release planning
-TBD.
+We are planning for a bi-weekly release.
