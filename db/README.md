@@ -51,3 +51,12 @@ Restore:
 ```bash
 cat dump_name.sql | docker exec -i postgres psql -Upostgres
 ```
+
+## Loading the test data
+The test data in `test-db/init-test-db.sql` is automatically loaded into the database when the container is created.
+
+You can also manually load it by starting the Postgres container and running:
+
+```bash
+cat test-db/init-test-db.sql | docker exec -i postgres psql -Upostgres
+```
