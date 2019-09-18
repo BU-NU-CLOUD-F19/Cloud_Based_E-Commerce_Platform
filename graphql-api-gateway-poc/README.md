@@ -8,7 +8,6 @@ To run this demo locally:
 
 ```bash
 cd graphql-api-gateway-poc
-npm install
 ```
 
 ```bash
@@ -37,12 +36,20 @@ This will start up the gateway and serve it at http://localhost:3000
 Open up http://localhost:3000 on the browser to view the GraphQL playground for making API requests
 Write a query (for example:
 
-````{
+```
+Query:
+{
    myProducts{
     weight
     name
    }
-}```) to receive a JSON response for the given request
+}
+```
+
+) to receive a JSON response for the given request
 
 The API gateway makes use of the running microservices to create an overall composed schema which can be queried
-````
+
+```
+
+```
