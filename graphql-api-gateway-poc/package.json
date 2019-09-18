@@ -1,0 +1,20 @@
+{
+  "name": "graphql-api-gateway-poc",
+  "version": "1.0.0",
+  "description": "GraphQL API Gateway for microservices architecture",
+  "main": "index.js",
+  "scripts": {
+    "start-gateway": "nodemon src/index.js",
+    "start-service-products": "nodemon services/products/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/gateway": "^0.10.4",
+    "apollo-server": "^2.9.3",
+    "graphql": "^14.5.6"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.2"
+  }
+}
