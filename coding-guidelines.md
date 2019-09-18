@@ -21,4 +21,8 @@ Note: _This coding guidelines are for general coding and doesn't focus on any pa
 9. Write clean code rather than clever code.
 ```
 
-For more details follow this url: [Coding Conventions Wiki](https://en.wikipedia.org/wiki/Coding_conventions)
+For more details follow these url:
+
+* [Coding Conventions Wiki](https://en.wikipedia.org/wiki/Coding_conventions)
+
+* [Google JS style guide](https://google.github.io/styleguide/jsguide.html)
