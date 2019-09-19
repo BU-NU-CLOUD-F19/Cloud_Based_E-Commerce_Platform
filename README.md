@@ -68,15 +68,16 @@ A short description of the system components that are building blocks of the arc
 
 * Back-end: Business logic implemented using Node.JS for server-side functionality like user authentication, messaging, and communicating with a database
 * Front-end: UI components like login/register, shopping cart, payment page etc.
-<!-- To what degree is front-end a main part of our solution? The project description says that "any front-end development will be solely for testing"-->
-* implemented using React.JS/ Next.JS
+  * implemented using React.JS/ Next.JS
 * End-points: Maintains all service endpoints using GraphQL/REST APIs
 * Load testing: Probably Loadtest
 * Deployment: Application deployment on cloud using Docker containers, with Kubernetes for scaling and management
 * Server Host: Server framework on which the application runs - Nginx/ Express.JS
 * Message Queues: Handling email notifications like order status, payment details etc.
-* using Apache Kafka
+  * using Apache Kafka
 * Database: Data storage and retrieval system - PostgreSQL
+
+![High-level overview of stack](img/hl_stack_overview.png)
 
 ## 5. Acceptance Criteria
 
