@@ -40,6 +40,13 @@ Order management:
 * retrieve
 * cancel
 
+Users:
+
+* log in
+* log out
+* register
+* delete account
+
 ## Diagrams/flows
 ### Checkout
 What happens when the user presses 'check out' on the cart:
