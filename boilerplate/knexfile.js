@@ -1,5 +1,9 @@
 // Update with your config settings.
 
+/**
+ * This file will be used when running knex migrations
+ */
+
 module.exports = {
 
   development: {

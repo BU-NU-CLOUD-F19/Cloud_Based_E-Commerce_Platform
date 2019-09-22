@@ -1,5 +1,5 @@
 'use strict';
-const logger = require('winston');
+const logger = require('../utils/logger');
 
 class Handlers {
   constructor(model) {
@@ -9,14 +9,8 @@ class Handlers {
   findOne(req, rep) {
     const id = req.params.id;
     const reply = rep;
-
-    return this.model.findOne(context, id)
-      .then((result) => {
-        return reply(result).code(200);
-      })
-      .catch((err) => {
-        return logger.error(err.message);
-      });
+    logger.log('info',`Get request for ${this.model.resource}`);
+    return reply.response(id).code(200);
   }
 
   insert(req, rep) {

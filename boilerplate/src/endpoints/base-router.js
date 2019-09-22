@@ -16,14 +16,13 @@ class Router {
       path: `/${this.resource}/{id}`,
       handler: this.handler.findOne.bind(this.handler),
       config: {
-        auth: this.auth,
-        description: `Get an item from ${this.resource}.`,
+        description: `Get a ${this.resource} record.`,
         tags: ['api'],
         plugins: {
           'hapi-swagger': {
             responses: {
-              200: { description: 'Success' },
-              404: { description: 'Item Not Found' },
+              201: { description: 'Success' },
+              400: { description: 'Bad Request' },
             },
           },
         },
@@ -38,7 +37,6 @@ class Router {
       handler: this.handler.insert.bind(this.handler),
       config: {
         description: `Post to ${this.resource}.`,
-        notes: `Returns the posted ${this.singular}.`,
         tags: ['api'],
         plugins: {
           'hapi-swagger': {

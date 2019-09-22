@@ -1,9 +1,10 @@
 'use strict';
 
+
 const _ = require('lodash');
 const elv = require('elv');
 
-const emptyLogger = require('./empty-logger');
+const logger = require('../src/utils/logger');
 const knex = require('./knex');
 
 class PostgreSqlRepository {
@@ -19,13 +20,11 @@ class PostgreSqlRepository {
       this.knex = knex(connection, pool);
     }
 
-    this.logger = elv.coalesce(options.logger, emptyLogger);
+    this.logger = elv.coalesce(options.logger, logger);
     this.resource = options.resource;
   }
 
-  insert(context, id, data) {
-    PostgreSqlRepository._assertContext(context);
-    PostgreSqlRepository._assertId(id);
+  insert(id, data) {
 
     const value = {
       id,
@@ -40,16 +39,16 @@ class PostgreSqlRepository {
       })
       .catch((err) => {
         this.logger.error(err.message);
+        throw err;
       });
   }
 
-  findOne(context, id, transaction, options) {
+  findOne(id, transaction, options) {
     PostgreSqlRepository._assertContext(context);
     PostgreSqlRepository._assertId(id);
 
     const query = this._query(transaction, options)
       .where({ id });
-
 
     const builder = query.first();
     this.logSql(builder);
@@ -61,7 +60,8 @@ class PostgreSqlRepository {
         return result.data;
       })
       .catch((err) => {
-        throw translate(err, false);
+        this.logger.error(err.message);
+        throw err;
       });
   }
 

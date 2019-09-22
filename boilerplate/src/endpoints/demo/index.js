@@ -5,17 +5,12 @@
 'use strict';
 
 const Router = require('./router');
-const Names = require('../../../classNames');
+const Names = require('../../classNames');
 
 const resource = Names.demo;
 
 
-module.exports.register = (server, options, next) => {
+module.exports.register = (server, options, ) => {
   new Router(null, options).route(server);
-  next();
 };
-
-module.exports.register.attributes = {
-  name: resource,
-  version: '1.0.0',
-};
+module.exports.name = resource;

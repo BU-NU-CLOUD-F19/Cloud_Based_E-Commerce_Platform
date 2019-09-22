@@ -3,10 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 const elv = require('elv');
-const Glue = require('glue');
+const Glue = require('@hapi/glue');
 const Promise = require('bluebird');
 const registrationsFactory = require('./registrations');
 const config = require('./config');
+const logger = require('./src/utils/logger');
 
 const isProduction = (process.env.NODE_ENV === 'production');
 
@@ -19,33 +20,9 @@ module.exports = new Promise((resolve) => {
 
     const manifest = {
       server: {
-        connections: {
-          routes: {
-            cors: {
-              credentials: false,
-              origin: elv.coalesce(
-                process.env.CORS_ORIGIN,
-                'http://localhost:8000')
-                .split(','),
-              additionalHeaders: [
-                'cache-control',
-                'x-requested-with',
-                'if-match',
-                'authorization',
-                'etag',
-              ],
-            },
-          },
-        },
+        port,
       },
-      connections: [
-        {
-          host: '0.0.0.0',
-          port,
-          labels: ['api'],
-        },
-      ],
-      registrations,
+      register: registrations,
     };
 
     const options = {
@@ -53,19 +30,11 @@ module.exports = new Promise((resolve) => {
     };
 
 
-    Glue.compose(manifest, options, (err, server) => {
-      if (err) {
-        throw err;
-      }
-      server.start((err) => {
-        if (err)
-          throw err;
-        server.log(['info', 'start'], `Server started at ports: ${port}`);
-        resolve(server);
-      });
-
-      // Register events handlers
-      eventsRegistration();
+    const server = await Glue.compose(manifest, options);
+     
+    return server.start()
+    .then(() => {
+       return logger.log('info',`Server started at ports: ${port}`);
     });
   });
 });

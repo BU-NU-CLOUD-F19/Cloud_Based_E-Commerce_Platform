@@ -1,11 +1,9 @@
 'use strict';
 
-const {
-  PostgreSqlRepository,
-} = require('../../../postgresql');
+const PostgreSqlRepository = require('../../../repository');
 
-const logger = require('../../../logger');
-const Names = require('../../../classNames');
+const logger = require('../../utils/logger');
+const Names = require('../../classNames');
 const Kernel = require('../../../kernel');
 
 const resource = Names.demo;

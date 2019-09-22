@@ -1,0 +1,65 @@
+const elv = require('elv');
+const { createLogger, format, transports } = require('winston');
+const { combine, colorize, timestamp, label, printf, prettyPrint, splat, simple } = format;
+require('winston-daily-rotate-file');
+const fs = require('fs');
+const path = require('path');
+
+const env = process.env.NODE_ENV;
+const logDir = 'log';
+
+// Create the log directory if it does not exist
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+const filename = path.join(logDir, 'results.log');
+
+// creates a new log file everyday
+const dailyRotateFileTransport = new transports.DailyRotateFile({
+  filename: `${logDir}/%DATE%-results.log`,
+  datePattern: 'YYYY-MM-DD'
+});
+
+// set the level based on env
+const level = elv.coalesce(
+  process.env.loglevel,
+  (env === 'production' || env === 'test') ? 'error' : 'debug',
+);
+
+const logger = createLogger({
+  level,
+  format: combine(
+    timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+  ),
+  transports: [
+    new transports.Console({
+      level,
+      json: true,
+      stringify: obj => JSON.stringify(obj),
+      format: combine(
+        colorize(),
+        printf(
+          info => `${info.timestamp} ${info.level}: ${info.message}`
+        )
+      )
+    }),
+    new transports.File({
+      filename,
+      json: true,
+      stringify: obj => JSON.stringify(obj),
+      format: combine(
+        printf(
+          info =>
+            `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`
+        )
+      )
+    }),
+    // dailyRotateFileTransport
+  ],
+});
+
+
+module.exports = logger;

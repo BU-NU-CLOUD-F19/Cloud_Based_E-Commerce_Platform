@@ -2,11 +2,10 @@
 
 const elv = require('elv');
 const _ = require('lodash');
-const { Clause, Filter } = require('spleen');
 const Promise = require('bluebird');
 
 const Kernel = require('../../../kernel');
-const Names = require('../../../classNames');
+const Names = require('../../classNames');
 const Repository = require('./repository');
 const Model = require('../base-model');
 
@@ -25,7 +24,7 @@ class DemoModel extends Model {
   }
 
   findOne(id) {
-    return super.patch(id);
+    return super.findOne(id);
   }
 }
 

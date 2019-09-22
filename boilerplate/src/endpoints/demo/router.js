@@ -5,7 +5,7 @@ const BaseRouter = require('../base-router');
 
 const Handlers = require('./handlers');
 
-const resource = require('../../../classNames').demo;
+const resource = require('../../classNames').demo;
 
 class Router extends BaseRouter {
   constructor(handler) {

@@ -14,7 +14,7 @@ RUN npm install -g pm2@1.1.3
 RUN apk add dos2unix --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ --allow-untrusted
 
 # Copy content
-COPY "./src" "$APP_DIR/src"
+COPY "." "$APP_DIR"
 
 RUN apk --no-cache --virtual build-dependencies add \
   python \
@@ -25,7 +25,7 @@ RUN apk --no-cache --virtual build-dependencies add \
   && apk del dos2unix
 
 # Setup ports
-ENV API_PORT 4000
+ENV API_PORT 3000
 EXPOSE $API_PORT
 
 # Run it
@@ -33,4 +33,4 @@ EXPOSE $API_PORT
 ENTRYPOINT ["pm2", "--no-daemon", "start"]
 
 # Actual script to start can be overridden from `docker run`
-CMD [""]
+CMD ["/usr/local/bin/node", "/usr/local/bin/npm", "start"]
