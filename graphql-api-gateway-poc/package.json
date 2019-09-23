@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start-gateway": "nodemon src/index.js",
-    "start-service-products": "nodemon services/products/index.js"
+    "start-service-products": "nodemon services/products/index.js",
+    "lint": "eslint -f unix -c ../.eslintrc.js ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@apollo/gateway": "^0.10.4",
     "apollo-server": "^2.9.3",
+    "eslint": "^6.4.0",
     "graphql": "^14.5.6"
   },
   "devDependencies": {
