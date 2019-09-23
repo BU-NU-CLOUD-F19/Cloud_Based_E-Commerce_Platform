@@ -144,3 +144,7 @@ typings/
 
 db/db-data/
 db/pgadmin/
+
+# Node modules
+graphql-api-gateway-poc/node_modules
+graphql-api-gateway-poc/services/products/node_modules
