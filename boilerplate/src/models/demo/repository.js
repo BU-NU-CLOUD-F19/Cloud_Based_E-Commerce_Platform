@@ -1,10 +1,10 @@
 'use strict';
 
-const PostgreSqlRepository = require('../../../repository');
+const PostgreSqlRepository = require('../../repository');
 
 const logger = require('../../utils/logger');
-const Names = require('../../classNames');
-const Kernel = require('../../../kernel');
+const Names = require('../../configs/classNames');
+const Kernel = require('../kernel');
 
 const resource = Names.demo;
 

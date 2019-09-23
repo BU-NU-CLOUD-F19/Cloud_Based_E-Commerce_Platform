@@ -5,7 +5,7 @@
 'use strict';
 
 const Router = require('./router');
-const Names = require('../../classNames');
+const Names = require('../../configs/classNames');
 
 const resource = Names.demo;
 

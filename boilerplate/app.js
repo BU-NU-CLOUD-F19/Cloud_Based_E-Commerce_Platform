@@ -6,7 +6,7 @@ const elv = require('elv');
 const Glue = require('@hapi/glue');
 const Promise = require('bluebird');
 const registrationsFactory = require('./registrations');
-const config = require('./config');
+const config = require('./src/configs/config');
 const logger = require('./src/utils/logger');
 
 const isProduction = (process.env.NODE_ENV === 'production');

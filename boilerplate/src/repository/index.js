@@ -4,7 +4,7 @@
 const _ = require('lodash');
 const elv = require('elv');
 
-const logger = require('../src/utils/logger');
+const logger = require('../utils/logger');
 const knex = require('./knex');
 
 class PostgreSqlRepository {

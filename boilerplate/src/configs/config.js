@@ -2,12 +2,11 @@
 
 const _ = require('lodash');
 const Kibbutz = require('kibbutz');
-const EnvProvider = require('./provider');
 const RcProvider = require('kibbutz-rc');
-const pkg = require('./package');
-const getKnex = require('./repository/knex');
-const Kernel = require('./kernel');
-const KnexManager = require('./knex-manager'); // to bind knex-instance to kernel
+const pkg = require('../../package');
+const getKnex = require('../repository/knex');
+const Kernel = require('../models/kernel');
+const KnexManager = require('../models/knex-manager'); // to bind knex-instance to kernel
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
@@ -15,7 +14,6 @@ if (!process.env.NODE_ENV) {
 
 const configName = pkg.config.appName;
 const config = new Kibbutz();
-const envLoader = new EnvProvider(configName);
 const rcLoader = new RcProvider({
   appName: configName,
 });
@@ -31,7 +29,7 @@ const converToInt = (conf, path) => {
 
 module.exports = new Promise((resolve, reject) => {
   // config.load([envLoader, rcLoader], (err, conf) => {
-  config.load([ rcLoader, envLoader ], (err, conf) => {
+  config.load([ rcLoader ], (err, conf) => {
     if (err) {
       reject(err);
     }

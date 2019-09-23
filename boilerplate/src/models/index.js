@@ -1,6 +1,6 @@
 'use strict';
 
-const Kernel = require('../../kernel');
+const Kernel = require('./kernel');
 
 // DEMO
 //

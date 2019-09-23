@@ -51,6 +51,7 @@ const logger = createLogger({
       json: true,
       stringify: obj => JSON.stringify(obj),
       format: combine(
+        label({ label: path.basename(process.mainModule.filename) }),
         printf(
           info =>
             `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`

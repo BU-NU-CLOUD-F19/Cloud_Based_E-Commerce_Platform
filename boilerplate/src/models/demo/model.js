@@ -4,8 +4,8 @@ const elv = require('elv');
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Kernel = require('../../../kernel');
-const Names = require('../../classNames');
+const Kernel = require('../kernel');
+const Names = require('../../configs/classNames');
 const Repository = require('./repository');
 const Model = require('../base-model');
 
