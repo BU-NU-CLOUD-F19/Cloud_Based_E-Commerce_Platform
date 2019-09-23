@@ -10,16 +10,12 @@ class Model {
 
   insert(value) {
     return this.repository.insert(value)
-      .then((result) => {
-        return result.value;
-      });
+      .then(result => result.value);
   }
 
   findOne(id) {
     return this.repository.findOne(id)
-      .then((entity) => {
-        return entity.data;
-      });
+      .then(entity => entity.data);
   }
 
 }

@@ -17,7 +17,7 @@ class DemoRepository extends PostgreSqlRepository {
       resource,
       knex: knexManager.knex,
       logger,
-      identifier: `${resource}.data`
+      identifier: `${resource}.data`,
     });
   }
 }

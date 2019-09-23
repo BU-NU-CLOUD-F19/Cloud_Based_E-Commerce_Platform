@@ -1,5 +1,3 @@
-'use strict';
-
 const elv = require('elv');
 const BaseRouter = require('../base-router');
 

@@ -10,7 +10,7 @@ const Names = require('../../configs/classNames');
 const resource = Names.demo;
 
 
-module.exports.register = (server, options, ) => {
+module.exports.register = (server, options) => {
   new Router(null, options).route(server);
 };
 module.exports.name = resource;

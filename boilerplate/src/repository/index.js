@@ -1,7 +1,5 @@
 'use strict';
 
-
-const _ = require('lodash');
 const elv = require('elv');
 
 const logger = require('../utils/logger');
@@ -10,7 +8,6 @@ const knex = require('./knex');
 class PostgreSqlRepository {
 
   constructor(options = {}) {
-
     this.knex = options.knex;
     if (!this.knex) {
       const {
@@ -25,14 +22,12 @@ class PostgreSqlRepository {
   }
 
   insert(id, data) {
-
     const value = {
       id,
       data,
     };
-    const data = JSON.stringify(value.data);
-    const knex = this.knex(this.resource);
-    return knex.insert(value).returning('*')
+    const knexBuilder = this.knex(this.resource);
+    return knexBuilder.insert(value).returning('*')
       .then((result) => {
         this.logger.info(`Successfully inserted 1 record into: ${this.resource}`);
         return result.data;
@@ -43,20 +38,11 @@ class PostgreSqlRepository {
       });
   }
 
-  findOne(id, transaction, options) {
-    PostgreSqlRepository._assertContext(context);
-    PostgreSqlRepository._assertId(id);
-
-    const query = this._query(transaction, options)
-      .where({ id });
-
-    const builder = query.first();
-    this.logSql(builder);
-    return builder
+  findOne(id, options) {
+    const knexBuilder = this.knex(this.resource);
+    return knexBuilder.select('*').whereRaws('id', id)
       .then((result) => {
-        if (!result) {
-          throw new Error('NotFoundError: Request', { id, resource: this.resource });
-        }
+        this.logger.info(`Successfully inserted 1 record into: ${this.resource}`);
         return result.data;
       })
       .catch((err) => {

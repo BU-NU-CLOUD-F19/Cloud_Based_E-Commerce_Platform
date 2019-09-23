@@ -2,7 +2,6 @@
 
 const elv = require('elv');
 const Handlers = require('./base-handlers');
-const Joi = require('joi');
 
 class Router {
   constructor(resource, handler, auth) {

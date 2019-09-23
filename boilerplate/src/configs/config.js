@@ -6,6 +6,7 @@ const RcProvider = require('kibbutz-rc');
 const pkg = require('../../package');
 const getKnex = require('../repository/knex');
 const Kernel = require('../models/kernel');
+// eslint-disable-next-line no-unused-vars
 const KnexManager = require('../models/knex-manager'); // to bind knex-instance to kernel
 
 if (!process.env.NODE_ENV) {
@@ -29,7 +30,7 @@ const converToInt = (conf, path) => {
 
 module.exports = new Promise((resolve, reject) => {
   // config.load([envLoader, rcLoader], (err, conf) => {
-  config.load([ rcLoader ], (err, conf) => {
+  config.load([rcLoader], (err, conf) => {
     if (err) {
       reject(err);
     }

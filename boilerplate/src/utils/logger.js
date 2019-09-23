@@ -1,6 +1,7 @@
 const elv = require('elv');
 const { createLogger, format, transports } = require('winston');
-const { combine, colorize, timestamp, label, printf, prettyPrint, splat, simple } = format;
+
+const { combine, colorize, timestamp, label, printf } = format;
 require('winston-daily-rotate-file');
 const fs = require('fs');
 const path = require('path');
@@ -15,9 +16,10 @@ if (!fs.existsSync(logDir)) {
 const filename = path.join(logDir, 'results.log');
 
 // creates a new log file everyday
+// eslint-disable-next-line no-unused-vars
 const dailyRotateFileTransport = new transports.DailyRotateFile({
   filename: `${logDir}/%DATE%-results.log`,
-  datePattern: 'YYYY-MM-DD'
+  datePattern: 'YYYY-MM-DD',
 });
 
 // set the level based on env
@@ -30,9 +32,9 @@ const logger = createLogger({
   level,
   format: combine(
     timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss'
+      format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+    printf(info => `${info.timestamp} ${info.level}: ${info.message}`),
   ),
   transports: [
     new transports.Console({
@@ -42,9 +44,9 @@ const logger = createLogger({
       format: combine(
         colorize(),
         printf(
-          info => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      )
+          info => `${info.timestamp} ${info.level}: ${info.message}`,
+        ),
+      ),
     }),
     new transports.File({
       filename,
@@ -54,9 +56,9 @@ const logger = createLogger({
         label({ label: path.basename(process.mainModule.filename) }),
         printf(
           info =>
-            `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`
-        )
-      )
+            `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`,
+        ),
+      ),
     }),
     // dailyRotateFileTransport
   ],

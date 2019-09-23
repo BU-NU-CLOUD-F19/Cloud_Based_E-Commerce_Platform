@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * This class instantiates knex query-builder object.
  * For more details: http://knexjs.org/

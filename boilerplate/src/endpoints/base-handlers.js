@@ -1,4 +1,5 @@
 'use strict';
+
 const logger = require('../utils/logger');
 
 class Handlers {
@@ -9,7 +10,7 @@ class Handlers {
   findOne(req, rep) {
     const id = req.params.id;
     const reply = rep;
-    logger.log('info',`Get request for ${this.model.resource}`);
+    logger.log('info', `Get request for ${this.model.resource}`);
     return reply.response(id).code(200);
   }
 
@@ -18,12 +19,8 @@ class Handlers {
     const reply = rep;
 
     return this.model.insert(request)
-      .then((result) => {
-        return reply(result).code(201);
-      })
-      .catch((err) => {
-        return logger.error(err.message);
-      });
+      .then(result => reply(result).code(201))
+      .catch(err => logger.error(err.message));
   }
 }
 
