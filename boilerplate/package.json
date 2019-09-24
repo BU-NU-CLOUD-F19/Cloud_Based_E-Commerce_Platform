@@ -12,14 +12,12 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "start": "node app.js",
+    "start": "set NODE_ENV=development || export NODE_ENV && node app.js",
     "lint": "eslint -f unix -c ../.eslintrc.js ."
   },
   "dependencies": {
     "bluebird": "3.5.5",
-    "chai": "^4.0.2",
     "elv": "^1.0.1",
-    "express": "4.16.4",
     "@hapi/glue": "6.2.0",
     "@hapi/hapi": "18.4.0",
     "hapi-swagger": "^7.0.0",
@@ -28,23 +26,15 @@
     "kibbutz-rc": "^1.0.0",
     "knex": "^0.14.2",
     "lodash": "^4.17.4",
-    "moment": "^2.18.1",
     "npx": "^10.2.0",
     "pg": "^7.4.1",
-    "qs": "^6.5.1",
-    "uuid": "^3.0.1",
     "winston": "3.2.1",
     "winston-daily-rotate-file": "4.1.0"
   },
   "devDependencies": {
-    "eslint": "^3.13.1",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-private-props": "^0.3.0",
-    "eslint-plugin-react": "^6.9.0",
-    "nodemon": "^1.17.2",
-    "hapi": "^18.1.0"
+    "eslint": "6.4.0",
+    "nodemon": "1.19.2",
+    "@hapi/hapi": "18.4.0"
   },
   "engines": {
     "node": ">= 8.3.0"
