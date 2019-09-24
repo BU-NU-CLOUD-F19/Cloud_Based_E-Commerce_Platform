@@ -2,7 +2,10 @@ module.exports = {
   "extends": "eslint:recommended",
   "plugins": [],
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2019,
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "env": {
     "es6": true,
@@ -24,7 +27,7 @@ module.exports = {
     "no-plusplus": "off",
     "no-proto": "error",
     "no-return-await": "error",
-    "no-underscore-dangle": "error",
+    "no-underscore-dangle": "off",
     "no-unused-vars": ["error", { "args": "none" }],
     "no-shadow": "error",
     "strict": "off",
