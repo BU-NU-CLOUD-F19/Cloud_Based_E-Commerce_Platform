@@ -36,7 +36,7 @@ class Handlers {
     const reply = rep;
 
     return this.model.insert(data)
-      .then(result => reply(result).code(201))
+      .then(result => reply.response(result).code(201))
       .catch(err => logger.error(err.message));
   }
 }
