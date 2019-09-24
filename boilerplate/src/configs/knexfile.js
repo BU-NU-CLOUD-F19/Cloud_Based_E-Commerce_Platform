@@ -6,6 +6,7 @@
 
 module.exports = {
 
+  // for development environment
   development: {
     client: 'postgresql',
     connection: {
@@ -22,6 +23,7 @@ module.exports = {
     },
   },
 
+  // for test environment
   test: {
     client: 'postgresql',
     connection: {

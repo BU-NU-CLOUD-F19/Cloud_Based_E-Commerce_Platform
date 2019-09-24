@@ -1,9 +1,13 @@
+/**
+ * This class defines business logic to process the request for `demo` resource.
+ */
+
 'use strict';
 
 const elv = require('elv');
 
 const Kernel = require('../kernel');
-const Names = require('../../configs/classNames');
+const Names = require('../../configs/modelNames');
 const Repository = require('./repository');
 const Model = require('../base-model');
 
@@ -17,14 +21,25 @@ class DemoModel extends Model {
     });
   }
 
+  /**
+   * Inserts a `demo` record into the database
+   *
+   * @param  {Object} value the value to be inserted
+   */
   insert(value) {
     return super.insert(value);
   }
 
+  /**
+   * Retrieves a `demo` record from database by its id
+   * @param  {String} id the id by which the record should be fetched
+   */
   findOne(id) {
     return super.findOne(id);
   }
 }
 
+// binds the instance to Kernel for singularity
 Kernel.bind(Names.demo, DemoModel);
+
 module.exports = DemoModel;

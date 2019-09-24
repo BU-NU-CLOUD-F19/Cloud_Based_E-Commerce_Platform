@@ -1,7 +1,13 @@
+/**
+ * The base class for all the router classes to be implemented.
+ * This class defines the basic routes (GET, POST, PUT, PATCH, DELETE)
+ * for all the resources.
+ */
+
 'use strict';
 
 const elv = require('elv');
-const Handlers = require('./base-handlers');
+const Handlers = require('./base-handler');
 
 class Router {
   constructor(resource, handler, auth) {
@@ -13,9 +19,9 @@ class Router {
     server.route({
       method: 'GET',
       path: `/${this.resource}/{id}`,
-      handler: this.handler.findOne.bind(this.handler),
+      handler: this.handler.findOneById.bind(this.handler), // bind a request handler for this route
       config: {
-        description: `Get a ${this.resource} record.`,
+        description: `Get a ${this.resource} record by id.`,
         tags: ['api'],
         plugins: {
           'hapi-swagger': {

@@ -1,11 +1,12 @@
-// sets the hapi routes: https://github.com/hapijs/glue
-// Guide: https://hapibook.jjude.com/book/plugins
-
+/**
+ * This class sets the hapi routes for the `demo` resource
+ * (https://github.com/hapijs/glue)
+ */
 
 'use strict';
 
 const Router = require('./router');
-const Names = require('../../configs/classNames');
+const Names = require('../../configs/modelNames');
 
 const resource = Names.demo;
 

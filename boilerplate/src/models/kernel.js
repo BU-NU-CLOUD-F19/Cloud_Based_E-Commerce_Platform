@@ -1,3 +1,7 @@
+/**
+ * Creates a shared instance of container that can be used anywhere in the application.
+ */
+
 'use strict';
 
 const Container = require('jerkface').Container;

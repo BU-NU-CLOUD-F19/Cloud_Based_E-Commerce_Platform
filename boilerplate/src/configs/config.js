@@ -1,3 +1,8 @@
+/**
+ * This file loads the global configuration required throughout the scope of the application.
+ * The configurations to be loaded are located in `.rc` file.
+ */
+
 'use strict';
 
 const _ = require('lodash');

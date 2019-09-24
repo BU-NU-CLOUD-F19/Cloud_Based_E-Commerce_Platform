@@ -1,3 +1,8 @@
+/**
+ * This is the starting point of the application.
+ * It defines the logic to start the api-server with provided configurations.
+ */
+
 'use strict';
 
 const elv = require('elv');

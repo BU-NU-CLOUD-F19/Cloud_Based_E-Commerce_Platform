@@ -1,3 +1,7 @@
+/**
+ * This class defines all the routes to be registered on this application server
+ */
+
 'use strict';
 
 

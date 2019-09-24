@@ -1,9 +1,14 @@
+/**
+ * This class defines all the custom routes in addition to the base routes
+ * for `demo` resource
+ */
+
 const elv = require('elv');
 const BaseRouter = require('../base-router');
 
 const Handlers = require('./handlers');
 
-const resource = require('../../configs/classNames').demo;
+const resource = require('../../configs/modelNames').demo;
 
 class Router extends BaseRouter {
   constructor(handler) {

@@ -1,3 +1,8 @@
+/**
+ * This is the repository class which talks to the database for all
+ * the storage and retrieval functions
+ */
+
 'use strict';
 
 const elv = require('elv');
@@ -21,6 +26,11 @@ class PostgreSqlRepository {
     this.resource = options.resource;
   }
 
+  /**
+   * Inserts a record into the database
+   * @param  {String} id of the database to be inserted
+   * @param  {Object} data of the record to be inserted
+   */
   insert(id, data) {
     const value = {
       id,
@@ -38,12 +48,17 @@ class PostgreSqlRepository {
       });
   }
 
-  findOne(id, options) {
+  /**
+   * Finds a db record base on the id
+   * @param  {String} id of the record to be found
+   * @returns the retrieved record
+   */
+  findOneById(id) {
     const knexBuilder = this.knex(this.resource);
     return knexBuilder.select('*').whereRaws('id', id)
       .then((result) => {
-        this.logger.info(`Successfully inserted 1 record into: ${this.resource}`);
-        return result.data;
+        this.logger.info(`Successfully found 1 record into: ${this.resource}`);
+        return result;
       })
       .catch((err) => {
         this.logger.error(err.message);
