@@ -1,61 +1,41 @@
 const { ApolloServer, gql } = require("apollo-server");
+const ProductsAPI = require("./restProducts");
 const { buildFederatedSchema } = require("@apollo/federation");
 
 const typeDefs = gql`
-  extend type Query {
-    myProducts(first: Int = 5): [Product]
-  }
-  type Product @key(fields: "id") {
+  type Product {
     id: String!
     name: String
     price: Int
     weight: Int
   }
+  type Query {
+    products: [Product]
+  }
 `;
 
 const resolvers = {
-  Product: {
-    __resolveReference(object) {
-      return products.find(product => product.id === object.id);
-    }
-  },
   Query: {
-    myProducts(_, args) {
-      return products.slice(0, args.first);
-    }
+    products: (root, args, dataSources) =>
+      dataSources.productsAPI.getAllProducts()
   }
 };
 
-const server = new ApolloServer({
-  schema: buildFederatedSchema([
-    {
-      typeDefs,
-      resolvers
+const schema = buildFederatedSchema([
+  {
+    typeDefs,
+    resolvers,
+    dataSources: () => {
+      return {
+        productsAPI: new ProductsAPI()
+      };
     }
-  ])
+  }
+]);
+const server = new ApolloServer({
+  schema
 });
 
 server.listen({ port: 4001 }).then(({ url }) => {
   console.log(`Server ready at ${url}`);
 });
-
-const products = [
-  {
-    id: "1",
-    name: "Table",
-    price: 100,
-    weight: 10
-  },
-  {
-    id: "2",
-    name: "Board",
-    price: 500,
-    weight: 50
-  },
-  {
-    id: "3",
-    name: "Chair",
-    price: 50,
-    weight: 5
-  }
-];
