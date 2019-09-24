@@ -1,60 +1,15 @@
-# This file serves as a demo as of now but should be replaced with actual values once travis is setup on repo
 # For more details: https://docs.travis-ci.com
-
 language: node_js # the base for this build
 
 node_js:
   - 8 # the version of the base
 
-sudo: required
 dist: trusty # the platform for the build: Ubuntu trusty
 
-services:
-  - docker # the builds will run on docker container
-
-addons:
-  apt:
-    packages: # additional packages that we require
-      - "python3"
-      - "python3-pip"
-
-before_install: # scripts to run before install phase
-  - docker --version
-  - python3 --version
-  - pip3 --version
-  - pip3 install --user awscli
-  - export PATH=$PATH:$HOME/.local/bin
-  - mkdir ~/.aws
-  - echo -e "[builder]\naws_access_key_id = $AWS_ACCESS_KEY_ID \naws_secret_access_key = $AWS_SECRET_ACCESS_KEY\nregion = $AWS_REGION " >> ~/.aws/credentials
-  - cat ~/.aws/credentials
-  - eval $(aws ecr get-login --no-include-email --region us-east-1)
-
-env:
-  global:
-    # list of global environment variable used during this build 
+# Integrating Docker: https://docs.travis-ci.com/user/docker/
+# Eventually we also want to write tests and run `npm test`
 
 script: # scripts to run on the service package
   - npm run lint
-  - npm test
 
-after_success: # scripts to run after build is successful
-  - docker build -t demo .
-  - |
-    if [ ! -z "$TRAVIS_TAG" ]; then
-      docker tag demo:latest [ecr-link]/demo:$TRAVIS_TAG
-    fi
-
-deploy: # script to run in the last stage of the build
-  - provider: script
-    skip_cleanup: true
-    script: docker push [insert ecr link here]/demo:$TRAVIS_TAG
-    on:
-      branch: master # if base is master branch
-      tags: true
-
-cache:
-  directories:
-    - node_modules
-
-# notifications:
-#   slack: 
+# node_modules is cached by default by Travis
