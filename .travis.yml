@@ -21,6 +21,11 @@ matrix:
         - npm install
       script:
         - npm run lint
+    - before_script:
+        - cd boilerplate/
+        - npm install
+      script:
+        - npm run lint
 
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching
