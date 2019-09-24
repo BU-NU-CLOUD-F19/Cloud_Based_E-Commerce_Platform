@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "node app.js",
-    "lint": "eslint . --fix"
+    "lint": "eslint ."
   },
   "dependencies": {
     "bluebird": "3.5.5",
