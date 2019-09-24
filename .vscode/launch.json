@@ -7,8 +7,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/graphql-api-gateway-poc/services/products/index.js"
+      "name": "Launch Rest",
+      "program": "${workspaceFolder}/products/restfulAPI.js"
+    },
+    
+    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Product",
+      "program": "${workspaceFolder}/products/index.js"
     },
     {
       "type": "node",
