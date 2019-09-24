@@ -1,15 +1,21 @@
 module.exports = {
-  "extends": "airbnb",
+  "extends": "eslint:recommended",
   "plugins": [],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "env": {
-    "jest": true
+    "es6": true,
+    "node": true,
+    "browser": true
   },
   "rules": {
-    "arrow-body-style": 2,
+    "arrow-body-style": "error",
     "class-methods-use-this": "error",
     "consistent-return": "off",
     "curly": "error",
-    "func-names": 2,
+    "func-names": "error",
+    "func-style": ["error", "declaration", {"allowArrowFunctions": true}],
     "max-len": ["error", 120],
     "no-await-in-loop": "off",
     "no-case-declarations": "error",
@@ -18,7 +24,7 @@ module.exports = {
     "no-plusplus": "off",
     "no-proto": "error",
     "no-return-await": "error",
-    "no-underscore-dangle": "off",
+    "no-underscore-dangle": "error",
     "no-unused-vars": ["error", { "args": "none" }],
     "no-shadow": "error",
     "strict": "off",

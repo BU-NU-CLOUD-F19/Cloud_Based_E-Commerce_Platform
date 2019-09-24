@@ -1,0 +1,31 @@
+# For more details: https://docs.travis-ci.com
+# Always validate using: https://config.travis-ci.org
+os: linux
+dist: trusty # the platform for the build: Ubuntu trusty
+language: node_js
+node_js: 8
+
+# Integrating Docker: https://docs.travis-ci.com/user/docker/
+# Eventually we also want to write tests and run `npm test`
+
+# Since we have multiple subprojects, use a build matrix.
+# https://docs.travis-ci.com/user/build-matrix
+matrix:
+  # Mark build as completed when only remaining jobs are allowed to fail, or a job already failed
+  fast_finish: true
+
+  # The jobs to run
+  include:
+    - before_script:
+        - cd graphql-api-gateway-poc/
+        - npm install
+      script:
+        - npm run lint
+    - before_script:
+        - cd boilerplate/
+        - npm install
+      script:
+        - npm run lint
+
+# node_modules is cached by default by Travis.
+# more info on caching: https://docs.travis-ci.com/user/caching

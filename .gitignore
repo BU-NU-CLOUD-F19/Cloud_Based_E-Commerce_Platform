@@ -91,7 +91,7 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
+**/node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
@@ -144,3 +144,10 @@ typings/
 .vscode/
 
 # End of https://www.gitignore.io/api/node
+
+db/db-data/
+db/pgadmin/
+
+# Node modules
+graphql-api-gateway-poc/node_modules
+graphql-api-gateway-poc/services/products/node_modules

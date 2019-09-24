@@ -1,0 +1,38 @@
+@startuml
+!include stylesheet.puml
+
+left to right direction
+
+title __High-Level Overview of Kubernetes Stack__\n
+
+' Definitions
+package Microservices as services {
+  rectangle "Inventory Management" as inv
+  rectangle "Shopping Cart" as cart
+  rectangle "User Authentication" as auth
+  rectangle "Checkout" as checkout
+  rectangle "Returns" as returns
+
+  ' Hidden links for layout
+  cart -[hidden]> inv
+  checkout -[hidden]> cart
+  auth -[hidden]> checkout
+  returns -[hidden]> auth
+}
+
+database "Postgres\nDatabase" as db
+rectangle pgAdmin
+rectangle "API Gateway" as gateway
+rectangle "<size:34><&monitor></size>" as frontend
+
+' Links
+pgAdmin <-> db
+db <--> services
+
+' Layout links (hidden)
+db -[hidden]-> checkout
+checkout -[hidden]-> gateway
+
+services <--> gateway : REST
+gateway <--> frontend : GraphQL
+@enduml
