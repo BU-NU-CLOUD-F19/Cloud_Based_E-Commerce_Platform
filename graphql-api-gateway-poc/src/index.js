@@ -1,4 +1,4 @@
-/*
+/**
  * This file is the entrypoint for the GraphQL API Gateway.
  */
 
@@ -8,6 +8,7 @@ const { ApolloGateway } = require("@apollo/gateway");
 const PORT = process.env.PORT || 3000;
 
 const gateway = new ApolloGateway({
+  // Add different microservices here with thier server (with schema, resolvers, data sources) url
   serviceList: [
     { name: "products", url: "http://localhost:4001/products" }
     // add other services here
@@ -17,11 +18,12 @@ const gateway = new ApolloGateway({
 const startGateway = async () => {
   const { schema, executor } = await gateway.load();
 
-  const server = new ApolloServer({ schema, executor });
+  const server = new ApolloServer({ schema, executor }); // Creates a new Apollo server for the API Gateway
 
   server.listen(PORT).then(({ url }) => {
     console.log(`Server started on ${url}`);
   });
 };
 
+// Boots up the Apollo Gateway
 startGateway();

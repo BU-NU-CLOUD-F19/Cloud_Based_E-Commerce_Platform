@@ -38,6 +38,7 @@ const schema = buildFederatedSchema([
   }
 ]);
 
+// Apollo Server is used to layer GraphQL over the RESTful API for our service
 const server = new ApolloServer({
   schema,
   dataSources: () => ({

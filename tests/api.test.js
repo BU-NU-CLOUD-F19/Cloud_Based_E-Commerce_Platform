@@ -1,4 +1,4 @@
-/*
+/**
  * The file contains tests for the GraphQL API Gateway and the REST API of the products microservice
  * It tests both the servers using Mocha, Chai and SuperTest
  */
