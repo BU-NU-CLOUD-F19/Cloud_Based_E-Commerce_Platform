@@ -27,10 +27,18 @@ server.route({
   method: "GET",
   path: "/products/{id}",
   handler: (req, res) => {
-    console.log(products, "products");
     const result = products.find(product => product.id === req.params.id);
-    console.log(result, "result");
     return res.response(result);
+  }
+});
+
+server.route({
+  method: "POST",
+  path: "/products",
+  handler: (req, res) => {
+    const newProduct = req.payload;
+    products.push(newProduct);
+    return res.response(products[products.length - 1]);
   }
 });
 

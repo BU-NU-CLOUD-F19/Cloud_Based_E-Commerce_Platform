@@ -10,6 +10,8 @@ module.exports = class ProductsAPI extends RESTDataSource {
     super();
     this.baseURL = "http://localhost:4050"; // Root domain of the RESTful API
     this.getAllProducts.bind(this);
+    this.getProduct.bind(this);
+    this.addProduct.bind(this);
   }
 
   /** 
@@ -28,6 +30,25 @@ module.exports = class ProductsAPI extends RESTDataSource {
   */
   async getProduct(id) {
     const result = await this.get(`products/${id}`);
+    return result;
+  }
+
+  /** 
+  Returns all products
+  @param product - Product to be added
+  @returns Array of products
+  */
+  async addProduct(product) {
+    product = JSON.stringify(product);
+    const result = await this.post(
+      `products`, // path
+      product, // request body
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
     return result;
   }
 };

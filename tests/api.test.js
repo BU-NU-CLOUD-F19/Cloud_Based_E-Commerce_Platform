@@ -36,6 +36,29 @@ describe("GraphQL API", () => {
         return done();
       });
   });
+  // Makes a request to add a new product with name Drawer
+  it("Adds new product successfully", done => {
+    requestGateway
+      .post("")
+      .send({
+        query: `mutation {
+        addProduct(input: {
+          id: "4",
+          name: "Drawer",
+          price: 200,
+          weight: 10
+        }) {
+          name
+        }
+      }`
+      })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.data.addProduct.name).to.equal("Drawer");
+        return done();
+      });
+  });
 });
 
 const urlRestAPI = `http://localhost:4050/`; // URL for GraphQL API Gateway
@@ -50,7 +73,7 @@ describe("Products REST API", () => {
       .expect(200)
       .end((err, res) => {
         if (err) return done(err);
-        expect(res.body).to.have.lengthOf(3);
+        expect(res.body).to.have.lengthOf(4);
         return done();
       });
   });
@@ -64,6 +87,20 @@ describe("Products REST API", () => {
         if (err) return done(err);
         expect(res.body).to.have.property("name");
         expect(res.body.name).to.equal("Table");
+        return done();
+      });
+  });
+  // Makes a request to add a new product with name Car
+  it("Adds new product successfully", done => {
+    const product = { id: "5", name: "Car", price: 1000, weight: 100 };
+    requestRestAPI
+      .post(`products`)
+      .set("content-type", "application/json")
+      .send({ product: product })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.product.name).to.equal("Car");
         return done();
       });
   });

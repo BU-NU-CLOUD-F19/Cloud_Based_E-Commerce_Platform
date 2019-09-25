@@ -8,6 +8,12 @@ const ProductsAPI = require("./products-datasource");
 const { buildFederatedSchema } = require("@apollo/federation");
 
 const typeDefs = gql`
+  input ProductDetails {
+    id: String!
+    name: String
+    price: Int
+    weight: Int
+  }
   type Product {
     id: String!
     name: String
@@ -18,6 +24,9 @@ const typeDefs = gql`
     products: [Product]
     product(id: String!): Product
   }
+  type Mutation {
+    addProduct(input: ProductDetails): Product
+  }
 `;
 
 const resolvers = {
@@ -27,6 +36,13 @@ const resolvers = {
     },
     product: (root, { id }, { dataSources }) => {
       return dataSources.productsAPI.getProduct(id);
+    }
+  },
+  Mutation: {
+    addProduct: (root, { input }, { dataSources }) => {
+      return dataSources.productsAPI.addProduct(input).then(result => {
+        return result;
+      });
     }
   }
 };
