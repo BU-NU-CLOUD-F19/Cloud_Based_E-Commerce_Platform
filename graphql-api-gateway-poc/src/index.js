@@ -1,3 +1,7 @@
+/*
+ * This file is the entrypoint for the GraphQL API Gateway.
+ */
+
 const { ApolloServer } = require("apollo-server");
 const { ApolloGateway } = require("@apollo/gateway");
 
