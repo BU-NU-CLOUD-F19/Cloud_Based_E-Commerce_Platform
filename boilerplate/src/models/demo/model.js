@@ -7,7 +7,7 @@
 const elv = require('elv');
 
 const Kernel = require('../kernel');
-const Names = require('../../configs/modelNames');
+const Names = require('../../constants/modelNames');
 const Repository = require('./repository');
 const Model = require('../base-model');
 

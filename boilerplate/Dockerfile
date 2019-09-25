@@ -33,4 +33,4 @@ EXPOSE $API_PORT
 ENTRYPOINT ["pm2", "--no-daemon", "start"]
 
 # Actual script to start can be overridden from `docker run`
-CMD ["/usr/local/bin/node", "/usr/local/bin/npm", "start"]
+CMD ["process.json"]

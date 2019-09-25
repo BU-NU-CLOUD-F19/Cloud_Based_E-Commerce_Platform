@@ -7,11 +7,21 @@ This package serves as the boilerplate for all the Node services to be built for
 
 To start this service:
 
+1. From terminal:
+
 ```code
 
 $ cd boilerplate
 $ npm i
 $ npm start
+```
+
+2. Via Docker:
+
+```code
+
+$ docker build -t <image-name> . // run it everytime you make changes to the code
+$ docker run --name <container-name> -p 0.0.0.0:3000:3000 -d <image-name>
 ```
 
 Now go to browser and hit: `http://localhost:3000/demo/123`
@@ -46,5 +56,7 @@ The file-structure explained:
 9. `Dockerfile` - contains the configuration required to generate docker image for this application.
 
 10. `registrations` - contains a list of the routes to be plugged into the server (should contain all the subfolders of `src/endpoints` folder).
+
+11. `process.json` -  defines pm2 process to be executed. (don't change this file unless required)
 
 For more details refer the relevant file in the folders.

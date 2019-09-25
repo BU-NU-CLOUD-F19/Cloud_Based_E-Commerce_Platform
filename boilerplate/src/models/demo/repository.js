@@ -8,7 +8,7 @@
 const PostgreSqlRepository = require('../../repository');
 
 const logger = require('../../utils/logger');
-const Names = require('../../configs/modelNames');
+const Names = require('../../constants/modelNames');
 const Kernel = require('../kernel');
 
 const resource = Names.demo;
