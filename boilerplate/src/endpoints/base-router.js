@@ -8,6 +8,7 @@
 
 const elv = require('elv');
 const Handlers = require('./base-handler');
+const Joi =  require('@hapi/joi');
 
 class Router {
   constructor(resource, handler, auth) {
@@ -31,6 +32,11 @@ class Router {
             },
           },
         },
+        validate: {
+          params: Joi.object({
+
+          })
+        }
       },
     });
   }
