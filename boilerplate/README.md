@@ -57,6 +57,12 @@ The file-structure explained:
 
 10. `registrations` - contains a list of the routes to be plugged into the server (should contain all the subfolders of `src/endpoints` folder).
 
-11. `process.json` -  defines pm2 process to be executed. (don't change this file unless required)
+11. `process.json` - defines pm2 process to be executed. (don't change this file unless required)
+
+12. `.apirc` - contains system-wide configuration to be used throughout the service.
+
+## Packages
+
+* `elv` - we use this package for `elv.coalesce` to pick the first non-null value out of the list of values
 
 For more details refer the relevant file in the folders.
