@@ -6,7 +6,7 @@
 'use strict';
 
 const Router = require('./router');
-const Names = require('../../configs/modelNames');
+const Names = require('../../constants/modelNames');
 
 const resource = Names.demo;
 
