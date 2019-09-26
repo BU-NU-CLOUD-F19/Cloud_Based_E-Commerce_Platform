@@ -7,7 +7,6 @@
 
 const elv = require('elv');
 const Glue = require('@hapi/glue');
-const Promise = require('bluebird');
 const registrationsFactory = require('./registrations');
 const config = require('./src/configs/config');
 const logger = require('./src/utils/logger');

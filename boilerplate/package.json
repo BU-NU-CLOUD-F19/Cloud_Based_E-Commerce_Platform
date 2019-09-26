@@ -14,28 +14,28 @@
     "dev": "nodemon",
     "start": "node app.js",
     "start-dev": "export NODE_ENV=development || set NODE_ENV=development && node app.js",
-    "lint": "eslint -f unix -c ../.eslintrc.js ."
+    "lint": "eslint -f unix -c ../.eslintrc.js . --fix"
   },
   "dependencies": {
-    "bluebird": "3.5.5",
-    "elv": "^1.0.1",
+    "elv": "2.2.0",
     "@hapi/glue": "6.2.0",
     "@hapi/hapi": "18.4.0",
-    "hapi-swagger": "^7.0.0",
-    "jerkface": "^1.0.0",
-    "kibbutz": "^1.2.0",
-    "kibbutz-rc": "^1.0.0",
-    "knex": "^0.14.2",
-    "lodash": "^4.17.4",
-    "npx": "^10.2.0",
-    "pg": "^7.4.1",
+    "@hapi/joi": "16.1.4",
+    "@hapi/inert": "5.2.2",
+    "@hapi/vision": "5.5.4",
+    "hapi-swagger": "10.1.2",
+    "jerkface": "1.0.0",
+    "kibbutz": "2.0.0",
+    "kibbutz-rc": "1.0.0",
+    "knex": "0.19.4",
+    "lodash": "4.17.15",
+    "pg": "7.12.1",
     "winston": "3.2.1",
     "winston-daily-rotate-file": "4.1.0"
   },
   "devDependencies": {
     "eslint": "6.4.0",
-    "nodemon": "1.19.2",
-    "@hapi/hapi": "18.4.0"
+    "nodemon": "1.19.2"
   },
   "engines": {
     "node": ">= 8.3.0"

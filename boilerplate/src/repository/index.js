@@ -6,7 +6,6 @@
 'use strict';
 
 const elv = require('elv');
-
 const logger = require('../utils/logger');
 const knex = require('./knex');
 
@@ -55,9 +54,10 @@ class PostgreSqlRepository {
    */
   findOneById(id) {
     const knexBuilder = this.knex(this.resource);
-    return knexBuilder.select('*').whereRaws('id', id)
+    const query = knexBuilder.select('*').whereRaw('id = ?', parseInt(id));
+    return query
       .then((result) => {
-        this.logger.info(`Successfully found 1 record into: ${this.resource}`);
+        this.logger.info(`Found ${result.length} record from: ${this.resource}`);
         return result;
       })
       .catch((err) => {

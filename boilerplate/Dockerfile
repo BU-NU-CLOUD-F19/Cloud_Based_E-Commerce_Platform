@@ -33,4 +33,6 @@ EXPOSE $API_PORT
 ENTRYPOINT ["pm2", "--no-daemon", "start"]
 
 # Actual script to start can be overridden from `docker run`
+# you can pass in env to load,
+# e.g. "process.json", "--env", "production" will load production environment
 CMD ["process.json"]

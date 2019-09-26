@@ -28,12 +28,12 @@ class Model {
    */
   // eslint-disable-next-line class-methods-use-this
   async findOneById(id) {
-    return {
-      data: id,
-    };
     // uncomment this code when db is connected
-    // return this.repository.findOneById(id)
-    //   .then(entity => entity.data);
+    return this.repository.findOneById(id)
+      .then(entity => {
+        // you can add some post-querying logic here
+        return entity;
+      });
   }
 
 }

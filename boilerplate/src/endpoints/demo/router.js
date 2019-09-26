@@ -15,6 +15,10 @@ class Router extends BaseRouter {
     const h = elv.coalesce(handler, () => new Handlers());
     super(resource, h);
   }
+
+  // add all the resource specific routes here
+
+  // route:  /demo/a/b/c/d
 }
 
 module.exports = Router;

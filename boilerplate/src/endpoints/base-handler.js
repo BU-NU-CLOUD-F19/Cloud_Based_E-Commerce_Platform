@@ -21,6 +21,7 @@ class Handlers {
   findOneById(req, rep) {
     const id = req.params.id;
     const reply = rep;
+
     return this.model.findOneById(id)
       .then((result) => {
         logger.log('info', `Get request for ${this.model.resource}`);
