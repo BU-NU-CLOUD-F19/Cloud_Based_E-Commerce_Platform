@@ -48,7 +48,18 @@ Users:
 * delete account
 
 ## Diagrams/flows
-### Checkout
+### Overall checkout
 What happens when the user presses 'check out' on the cart:
 
 ![What happens when the user checks out](diagrams/checkout.png)
+
+## Microservice: shopping cart
+The states of the shopping cart:
+
+![Shopping cart state digram](diagrams/cart-service.png)
+
+## Microservice: checkout
+The states of the checkout microservice:
+
+![Checkout state diagram](diagrams/checkout-service.png)
+

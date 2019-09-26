@@ -1,0 +1,34 @@
+@startuml
+!include stylesheet.puml
+title __Checkout Service: State Diagram__\n
+hide empty description
+
+[*] -d-> Idle
+Idle -d-> begin : request to check out user from page
+  state "Begin Checkout" as begin
+  begin : start timer
+  begin : check out cart
+
+begin -right-> Error : cart error
+  Error : stop timer
+  Error : send failure message to cart
+
+begin -down-> checkout : products received from cart
+  state "Checkout" as checkout {
+    [*] --> Start
+      Start : subtract products from inventory
+    Start --> Payment
+  }
+Payment -left-> Success : payment successful
+  Success : finalize timer
+  Success : send success message to cart
+Success -up-> Idle
+
+Payment -right-> Error : payment failed
+
+checkout -right-> readd_products : timer reaches 0
+  state "Add products to inventory" as readd_products
+readd_products -up-> Error
+
+Error -up-> Idle
+@enduml
