@@ -2,7 +2,7 @@ module.exports = {
   "extends": "eslint:recommended",
   "plugins": [],
   "parserOptions": {
-    "ecmaVersion": 2019,
+    "ecmaVersion": 2020,
     "ecmaFeatures": {
       "jsx": true
     }
@@ -13,7 +13,7 @@ module.exports = {
     "browser": true
   },
   "rules": {
-    "arrow-body-style": "error",
+    "arrow-body-style": "off", // we don't something like (e => e.y) because it makes debugging harder
     "class-methods-use-this": "error",
     "consistent-return": "off",
     "curly": "error",
