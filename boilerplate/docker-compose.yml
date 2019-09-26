@@ -62,4 +62,6 @@ services:
       - ./db-data:/var/lib/postgresql/data
       # Script to initialize a test database
       - ./test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+      # To store logs
+      - ./docker_logs:/usr/app/log
     restart: unless-stopped
