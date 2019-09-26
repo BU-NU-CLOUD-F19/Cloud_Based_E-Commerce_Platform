@@ -5,6 +5,12 @@ NodeJS_Boilerplate_for_microservices
 
 This package serves as the boilerplate for all the Node services to be built for the `Cloud based E-commerce Platform` project.
 
+Prerequisites:
+
+1. Postgres docker container up and running
+2. Set up `cloud-demo` db and create `demo` table
+3. Create a column called `id` as integer, `name` as varchar and populate table with value 1, 'DC'
+
 To start this service:
 
 1. From terminal:
@@ -21,16 +27,18 @@ $ npm start
 ```code
 
 $ docker build -t <image-name> . // run it everytime you make changes to the code
-$ docker run --name <container-name> -p 0.0.0.0:3000:3000 -d <image-name>
+$ docker run --name <container-name> -p 0.0.0.0:3000:3000 -v ${PWD}/log:/usr/app/log -d <image-name>
 ```
+Note: $(pwd) should be replaced by ${PWD} if running on windows
 
-Now go to browser and hit: `http://localhost:3000/demo/123`
+
+Now go to browser and hit: `http://localhost:3000/demo/1`
 
 You should be able to see this json:
 
 ```json
 
-{"data":"123"}
+{"id": 1, "name": "DC"}
 ```
 
 The main purpose of this service is to provide you with the basic scripts required to start developing a microservice.
@@ -59,7 +67,7 @@ The file-structure explained:
 
 11. `process.json` - defines pm2 process to be executed. (don't change this file unless required)
 
-12. `.apirc` - contains system-wide configuration to be used throughout the service.
+12. `.apirc` - contains system-wide configuration to be used throughout the service. Should be copied to root folder when running locally.
 
 ## Packages
 
