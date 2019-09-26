@@ -1,68 +1,24 @@
-const elv = require('elv');
-const { createLogger, format, transports } = require('winston');
-
-const { combine, colorize, timestamp, label, printf } = format;
-require('winston-daily-rotate-file');
+const logger = require('./winstonLogger');
 const fs = require('fs');
-const path = require('path');
-
-const env = process.env.NODE_ENV;
 const logDir = 'log';
-
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
+    fs.mkdirSync(logDir);
 }
-const filename = path.join(logDir, 'results.log');
+const wrappers = {
+    log: (lvl, data) => {
+        logger.log(lvl, data);
+    },
+    info: (data) => {
+        logger.log('info', data);
+    },
+    error: ({error, url}, logger, level) => {
+        logger.log(level, error.toString(), {
+            type: 'response-error',
+            stack: error.stack,
+            url,
+        });
+    },
+};
 
-// creates a new log file everyday
-// eslint-disable-next-line no-unused-vars
-const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: `${logDir}/%DATE%-results.log`,
-  datePattern: 'YYYY-MM-DD',
-});
-
-// set the level based on env
-const level = elv.coalesce(
-  process.env.loglevel,
-  (env === 'production' || env === 'test') ? 'error' : 'debug',
-);
-
-const logger = createLogger({
-  level,
-  format: combine(
-    timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
-    }),
-    printf(info => `${info.timestamp} ${info.level}: ${info.message}`),
-  ),
-  transports: [
-    new transports.Console({
-      level,
-      json: true,
-      stringify: obj => JSON.stringify(obj),
-      format: combine(
-        colorize(),
-        printf(
-          info => `${info.timestamp} ${info.level}: ${info.message}`,
-        ),
-      ),
-    }),
-    new transports.File({
-      filename,
-      json: true,
-      stringify: obj => JSON.stringify(obj),
-      format: combine(
-        label({ label: path.basename(process.mainModule.filename) }),
-        printf(
-          info =>
-            `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`,
-        ),
-      ),
-    }),
-    // dailyRotateFileTransport
-  ],
-});
-
-
-module.exports = logger;
+module.exports = wrappers;
