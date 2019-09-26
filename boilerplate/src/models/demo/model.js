@@ -34,8 +34,8 @@ class DemoModel extends Model {
    * Retrieves a `demo` record from database by its id
    * @param  {String} id the id by which the record should be fetched
    */
-  findOne(id) {
-    return super.findOne(id);
+  findOneById(id) {
+    return super.findOneById(id);
   }
 }
 

@@ -151,3 +151,6 @@ db/pgadmin/
 # Node modules
 graphql-api-gateway-poc/node_modules
 graphql-api-gateway-poc/services/products/node_modules
+
+# package-lock json
+*package-lock.json
