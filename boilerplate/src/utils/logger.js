@@ -12,7 +12,7 @@ const wrappers = {
     info: (data) => {
         logger.log('info', data);
     },
-    error: ({error, url}, logger, level) => {
+    error: ({error, url}, level) => {
         logger.log(level, error.toString(), {
             type: 'response-error',
             stack: error.stack,
