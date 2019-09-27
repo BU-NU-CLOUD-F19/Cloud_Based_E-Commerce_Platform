@@ -3,6 +3,8 @@ Cloud-Based E-Commerce Platform
 
 [![Build Status](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform.svg?branch=master)](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform)
 
+[Presentation - Demo 1](https://docs.google.com/presentation/d/1TYmVYvuYqNWoOj4FwtnGaxnmtSnmXSqMxC14MutpX2s/edit?usp=sharing)
+
 ## 1. Vision and Goals Of The Project:
 This project is an open-source, cloud based e-commerce solution that enables entrepreneurs to leverage this platform for individual or business purposes.
 The vision for this project is one of headless design, with the front-end and back-end entirely independent from each other.
