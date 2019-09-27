@@ -14,16 +14,22 @@ const Kernel = require('../models/kernel');
 // eslint-disable-next-line no-unused-vars
 const KnexManager = require('../models/knex-manager'); // to bind knex-instance to kernel
 
+const Names = require('../constants/modelNames');
+
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
 }
 
 const configName = pkg.config.appName;
 const config = new Kibbutz();
+
+// finds and loads .apirc
 const rcLoader = new RcProvider({
   appName: configName,
 });
 
+
+// convert some conf values to int, based on given path
 const converToInt = (conf, path) => {
   if (!_.has(conf, path)) {
     return;
@@ -34,7 +40,6 @@ const converToInt = (conf, path) => {
 };
 
 module.exports = new Promise((resolve, reject) => {
-  // config.load([envLoader, rcLoader], (err, conf) => {
   config.load([rcLoader], (err, conf) => {
     if (err) {
       reject(err);
@@ -51,10 +56,14 @@ module.exports = new Promise((resolve, reject) => {
       pool,
     } = conf.persistence.postgres;
 
+    // get a knex instance which will be used to transact with db
     const knexInstance = getKnex(connection, pool);
 
-    // TODO: add comments
-    const knexManager = Kernel.resolve('knex-manager');
+    // resolves knex manager instance from the kernel
+    const knexManager = Kernel.resolve(Names.knexManager);
+
+    // load the knex instance into knex-manager which will be used throughout application
+    // e.g. look at demo model's constructor
     knexManager.knex = knexInstance;
 
     resolve(conf);

@@ -5,7 +5,7 @@
         "host": "localhost",
         "user": "postgres",
         "password": "postgres",
-        "database": "test_db"
+        "database": "cloud-demo"
       },
       "pool": {
         "min": "2",
