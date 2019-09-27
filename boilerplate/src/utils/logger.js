@@ -12,13 +12,15 @@ const wrappers = {
     info: (data) => {
         logger.log('info', data);
     },
-    error: ({error, url}, level) => {
-        logger.log(level, error.toString(), {
-            type: 'response-error',
-            stack: error.stack,
-            url,
-        });
+    error: (data) => {
+        logger.log('error', data);
     },
+    warn: (data) => {
+        logger.log('warn', data);
+    },
+    debug: (data) => {
+        logger.log('debug', data);
+    }
 };
 
 module.exports = wrappers;
