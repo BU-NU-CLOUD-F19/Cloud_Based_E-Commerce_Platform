@@ -56,11 +56,14 @@ module.exports = new Promise((resolve, reject) => {
       pool,
     } = conf.persistence.postgres;
 
+    // get a knex instance which will be used to transact with db
     const knexInstance = getKnex(connection, pool);
 
     // resolves knex manager instance from the kernel
     const knexManager = Kernel.resolve(Names.knexManager);
 
+    // load the knex instance into knex-manager which will be used throughout application
+    // e.g. look at demo model's constructor
     knexManager.knex = knexInstance;
 
     resolve(conf);

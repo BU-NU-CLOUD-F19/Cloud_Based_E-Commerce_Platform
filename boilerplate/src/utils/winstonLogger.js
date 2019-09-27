@@ -12,6 +12,7 @@ const logDir = 'log';
 const filename = path.join(logDir, 'results.log');
 
 // creates a new log file everyday
+// https://www.npmjs.com/package/winston-daily-rotate-file
 // eslint-disable-next-line no-unused-vars
 const dailyRotateFileTransport = new transports.DailyRotateFile({
   filename: `${logDir}/%DATE%-results.log`,
@@ -56,7 +57,7 @@ const winstonLogger = createLogger({
         ),
       ),
     }),
-    dailyRotateFileTransport
+    dailyRotateFileTransport // see declaration for more details
   ],
 });
 
