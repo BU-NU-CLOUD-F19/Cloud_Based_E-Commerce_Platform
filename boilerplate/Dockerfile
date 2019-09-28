@@ -14,10 +14,11 @@ RUN apk add dos2unix --update-cache --repository http://dl-3.alpinelinux.org/alp
 
 # Copy content
 # Should also set up dev vs production - bind mounts vs copying.
-# Currently we need to rebuild the whole image every time a change is made, that's not good
-#   for dev purposes.
+# Currently we're mounting the code dir on the container fs, which isn't good for production.
+# In production, the code should be copied into the app dir and there should be no bind mounts.
+# COPY "." "$APP_DIR"
+COPY package*.json ./
 # See here https://hackernoon.com/how-to-move-code-into-a-docker-container-ab28edcc2901
-COPY "." "$APP_DIR"
 
 RUN npm i && apk del dos2unix
 

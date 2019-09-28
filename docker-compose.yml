@@ -56,9 +56,13 @@ services:
     ports:
       - 3000:3000
 
-    # Mount local directories on the container filesystem
+    # Mount local directories on the container filesystem.
+    # Should not happen in production.
     volumes:
-      - ./boilerplate/logs:/usr/app/log
+      - ./boilerplate:/usr/app
+      # The above line takes care of making the log dir accessible, but should be
+      #   handled differently in production.
+      # - ./boilerplate/log:/usr/app/log
 
     restart: unless-stopped
 
