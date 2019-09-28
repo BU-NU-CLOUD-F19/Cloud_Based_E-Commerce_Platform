@@ -48,6 +48,7 @@ services:
       - "${PGADMIN_PORT:-5050}:80"
     restart: unless-stopped
 
+  # Boilerplate for microservice (Node)
   boilerplate:
     build: ./boilerplate
     container_name: "boilerplate"
@@ -59,10 +60,14 @@ services:
     # Mount local directories on the container filesystem.
     # Should not happen in production.
     volumes:
-      - ./boilerplate:/usr/app
+      - ./boilerplate/src:/usr/app/src
+      - ./boilerplate/app.js:/usr/app/app.js
+      - ./boilerplate/process.json:/usr/app/process.json
+      - ./boilerplate/registrations.js:/usr/app/registrations.js
+      - ./boilerplate/.boilerplaterc:/usr/app/.boilerplaterc
+      - ./boilerplate/log:/usr/app/log
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
-      # - ./boilerplate/log:/usr/app/log
 
     restart: unless-stopped
 
