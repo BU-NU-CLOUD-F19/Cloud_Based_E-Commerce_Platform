@@ -9,9 +9,6 @@ WORKDIR $APP_DIR
 #PM2 will be used as PID 1 process
 RUN npm install -g pm2@3.5.1
 
-# for converting files to unix(LF)
-RUN apk add dos2unix --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ --allow-untrusted
-
 # Copy content
 # Should also set up dev vs production - bind mounts vs copying.
 # Currently we're mounting the code dir on the container fs, which isn't good for production.
@@ -20,7 +17,7 @@ RUN apk add dos2unix --update-cache --repository http://dl-3.alpinelinux.org/alp
 COPY package*.json ./
 # See here https://hackernoon.com/how-to-move-code-into-a-docker-container-ab28edcc2901
 
-RUN npm i && apk del dos2unix
+RUN npm i
 
 # Setup ports
 ENV API_PORT 3000
