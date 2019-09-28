@@ -3,8 +3,10 @@
  Because Kernel bindings must be objects, we created a Knex manager class.
  */
 
+// Import the defined Jerkface container
 const Kernel = require('./kernel');
 
+// Manages the Knex instance
 class KnexManager {
   constructor() {
     this._knex = null;
@@ -19,6 +21,7 @@ class KnexManager {
   }
 }
 
+// Add the class to the Kernel container
 Kernel.bind('knex-manager', KnexManager);
 
 module.exports = KnexManager;

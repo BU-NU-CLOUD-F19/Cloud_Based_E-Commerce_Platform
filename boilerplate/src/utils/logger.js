@@ -1,10 +1,7 @@
+// Use the custom Winston logger
 const logger = require('./winstonLogger');
-const fs = require('fs');
-const logDir = 'log';
-// Create the log directory if it does not exist
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
+
+// Creat convenience methods for logging
 const wrappers = {
     log: (lvl, data) => {
         logger.log(lvl, data);

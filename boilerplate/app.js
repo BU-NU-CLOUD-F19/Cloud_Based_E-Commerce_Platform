@@ -6,8 +6,14 @@
 
 'use strict';
 
+// A server composer for the Hapi server
+// https://github.com/hapijs/glue
 const Glue = require('@hapi/glue');
+
+// Route registrations for Hapi
 const registrationsFactory = require('./registrations');
+
+// Global configuration for the app
 const config = require('./src/configs/config');
 const logger = require('./src/utils/logger');
 
@@ -32,5 +38,5 @@ module.exports = new Promise(resolve => config.then(async (conf) => {
   const server = await Glue.compose(manifest, options);
 
   return server.start()
-    .then(() => logger.log('info', `Server started at ports: ${port}`));
+    .then(() => logger.info(`Server started at ports: ${port}`));
 }));

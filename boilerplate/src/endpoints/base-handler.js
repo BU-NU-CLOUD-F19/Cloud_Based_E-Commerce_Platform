@@ -24,7 +24,7 @@ class Handlers {
 
     return this.model.findOneById(id)
       .then((result) => {
-        logger.log('info', `Get request for ${this.model.resource}`);
+        logger.info(`Get request for ${this.model.resource}`);
         return reply.response(result).code(200);
       })
       .catch((err) => {

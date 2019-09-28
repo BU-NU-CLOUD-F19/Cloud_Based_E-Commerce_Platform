@@ -26,7 +26,6 @@ class Model {
    * Find a record by its id
     * @param  {String} id the id by which the record needs to be found
    */
-  // eslint-disable-next-line class-methods-use-this
   async findOneById(id) {
     // uncomment this code when db is connected
     return this.repository.findOneById(id)

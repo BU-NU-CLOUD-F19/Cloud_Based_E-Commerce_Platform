@@ -16,11 +16,13 @@ matrix:
 
   # The jobs to run
   include:
+    # GraphQL
     - before_script:
         - cd graphql-api-gateway-poc/
         - npm install
       script:
         - npm run lint
+    # Boilerplate
     - before_script:
         - cd boilerplate/
         - npm install

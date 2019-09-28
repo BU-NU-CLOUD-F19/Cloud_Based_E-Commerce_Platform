@@ -4,13 +4,15 @@
 
 'use strict';
 
-
 const Kernel = require('../kernel');
 const Names = require('../../constants/modelNames');
-const Repository = require('./repository');
-const Model = require('../base-model');
 
-class DemoModel extends Model {
+// The data repository (database)
+const Repository = require('./repository');
+
+const BaseModel = require('../base-model');
+
+class DemoModel extends BaseModel {
   constructor(options = {}) {
     const repo = options.repository || (new Repository());
 
