@@ -1,4 +1,4 @@
-NodeJS_Boilerplate_for_microservices
+NodeJS Boilerplate for microservices
 ====================================
 
 ## Overview
@@ -19,26 +19,7 @@ Prerequisites:
   ```
 3. Create a column called `id` as integer, `name` as varchar and populate table with value 1, 'DC'
 
-To start this service:
-
-1. From terminal:
-
-```code
-
-$ cd boilerplate
-$ npm i
-$ npm start
-```
-
-2. Via Docker:
-
-```code
-
-$ docker build -t <image-name> . // run it everytime you make changes to the code
-$ docker run --name <container-name> -p 0.0.0.0:3000:3000 -v ${PWD}/log:/usr/app/log -d <image-name>
-```
-Note: $(pwd) should be replaced by ${PWD} if running on windows
-
+To start this service, use the docker-compose file in the root of the repository:
 
 Now go to browser and hit: `http://localhost:3000/demo/1`
 
