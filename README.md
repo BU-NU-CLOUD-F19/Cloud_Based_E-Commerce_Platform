@@ -1,4 +1,4 @@
-Cloud-Based E-Commerce Platform 
+Cloud-Based E-Commerce Platform
 ====================================
 
 [![Build Status](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform.svg?branch=master)](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform)
