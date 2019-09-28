@@ -1,4 +1,3 @@
-const elv = require('elv');
 const { createLogger, format, transports } = require('winston');
 
 const { combine, colorize, timestamp, label, printf } = format;
@@ -20,10 +19,7 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
 });
 
 // set the level based on env
-const level = elv.coalesce(
-  process.env.loglevel,
-  (env === 'production' || env === 'test') ? 'error' : 'debug',
-);
+const level = process.env.loglevel || ((env === 'production' || env === 'test') ? 'error' : 'debug')
 
 const winstonLogger = createLogger({
   level,

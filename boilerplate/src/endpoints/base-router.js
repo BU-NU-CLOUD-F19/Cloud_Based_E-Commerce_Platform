@@ -6,13 +6,12 @@
 
 'use strict';
 
-const elv = require('elv');
 const Handlers = require('./base-handler');
 
 class Router {
   constructor(resource, handler, auth) {
     this.resource = resource;
-    this.handler = elv.coalesce(handler, () => new Handlers());
+    this.handler = handler || (new Handlers());
   }
 
   routeGet(server) {

@@ -5,7 +5,6 @@
 
 'use strict';
 
-const elv = require('elv');
 const logger = require('../utils/logger');
 const knex = require('./knex');
 
@@ -21,7 +20,7 @@ class PostgreSqlRepository {
       this.knex = knex(connection, pool);
     }
 
-    this.logger = elv.coalesce(options.logger, logger);
+    this.logger = options.logger || logger;
     this.resource = options.resource;
   }
 

@@ -5,14 +5,13 @@
 
 'use strict';
 
-const elv = require('elv');
 const BaseHandler = require('../base-handler');
 
 const Model = require('../../models').demo.Model;
 
 class Handlers extends BaseHandler {
   constructor(model) {
-    const m = elv.coalesce(model, () => new Model());
+    const m = model || (new Model());
     super(m);
   }
 }

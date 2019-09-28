@@ -4,7 +4,6 @@
 
 'use strict';
 
-const elv = require('elv');
 
 const Kernel = require('../kernel');
 const Names = require('../../constants/modelNames');
@@ -12,12 +11,12 @@ const Repository = require('./repository');
 const Model = require('../base-model');
 
 class DemoModel extends Model {
-  constructor(options) {
-    const ops = elv.coalesce(options, {});
+  constructor(options = {}) {
+    const repo = options.repository || (new Repository());
 
     super({
       resource: Names.demo,
-      repository: elv.coalesce(ops.repository, () => new Repository()),
+      repository: repo,
     });
   }
 
