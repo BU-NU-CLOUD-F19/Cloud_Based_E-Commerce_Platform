@@ -11,6 +11,7 @@ const RcProvider = require('kibbutz-rc');
 const pkg = require('../../package');
 const getKnex = require('../repository/knex');
 const Kernel = require('../models/kernel');
+const logger = require('../utils/logger');
 // eslint-disable-next-line no-unused-vars
 const KnexManager = require('../models/knex-manager'); // to bind knex-instance to kernel
 
@@ -21,10 +22,14 @@ if (!process.env.NODE_ENV) {
 }
 
 const configName = pkg.config.appName;
+logger.log('info', `App name: ${configName}`);
 const config = new Kibbutz();
 
-// finds and loads .apirc
+// finds and loads .boilerplaterc
+// via Kibbutz: https://www.npmjs.com/package/kibbutz-rc
+// this uses the rc module: https://www.npmjs.com/package/rc
 const rcLoader = new RcProvider({
+  // configName is set in the rc
   appName: configName,
 });
 
@@ -55,6 +60,7 @@ module.exports = new Promise((resolve, reject) => {
       connection,
       pool,
     } = conf.persistence.postgres;
+    logger.log('info', `PG connection: ${connection.host}, DB ${connection.database}`);
 
     // get a knex instance which will be used to transact with db
     const knexInstance = getKnex(connection, pool);

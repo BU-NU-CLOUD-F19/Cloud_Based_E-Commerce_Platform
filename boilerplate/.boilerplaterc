@@ -2,10 +2,10 @@
   "persistence": {
     "postgres": {
       "connection": {
-        "host": "localhost",
+        "host": "postgres",
         "user": "postgres",
-        "password": "postgres",
-        "database": "cloud-demo"
+        "password": "northeastern",
+        "database": "cloud_demo"
       },
       "pool": {
         "min": "2",

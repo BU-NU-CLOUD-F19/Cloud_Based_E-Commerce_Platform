@@ -8,7 +8,15 @@ This package serves as the boilerplate for all the Node services to be built for
 Prerequisites:
 
 1. Postgres docker container up and running
-2. Set up `cloud-demo` db and create `demo` table
+2. Set up `cloud_demo` db and create `demo` table:
+
+  ```sql
+  create table demo (
+    id SERIAL PRIMARY KEY, -- serial is auto incrementing int
+    name VARCHAR(100)
+  );
+  insert into demo (name) values ('DC');
+  ```
 3. Create a column called `id` as integer, `name` as varchar and populate table with value 1, 'DC'
 
 To start this service:

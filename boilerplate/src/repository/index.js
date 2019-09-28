@@ -53,8 +53,10 @@ class PostgreSqlRepository {
    * @returns the retrieved record
    */
   findOneById(id) {
+    this.logger.info(`In index.js`);
     const knexBuilder = this.knex(this.resource);
     const query = knexBuilder.select('*').whereRaw('id = ?', parseInt(id));
+    this.logger.info(`Running query ${query}`);
     return query
       .then((result) => {
         this.logger.info(`Found ${result.length} record from: ${this.resource}`);
