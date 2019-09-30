@@ -140,7 +140,11 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+<<<<<<< HEAD
 # VSCODE
+=======
+# VSCode
+>>>>>>> samarth-test-framework
 .vscode/
 
 # End of https://www.gitignore.io/api/node
@@ -150,4 +154,9 @@ db/pgadmin/
 
 # Node modules
 graphql-api-gateway-poc/node_modules
+<<<<<<< HEAD
 graphql-api-gateway-poc/services/products/node_modules
+=======
+products/node_modules
+tests/node_modules
+>>>>>>> samarth-test-framework

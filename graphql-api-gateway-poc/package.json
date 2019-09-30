@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start-gateway": "nodemon src/index.js",
+<<<<<<< HEAD
     "start-service-products": "nodemon services/products/index.js",
+=======
+>>>>>>> samarth-test-framework
     "lint": "eslint -f unix -c ../.eslintrc.js ."
   },
   "author": "",
