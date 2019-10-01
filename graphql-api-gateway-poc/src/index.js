@@ -5,7 +5,7 @@
 const { ApolloServer } = require("apollo-server");
 const { ApolloGateway } = require("@apollo/gateway");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3050;
 
 const gateway = new ApolloGateway({
   // Add different microservices here with thier server (with schema, resolvers, data sources) url

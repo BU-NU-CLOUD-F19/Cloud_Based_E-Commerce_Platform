@@ -26,6 +26,7 @@ services:
       - ./db/db-data:/var/lib/postgresql/data
       # Script to initialize a test database
       - ./db/test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+      - ./db/test-db/init-demo-db.sql:/docker-entrypoint-initdb.d/init-demo-db.sql
     restart: unless-stopped
 
   # Pgadmin service (web interface)
@@ -70,4 +71,29 @@ services:
       #   handled differently in production.
 
     restart: unless-stopped
-
+  products:
+    build: ./products
+    container_name: "products-service"
+    volumes:
+      - ./products/index.js:/usr/app/index.js
+      - ./products/products-datasource.js:/usr/app/products-datasource.js
+      - ./products/products-api.js:/usr/app/products-api.js
+      - ./products/process.json:/usr/app/process.json
+    expose:
+      - 4050
+      - 4001
+    ports:
+      - 4050:4050
+      - 4001:4001
+  api-gateway:
+    build: ./graphql-api-gateway-poc
+    container_name: "api-gateway"
+    volumes:
+      - ./graphql-api-gateway-poc/src:/usr/app/src
+      - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
+    links:
+      - products
+    expose:
+      - 3050
+    ports:
+      - 3050:3050
