@@ -34,7 +34,7 @@ class Router {
         },
         validate: {
           params: Joi.object({
-
+            id: Joi.string().required().description(`id of the ${this.resource}`),
           })
         }
       },

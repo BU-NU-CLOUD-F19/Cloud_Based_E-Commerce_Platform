@@ -30,6 +30,7 @@
     "knex": "0.19.4",
     "lodash": "4.17.15",
     "pg": "7.12.1",
+    "swagger-ui": "3.23.11",
     "winston": "3.2.1",
     "winston-daily-rotate-file": "4.1.0"
   },

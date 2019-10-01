@@ -6,10 +6,13 @@
 const Inert = require('@hapi/inert');
 const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
+const pkg = require('./package');
 
 module.exports = function registrations(config) {
   const swaggerOptions = {
+    swagger: '3.0',
     info: {
+            version: pkg.version,
             title: 'Test API Documentation',
         },
     };
