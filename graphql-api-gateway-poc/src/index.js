@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3050;
 const gateway = new ApolloGateway({
   // Add different microservices here with thier server (with schema, resolvers, data sources) url
   serviceList: [
-    { name: "products", url: "http://localhost:4001/products" }
+    { name: "products", url: "http://products:4001/products" }
     // add other services here
   ]
 });
