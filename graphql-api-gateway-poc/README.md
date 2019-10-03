@@ -11,47 +11,29 @@ To run this demo locally:
 Navigate to the root directory of the application
 
 ```bash
-cd products
+docker-compose up -d
 ```
 
-```bash
-npm install
-```
+This will run the containers in the background
 
-This will install all of the dependencies for the product
-
-```bash
-npm run start-products
-```
-
-This command will start up the Apollo Server for the products service which utilises data sources to communicate with the REST API and will also run the REST API server concurrently.
-The servers will run on http://localhost:4001 and http://localhost:4050 respectively
-
-### Booting up the GraphQL API Gateway
-
-In another terminal,
-
-```bash
-cd ../graphql-api-gateway-poc/
-```
-
-```bash
-npm install
-```
-
-This will install all of the dependencies for the gateway
-
-```bash
-npm run start-gateway
-```
-
-This command will start the GraphQL API gateway
-This will start up the gateway and serve it at http://localhost:3000
+The API Gateway runs on http://localhost:3050 <br />
+The boilerplate runs on http://localhost:3000
+<br />
+The products microservice runs on http://localhost:4001
 
 ## Testing by making API requests
 
-Open up http://localhost:3000 on the browser to view the GraphQL playground for making API requests
+Open up http://localhost:3050 on the browser to view the GraphQL playground for making API requests
 Write queries (for example):
+
+```
+{
+  member(id: 1){
+    id
+    name
+  }
+}
+```
 
 ```
 {

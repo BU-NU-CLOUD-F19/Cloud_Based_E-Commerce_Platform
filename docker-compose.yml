@@ -92,8 +92,19 @@ services:
       - ./graphql-api-gateway-poc/src:/usr/app/src
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
     links:
-      - products
+      - graphql-service
     expose:
       - 3050
     ports:
       - 3050:3050
+  graphql-service:
+    build: ./graphql-service
+    container_name: "graphql-service"
+    volumes:
+      - ./graphql-service/index.js:/usr/app/index.js
+      - ./graphql-service/datasource.js:/usr/app/datasource.js
+      - ./graphql-service/process.json:/usr/app/process.json
+    expose:
+      - 5000
+    ports:
+      - 5000:5000

@@ -22,8 +22,8 @@ COPY package*.json ./
 RUN npm i
 
 # Setup ports
-ENV GATEWAY_PORT 3050
-EXPOSE $GATEWAY_PORT
+ENV SERVICE_PORT 5000
+EXPOSE $SERVICE_PORT
 
 # Run it
 # Start PM2 as PID 1 process

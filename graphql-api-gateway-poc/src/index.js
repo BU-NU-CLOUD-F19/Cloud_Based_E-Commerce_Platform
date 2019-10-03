@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 3050;
 const gateway = new ApolloGateway({
   // Add different microservices here with thier server (with schema, resolvers, data sources) url
   serviceList: [
-    { name: "products", url: "http://products:4001/products" }
+    { name: "products", url: "http://products:4001/products" }, // Demo products service to test GraphQL API
+    { name: "members", url: "http://graphql-service:5000/members" }
     // add other services here
   ]
 });
