@@ -18,7 +18,7 @@ services:
 
     # Forward ports, format 'container:host'
     ports:
-      - 5432:5432
+      - 5433:5433
 
     # Mount local directories on the container filesystem
     volumes:
