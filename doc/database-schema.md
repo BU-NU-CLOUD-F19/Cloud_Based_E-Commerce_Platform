@@ -4,18 +4,20 @@ The entity-relationship diagram:
 ![ER diagram](diagrams/Database.png)
 
 This gives the following relations:
-- Products (*pcode*, price, sku, amount_in_stock, pname, desc, lang)
+- Products (*pid*, pcode, price, sku, amount_in_stock, pname, desc, lang)
 - Users (*uid*, fname, lname, address, phone, email, pass NULLABLE)
-- Carts (*uid → User*, pcode → Product, amount_in_cart)
+- Carts (*uid → User*, pid → Product, amount_in_cart, time_added)
 - Orders (*oid*, total_price, date, destination, shipping, uid → User)
-- ProductsInOrder (*oid → Orders*, *pcode → Products*, amount_in_order)
+- ProductsInOrder (*oid → Orders*, *pid → Products*, amount_in_order)
 
 Resulting in the following schema:
 
 ```sql
 create table Products (
   /* NOT NULL constraints could be changed depending on what we want */
-  pcode INT PRIMARY KEY,  -- could also be alphanumeric
+
+  pid INT PRIMARY KEY,
+  pcode INT,  -- could also be alphanumeric
   price float(2), -- assuming two decimal digits
   sku INT NOT NULL, -- I'm not sure of the notation of sku, could be a different type
   amount_in_stock INT CHECK(amount_in_stock >= 0),
@@ -36,22 +38,23 @@ create table Users (
 
 create table Carts (
   uid VARCHAR(20) references Users(uid) PRIMARY KEY,
-  pcode INT references Products(pcode) NOT NULL,
+  pid INT references Products(pid) NOT NULL,
   amount_in_cart INT NOT NULL CHECK (amount_in_cart > 0) -- if not in cart, not in table
+  time_added TIMESTAMPTZ NOT NULL
 );
 
 create table Orders (
   oid INT PRIMARY KEY,
   total_price float(2) NOT NULL,
-  date TIMESTAMP NOT NULL, -- maybe TIMESTAMPTZ?
+  date TIMESTAMPTZ NOT NULL,
   destination VARCHAR(50) NOT NULL,
   uid VARCHAR(20) references Users(uid)
 );
 
 create table ProductsInOrder (
   oid INT references Orders(oid),
-  pcode INT references Products(pcode),
+  pid INT references Products(pid),
   amount_in_order INT NOT NULL CHECK (amount_in_order > 0),
-  PRIMARY KEY (oid, pcode)
+  PRIMARY KEY (oid, pid)
 );
 ```

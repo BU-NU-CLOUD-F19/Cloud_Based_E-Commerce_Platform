@@ -10,8 +10,7 @@ Idle -d-> begin : request to check out user from page
   begin : check out cart
 
 begin -right-> Error : cart error
-  Error : stop timer
-  Error : send failure message to cart
+  Error : reset timer
 
 begin -down-> checkout : products received from cart
   state "Checkout" as checkout {
@@ -30,5 +29,11 @@ checkout -right-> readd_products : timer reaches 0
   state "Add products to inventory" as readd_products
 readd_products -up-> Error
 
-Error -up-> Idle
+Error -up-> Cancel : max retries reached
+  Cancel : stop timer
+  Cancel : send failure message to cart
+Cancel -up-> Idle
+
+Error -up-> checkout
+
 @enduml

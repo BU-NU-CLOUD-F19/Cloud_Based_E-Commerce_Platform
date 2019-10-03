@@ -28,6 +28,7 @@ Shopping cart:
 * remove a product
 * empty the cart
 * retrieve all products in cart
+* modify amount in cart
 
 Checkout:
 
