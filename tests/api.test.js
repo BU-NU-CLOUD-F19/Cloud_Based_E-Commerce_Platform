@@ -18,7 +18,7 @@ describe("GraphQL API", () => {
       .send({ query: "{ member(id: 1) { id name } }" })
       .expect(200)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         expect(res.body.data.member).to.have.property("name");
         expect(res.body.data.member.name).to.equal("Alex");
         return done();
@@ -36,7 +36,7 @@ describe("Members REST API", () => {
       .get(`demo/${id}`)
       .expect(200)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         expect(res.body[0]).to.have.property("name");
         expect(res.body[0].name).to.equal("Alex");
         return done();
