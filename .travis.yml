@@ -42,14 +42,14 @@ matrix:
         - npm run lint
     # Test
     - before_script:
+        - docker-compose up -d
         - cd tests/
         - npm install
-        - cd ..
-        - docker-compose up -d
       script:
         - npm run lint
         - npm test
       after_script:
+        - cd ..
         - docker-compose down
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching
