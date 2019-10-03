@@ -5,8 +5,8 @@
 
 const chai = require("chai");
 const { expect } = chai;
-const host = process.env.API_GATEWAY;
-const urlGateway = `http://${host}:3050/`; // URL for GraphQL API Gateway
+const host = process.env.API_GATEWAY || "localhost";
+const urlGateway = `http://api-gateway:3050/`; // URL for GraphQL API Gateway
 const requestGateway = require("supertest")(urlGateway);
 
 // Tests for GraphQL API Gateway
