@@ -13,8 +13,6 @@ node_js: 8
 matrix:
   # Mark build as completed when only remaining jobs are allowed to fail, or a job already failed
   fast_finish: true
-  env:
-    - API_GATEWAY=api-gateway
 
   # The jobs to run
   include:
@@ -44,14 +42,9 @@ matrix:
         - npm run lint
     # Test
     - before_script:
-        - docker-compose up -d
         - cd tests/
         - npm install
       script:
         - npm run lint
-        - npm test
-      after_script:
-        - cd ..
-        - docker-compose down
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching
