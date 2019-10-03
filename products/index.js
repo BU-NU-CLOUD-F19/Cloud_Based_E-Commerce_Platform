@@ -7,6 +7,7 @@ const { ApolloServer, gql } = require("apollo-server");
 const ProductsAPI = require("./products-datasource");
 const { buildFederatedSchema } = require("@apollo/federation");
 
+// Type definitions for a GraphQL schema
 const typeDefs = gql`
   input ProductDetails {
     id: String!
@@ -29,7 +30,9 @@ const typeDefs = gql`
   }
 `;
 
+// Resolvers are required for each schema type to be able to respond to queries
 const resolvers = {
+  // Query and Mutations are root types that will be executed by the GraphQL server
   Query: {
     products: (root, args, { dataSources }) => {
       return dataSources.productsAPI.getAllProducts();
@@ -47,6 +50,7 @@ const resolvers = {
   }
 };
 
+// Builds a federated schema from the typedefs and resolvers
 const schema = buildFederatedSchema([
   {
     typeDefs,
@@ -62,6 +66,7 @@ const server = new ApolloServer({
   })
 });
 
+// Starts the GraphQL server for the products microservice
 server.listen({ port: 4001 }).then(({ url }) => {
   console.log(`Server ready at ${url}`);
 });

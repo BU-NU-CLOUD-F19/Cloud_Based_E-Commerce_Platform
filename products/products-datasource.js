@@ -8,10 +8,7 @@ const { RESTDataSource } = require("apollo-datasource-rest");
 module.exports = class ProductsAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL = "http://localhost:4050"; // Root domain of the RESTful API
-    this.getAllProducts.bind(this);
-    this.getProduct.bind(this);
-    this.addProduct.bind(this);
+    this.baseURL = "http://localhost:4050"; // Root domain of the RESTful API for products microservice
   }
 
   /** 

@@ -1,5 +1,6 @@
 /**
- * This file creates a simple RESTful API for the products microservice and declares a products array with data for testing the API.
+ * This file creates a simple RESTful API for the products microservice and
+ * declares a products array with data for testing the API.
  */
 
 const Hapi = require("hapi");

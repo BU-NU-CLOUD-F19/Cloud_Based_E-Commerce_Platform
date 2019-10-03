@@ -19,7 +19,7 @@ RUN npm install -g pm2@3.5.1
 # See here https://hackernoon.com/how-to-move-code-into-a-docker-container-ab28edcc2901
 
 COPY package*.json ./
-RUN npm i
+RUN npm install
 
 # Setup ports
 ENV API_PORT 4050
