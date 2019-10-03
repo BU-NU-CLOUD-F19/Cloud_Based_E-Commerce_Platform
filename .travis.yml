@@ -13,6 +13,8 @@ node_js: 8
 matrix:
   # Mark build as completed when only remaining jobs are allowed to fail, or a job already failed
   fast_finish: true
+  env:
+    - API_GATEWAY=api-gateway
 
   # The jobs to run
   include:
