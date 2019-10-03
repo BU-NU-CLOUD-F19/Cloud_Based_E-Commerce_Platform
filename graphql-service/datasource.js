@@ -4,11 +4,13 @@
  */
 
 const { RESTDataSource } = require("apollo-datasource-rest");
+const host = process.env.BOILERPLATE_SERVICE;
+const BOILERPLATE_PORT = process.env.BOILERPLATE_PORT || 3000;
 
 module.exports = class MembersAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL = "http://boilerplate:3000"; // Root domain of the RESTful API
+    this.baseURL = `http://${host}:${BOILERPLATE_PORT}`; // Root domain of the RESTful API
     this.getAllMembers.bind(this);
     this.getMember.bind(this);
     this.addMember.bind(this);

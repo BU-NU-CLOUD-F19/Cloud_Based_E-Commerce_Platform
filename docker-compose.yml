@@ -71,20 +71,6 @@ services:
       #   handled differently in production.
 
     restart: unless-stopped
-  products:
-    build: ./products
-    container_name: "products-service"
-    volumes:
-      - ./products/index.js:/usr/app/index.js
-      - ./products/products-datasource.js:/usr/app/products-datasource.js
-      - ./products/products-api.js:/usr/app/products-api.js
-      - ./products/process.json:/usr/app/process.json
-    expose:
-      - 4050
-      - 4001
-    ports:
-      - 4050:4050
-      - 4001:4001
   api-gateway:
     build: ./graphql-api-gateway-poc
     container_name: "api-gateway"
@@ -97,6 +83,8 @@ services:
       - 3050
     ports:
       - 3050:3050
+    environment:
+      GRAPHQL_SERVICE: graphql-service
   graphql-service:
     build: ./graphql-service
     container_name: "graphql-service"
@@ -108,3 +96,5 @@ services:
       - 5000
     ports:
       - 5000:5000
+    environment:
+      BOILERPLATE_SERVICE: boilerplate

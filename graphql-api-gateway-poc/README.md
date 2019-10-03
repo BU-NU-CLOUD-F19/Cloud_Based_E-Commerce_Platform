@@ -18,8 +18,6 @@ This will run the containers in the background
 
 The API Gateway runs on http://localhost:3050 <br />
 The boilerplate runs on http://localhost:3000
-<br />
-The products microservice runs on http://localhost:4001
 
 ## Testing by making API requests
 
