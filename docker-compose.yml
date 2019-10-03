@@ -78,20 +78,20 @@ services:
       - ./graphql-api-gateway-poc/src:/usr/app/src
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
     links:
-      - graphql-service
+      - demo
     expose:
       - 3050
     ports:
       - 3050:3050
     environment:
-      GRAPHQL_SERVICE: graphql-service
-  graphql-service:
-    build: ./graphql-service
-    container_name: "graphql-service"
+      GRAPHQL_SERVICE: demo
+  demo:
+    build: ./demo
+    container_name: "demo"
     volumes:
-      - ./graphql-service/index.js:/usr/app/index.js
-      - ./graphql-service/datasource.js:/usr/app/datasource.js
-      - ./graphql-service/process.json:/usr/app/process.json
+      - ./demo/index.js:/usr/app/index.js
+      - ./demo/datasource.js:/usr/app/datasource.js
+      - ./demo/process.json:/usr/app/process.json
     expose:
       - 5000
     ports:
