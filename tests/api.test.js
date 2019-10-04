@@ -22,7 +22,7 @@ describe("GraphQL API", () => {
           return done(err);
         }
         expect(res.body.data.member).to.have.property("name");
-        expect(res.body.data.member.name).to.equal("Alex");
+        expect(res.body.data.member.name).to.equal("apple");
         return done();
       });
   });
@@ -42,7 +42,7 @@ describe("Members REST API", () => {
           return done(err);
         }
         expect(res.body[0]).to.have.property("name");
-        expect(res.body[0].name).to.equal("Alex");
+        expect(res.body[0].name).to.equal("apple");
         return done();
       });
   });
