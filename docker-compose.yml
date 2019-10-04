@@ -26,6 +26,7 @@ services:
       - ./db/db-data:/var/lib/postgresql/data
       # Script to initialize a test database
       - ./db/test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
+      - ./db/test-db/init-demo-db.sql:/docker-entrypoint-initdb.d/init-demo-db.sql
     restart: unless-stopped
 
   # Pgadmin service (web interface)
