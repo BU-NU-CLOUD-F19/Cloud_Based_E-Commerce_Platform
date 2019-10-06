@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `shopping_cart` resource,
+ * This class defines all the methods to handle calls to db for `cart` resource,
  * using query-builder tool
  */
 
@@ -11,14 +11,14 @@ const logger = require('../../utils/logger');
 const Names = require('../../constants/modelNames');
 const Kernel = require('../kernel');
 
-const resource = Names.shopping_cart;
+const resource = Names.cart;
 
 class ShoppingCartRepository extends PostgreSqlRepository {
   constructor() {
     const knexManager = Kernel.resolve(Names.knexManager); // pick the already defined knex-instance
 
     super({
-      name: Names.shopping_cart,
+      name: Names.cart,
       resource,
       knex: knexManager.knex,
       logger,

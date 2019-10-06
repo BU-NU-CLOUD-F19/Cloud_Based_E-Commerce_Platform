@@ -1,5 +1,5 @@
 /**
- * This is a handler for all the requests to `shopping_cart` resource.
+ * This is a handler for all the requests to `cart` resource.
  * It extends the base handler class to leverage all the default routes.
  */
 
@@ -7,7 +7,7 @@
 
 const BaseHandler = require('../base-handler');
 
-const Model = require('../../models').shopping_cart.Model;
+const Model = require('../../models').cart.Model;
 
 class Handlers extends BaseHandler {
   constructor(model) {

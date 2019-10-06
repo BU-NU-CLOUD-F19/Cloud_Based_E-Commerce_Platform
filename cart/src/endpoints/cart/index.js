@@ -1,5 +1,5 @@
 /**
- * This class sets the hapi routes for the `shopping_cart` resource
+ * This class sets the hapi routes for the `cart` resource
  * (https://github.com/hapijs/glue)
  */
 
@@ -8,7 +8,7 @@
 const Router = require('./router');
 const Names = require('../../constants/modelNames');
 
-const resource = Names.shopping_cart;
+const resource = Names.cart;
 
 
 module.exports.register = (server, options) => {

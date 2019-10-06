@@ -1,5 +1,5 @@
 /**
- * This class defines business logic to process the request for `shopping_cart` resource.
+ * This class defines business logic to process the request for `cart` resource.
  */
 
 'use strict';
@@ -17,13 +17,13 @@ class ShoppingCartModel extends BaseModel {
     const repo = options.repository || (new Repository());
 
     super({
-      resource: Names.shopping_cart,
+      resource: Names.cart,
       repository: repo,
     });
   }
 
   /**
-   * Inserts a `shopping_cart` record into the database
+   * Inserts a `cart` record into the database
    *
    * @param  {Object} value the value to be inserted
    */
@@ -32,7 +32,7 @@ class ShoppingCartModel extends BaseModel {
   }
 
   /**
-   * Retrieves a `shopping_cart` record from database by its id
+   * Retrieves a `cart` record from database by its id
    * @param  {String} id the id by which the record should be fetched
    */
   findOneById(id) {
@@ -41,6 +41,6 @@ class ShoppingCartModel extends BaseModel {
 }
 
 // binds the instance to Kernel for singularity
-Kernel.bind(Names.shopping_cart, ShoppingCartModel);
+Kernel.bind(Names.cart, ShoppingCartModel);
 
 module.exports = ShoppingCartModel;

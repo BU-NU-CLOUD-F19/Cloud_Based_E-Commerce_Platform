@@ -8,7 +8,7 @@
   "homepage": "https://github.com/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform",
   "bugs": "",
   "config": {
-    "appName": "shopping_cart"
+    "appName": "cart"
   },
   "scripts": {
     "dev": "nodemon",

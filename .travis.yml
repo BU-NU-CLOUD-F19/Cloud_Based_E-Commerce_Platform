@@ -22,9 +22,9 @@ matrix:
         - npm install
       script:
         - npm run lint
-    # Boilerplate
+    # Cart
     - before_script:
-        - cd boilerplate/
+        - cd cart/
         - npm install
       script:
         - npm run lint

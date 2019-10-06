@@ -6,10 +6,10 @@
 
 const Kernel = require('./kernel');
 
-// shopping_cart
-const shopping_cart = require('./shopping_cart');
+// cart
+const cart = require('./cart');
 
 module.exports = {
-  shopping_cart,
+  cart,
   Kernel,
 };

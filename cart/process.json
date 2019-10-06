@@ -1,6 +1,6 @@
 {
   "apps" : [{
-    "name"        : "shopping_cart",
+    "name"        : "cart",
     "script"      : "app.js",
     "watch"       : false,
     "exp_backoff_restart_delay": 100,

@@ -5,7 +5,7 @@
         "host": "postgres",
         "user": "postgres",
         "password": "northeastern",
-        "database": "cloud_demo"
+        "database": "cloud_ecommerce"
       },
       "pool": {
         "min": "2",

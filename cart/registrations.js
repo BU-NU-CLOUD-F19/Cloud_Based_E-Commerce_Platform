@@ -9,7 +9,7 @@ module.exports = function registrations(config) {
   return {
     // Each string in this array is `require`d during composition
     plugins: [
-      './src/endpoints/shopping_cart',
+      './src/endpoints/cart',
     ],
   };
 };
