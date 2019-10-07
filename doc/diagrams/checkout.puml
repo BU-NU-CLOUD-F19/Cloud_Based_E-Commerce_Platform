@@ -1,0 +1,27 @@
+@startuml
+!include stylesheet.puml
+(*) --> "User presses check out"
+    -->===PAR1_START===
+
+    ===PAR1_START=== --> "**Checkout:**\nbegin check out process (start the timer)"
+      -->===PAR1_END===
+
+    ===PAR1_START=== --> "**Cart/Inventory:**\nsubtract items in cart from inventory"
+      -->===PAR1_END===
+
+    ===PAR1_END===--> "Authorize payment"
+
+if "Successful?" then
+  -->[Yes] "**Order/Cart:**\ncreate order from cart"
+  --> "**Cart:**\nempty cart"
+  --> "**Checkout:**\nEnd check out process (stop timer)"
+else
+  -right->[No] "Show error message to user"
+  if "max retries?" then
+    -->[Yes] "**Checkout:**\nEnd check out process (stop timer)"
+  else
+    -right->[No] "Reset timer"
+    -up-> "Authorize payment"
+
+"**Checkout:**\nEnd check out process (stop timer)" --> (*)
+@enduml

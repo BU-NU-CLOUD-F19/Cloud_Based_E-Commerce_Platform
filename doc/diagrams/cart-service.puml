@@ -1,0 +1,33 @@
+; State Diagram
+@startuml
+!include stylesheet.puml
+title __Shopping Cart: State Diagram__\n
+hide empty description
+
+[*] -do-> Idle
+Idle --> checkout : receive check out request
+
+state "Add Product" as add
+Idle -u-> add : user adds product to cart
+add -r-> Idle
+
+state "Checking Out" as checkout {
+  state "Begin Checkout" as begin
+  begin : lock cart
+  begin : send products to checkout service
+
+  state "Wait for result" as wait
+
+  [*] --> begin
+  begin --> wait
+}
+
+wait --> Finalize : checkout successful
+Finalize : unlock cart
+Finalize : empty cart
+Finalize -u-> Idle
+
+wait --> Cancel : checkout failed
+Cancel : unlock cart
+Cancel -u-> Idle
+@enduml
