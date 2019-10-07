@@ -6,52 +6,67 @@ The entity-relationship diagram:
 This gives the following relations:
 - Products (*pid*, pcode, price, sku, amount_in_stock, pname, desc, lang)
 - Users (*uid*, fname, lname, address, phone, email, pass NULLABLE)
-- Carts (*uid → User*, pid → Product, amount_in_cart, time_added)
+- Carts (*cartid*, date_modified, date_created, uid → User)
+- ProductsInCart (*cartid → Carts*, *pid → Product*, amount_in_cart, date_added)
 - Orders (*oid*, total_price, date, destination, shipping, uid → User)
 - ProductsInOrder (*oid → Orders*, *pid → Products*, amount_in_order)
 
 Resulting in the following schema:
 
 ```sql
-create table Products (
-  /* NOT NULL constraints could be changed depending on what we want */
-
-  pid INT PRIMARY KEY,
-  pcode INT,  -- could also be alphanumeric
-  price float(2), -- assuming two decimal digits
-  sku INT NOT NULL, -- I'm not sure of the notation of sku, could be a different type
+/* Notes:
+- NOT NULL constrains could be changed depending on what we want
+- pcode could be alphanumeric
+- price is assuming two decimal digits, could be null e.g. if not determined yet
+- sku notation depends on vendor, but default to alphanumeric
+- lang is language code, like en_US
+*/
+CREATE TABLE Products (
+  pid SERIAL PRIMARY KEY,
+  pcode VARCHAR(50),
+  price FLOAT(2) CHECK (price IS NULL OR price >= 0),
+  sku VARCHAR(50) NOT NULL,
   amount_in_stock INT CHECK(amount_in_stock >= 0),
   pname VARCHAR(50) NOT NULL,
-  desc TEXT NOT NULL,
-  lang varchar(7) NOT NULL -- this is language code, like en_US
+  description TEXT NOT NULL,
+  lang varchar(7) NOT NULL
 );
 
-create table Users (
+CREATE TABLE Users (
   uid VARCHAR(20) PRIMARY KEY,
-  fname VARCHAR(20) NOT NULL,
-  lname VARCHAR(20) NOT NULL,
+  fname VARCHAR(50) NOT NULL,
+  lname VARCHAR(50) NOT NULL,
   address VARCHAR(50) NOT NULL,
-  phone INT(10) NOT NULL,
+  phone NUMERIC(10) NOT NULL, -- 10 digits
   email VARCHAR(50) NOT NULL,
   password VARCHAR(100) -- can be NULL if the user is not registered
 );
 
-create table Carts (
-  uid VARCHAR(20) references Users(uid) PRIMARY KEY,
-  pid INT references Products(pid) NOT NULL,
-  amount_in_cart INT NOT NULL CHECK (amount_in_cart > 0) -- if not in cart, not in table
-  time_added TIMESTAMPTZ NOT NULL
+CREATE TABLE Carts (
+  cartid VARCHAR(50) PRIMARY KEY,
+  date_created TIMESTAMPTZ NOT NULL,
+  date_modified TIMESTAMPTZ, -- could be NULL if not modified
+  uid VARCHAR(20) REFERENCES Users(uid) NOT NULL
 );
 
-create table Orders (
+CREATE TABLE ProductsInCart (
+  cartid VARCHAR(50) REFERENCES Carts(cartid),
+  pid INT REFERENCES Products(pid),
+  amount_in_cart INT NOT NULL CHECK (amount_in_cart > 0), -- not equal to 0, because otherwise not in cart
+  date_added TIMESTAMPTZ NOT NULL,
+  PRIMARY KEY (cartid, pid)
+);
+
+CREATE TABLE Orders (
   oid INT PRIMARY KEY,
-  total_price float(2) NOT NULL,
+  total_price float(2) NOT NULL CHECK (total_price >= 0),
   date TIMESTAMPTZ NOT NULL,
   destination VARCHAR(50) NOT NULL,
+  shipping float(2) NOT NULL CHECK (shipping >= 0), -- shipping price
   uid VARCHAR(20) references Users(uid)
 );
 
-create table ProductsInOrder (
+CREATE TABLE ProductsInOrder (
   oid INT references Orders(oid),
   pid INT references Products(pid),
   amount_in_order INT NOT NULL CHECK (amount_in_order > 0),
