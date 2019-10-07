@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start-gateway": "nodemon src/index.js",
-    "start-service-products": "nodemon services/products/index.js",
     "lint": "eslint -f unix -c ../.eslintrc.js ."
   },
   "author": "",

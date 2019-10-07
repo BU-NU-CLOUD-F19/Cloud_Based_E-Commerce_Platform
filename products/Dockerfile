@@ -22,8 +22,10 @@ COPY package*.json ./
 RUN npm install
 
 # Setup ports
-ENV API_PORT 3000
+ENV API_PORT 4050
+ENV SERVICE_PORT 4001
 EXPOSE $API_PORT
+EXPOSE $SERVICE_PORT
 
 # Run it
 # Start PM2 as PID 1 process
