@@ -71,4 +71,30 @@ services:
       #   handled differently in production.
 
     restart: unless-stopped
-
+  api-gateway:
+    build: ./graphql-api-gateway-poc
+    container_name: "api-gateway"
+    volumes:
+      - ./graphql-api-gateway-poc/src:/usr/app/src
+      - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
+    links:
+      - members-graphql-service
+    expose:
+      - 3050
+    ports:
+      - 3050:3050
+    environment:
+      GRAPHQL_SERVICE: members-graphql-service
+  members-graphql-service:
+    build: ./members-graphql-service
+    container_name: "members-graphql-service"
+    volumes:
+      - ./members-graphql-service/index.js:/usr/app/index.js
+      - ./members-graphql-service/datasource.js:/usr/app/datasource.js
+      - ./members-graphql-service/process.json:/usr/app/process.json
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+    environment:
+      BOILERPLATE_SERVICE: boilerplate
