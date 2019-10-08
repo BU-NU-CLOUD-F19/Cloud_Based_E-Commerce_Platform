@@ -1,19 +1,19 @@
 module.exports = {
-  extends: "eslint:recommended",
-  plugins: [],
-  parserOptions: {
-    ecmaVersion: 2020,
-    ecmaFeatures: {
-      jsx: true
+  "extends": "eslint:recommended",
+  "plugins": [],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "jsx": true
     }
   },
-  env: {
-    es6: true,
-    node: true,
-    browser: true,
-    mocha: true
+  "env": {
+    "es6": true,
+    "node": true,
+    "browser": true,
+    "mocha": true
   },
-  rules: {
+  "rules": {
     "arrow-body-style": "off", // we don't something like (e => e.y) because it makes debugging harder
     "class-methods-use-this": "error",
     "consistent-return": "off",
