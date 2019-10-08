@@ -28,9 +28,9 @@ matrix:
         - npm install
       script:
         - npm run lint
-    # Demo service
+    # Members service
     - before_script:
-        - cd demo/
+        - cd members-graphql-service/
         - npm install
       script:
         - npm run lint
