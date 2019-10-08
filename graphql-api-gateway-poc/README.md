@@ -42,24 +42,6 @@ Write queries (for example):
 }
 ```
 
-```
-{
-   products{
-    weight
-    name
-   }
-}
-```
-
-```
-{
-  product(id: "1") {
-    name
-    weight
-  }
-}
-```
-
 to receive a JSON response for the given request
 
 The API gateway makes use of the running microservices to create an overall composed schema which can be queried
