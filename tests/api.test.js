@@ -15,14 +15,14 @@ describe("GraphQL API", () => {
   it("Returns member with ID == 1", done => {
     requestGateway
       .post("")
-      .send({ query: "{ member(id: 1) { id name } }" })
+      .send({ query: "{ member(id: 3) { id name } }" })
       .expect(200)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
         expect(res.body.data.member).to.have.property("name");
-        expect(res.body.data.member.name).to.equal("apple");
+        expect(res.body.data.member.name).to.equal("samarth");
         return done();
       });
   });
@@ -32,8 +32,8 @@ const urlMembersAPI = `http://localhost:3000/`; // URL for GraphQL API Gateway
 const requestMembersAPI = require("supertest")(urlMembersAPI);
 
 describe("Members REST API", () => {
-  it("Returns member with ID == 1", done => {
-    const id = 1;
+  it("Returns member with ID == 3", done => {
+    const id = 3;
     requestMembersAPI
       .get(`demo/${id}`)
       .expect(200)
@@ -42,7 +42,7 @@ describe("Members REST API", () => {
           return done(err);
         }
         expect(res.body[0]).to.have.property("name");
-        expect(res.body[0].name).to.equal("apple");
+        expect(res.body[0].name).to.equal("samarth");
         return done();
       });
   });
