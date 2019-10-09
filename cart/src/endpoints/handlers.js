@@ -7,10 +7,11 @@
 'use strict';
 
 const logger = require('../utils/logger');
+const Model = require('../models').cart.Model;
 
 class Handlers {
   constructor(model) {
-    this.model = model;
+    this.model = model || (new Model());
   }
 
   /**
