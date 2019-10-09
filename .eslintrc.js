@@ -10,14 +10,13 @@ module.exports = {
   "env": {
     "es6": true,
     "node": true,
-    "browser": true,
-    "mocha": true
+    "browser": true
   },
   "rules": {
     "arrow-body-style": "off", // we don't something like (e => e.y) because it makes debugging harder
     "class-methods-use-this": "error",
     "consistent-return": "off",
-    curly: "error",
+    "curly": "error",
     "func-names": "error",
     "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
     "max-len": ["error", 120],
@@ -29,10 +28,10 @@ module.exports = {
     "no-proto": "error",
     "no-return-await": "error",
     "no-underscore-dangle": "off",
-    "no-unused-vars": ["error", { args: "none" }],
+    "no-unused-vars": ["error", { "args": "none" }],
     "no-shadow": "error",
-    strict: "off",
+    "strict": "off",
     "valid-typeof": "error",
-    "linebreak-style": ["error", "unix"]
+    "linebreak-style": ["error", "unix"],
   }
 };
