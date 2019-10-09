@@ -8,6 +8,8 @@ const { ApolloServer, gql } = require("apollo-server");
 const MembersAPI = require("./datasource");
 const { buildFederatedSchema } = require("@apollo/federation");
 
+const logger = require('./src/utils/logger');
+
 // Type definitions for a GraphQL schema
 const typeDefs = gql`
   input MemberDetails {
@@ -64,6 +66,10 @@ const server = new ApolloServer({
 });
 
 // Starts the GraphQL server for the products microservice
-server.listen({ port: 5000 }).then(({ url }) => {
-  console.log(`Server ready at ${url}`);
-});
+try {
+  server.listen({ port: 5000 }).then(({ url }) => {
+    logger.info(`Server ready at ${url}`);
+  });
+} catch (err) {
+  logger.error(`Error occurred while starting the Apollo Server for the members microservice - ${err.message}`);
+}

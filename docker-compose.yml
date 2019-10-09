@@ -77,6 +77,7 @@ services:
     volumes:
       - ./graphql-api-gateway-poc/src:/usr/app/src
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
+      - ./graphql-api-gateway-poc/log:/usr/app/log
     links:
       - members-graphql-service
     expose:
@@ -92,6 +93,8 @@ services:
       - ./members-graphql-service/index.js:/usr/app/index.js
       - ./members-graphql-service/datasource.js:/usr/app/datasource.js
       - ./members-graphql-service/process.json:/usr/app/process.json
+      - ./members-graphql-service/src:/usr/app/src
+      - ./members-graphql-service/log:/usr/app/log
     expose:
       - 5000
     ports:
