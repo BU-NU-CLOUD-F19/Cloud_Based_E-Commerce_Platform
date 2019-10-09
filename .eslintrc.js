@@ -10,7 +10,8 @@ module.exports = {
   "env": {
     "es6": true,
     "node": true,
-    "browser": true
+    "browser": true,
+    "mocha": true
   },
   "rules": {
     "arrow-body-style": "off", // we don't something like (e => e.y) because it makes debugging harder
