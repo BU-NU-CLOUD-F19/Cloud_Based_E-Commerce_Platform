@@ -7,10 +7,6 @@ Main file: src/index.js
 - The Gateway will redirect the request from the client on the basis of the query made to the correct microservice
 - The Apollo server of that microservice will then return the desired result back to the gateway to be returned to the client
 
-## Installation
-
----
-
 ### Booting up the products microservice
 
 To run this demo locally:

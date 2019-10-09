@@ -18,7 +18,7 @@ module.exports = class MembersAPI extends RESTDataSource {
 
   /** 
   Retrieves all members
-  @returns Array of members
+  @returns {Array} of members
   */
   async getAllMembers() {
     const demo = await this.get("demo"); // Makes an HTTP GET request to /demo
@@ -27,8 +27,8 @@ module.exports = class MembersAPI extends RESTDataSource {
 
   /** 
   Returns a member given an ID
-  @param id - ID of the member
-  @returns Object with the desired member
+  @param {String} id ID of the member
+  @returns {Object} with the desired member
   */
   async getMember(id) {
     const result = await this.get(`demo/${id}`);
@@ -37,8 +37,8 @@ module.exports = class MembersAPI extends RESTDataSource {
 
   /** 
   Returns all members
-  @param product - Member to be added
-  @returns Array of members
+  @param {Object} product - Member to be added
+  @returns {Array} of members
   */
   async addMember(product) {
     product = JSON.stringify(product);
