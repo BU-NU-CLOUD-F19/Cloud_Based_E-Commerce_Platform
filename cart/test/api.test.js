@@ -5,7 +5,7 @@ const host = "localhost";
 const port = 3000;
 const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
-const Cart = require('../src/models').cart.Model;
+const Cart = require('../src/models').Model;
 
 describe("Cart REST API", () => {
   let product, cartid;
