@@ -38,8 +38,8 @@ matrix:
       script: npm run lint
       name: "Members GraphQL Service"
 
-      # Test
-      before_script:
+      # Tests
+    - before_script:
         - cd tests/
         - npm install
       script: npm run lint
