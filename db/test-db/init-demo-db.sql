@@ -79,9 +79,10 @@ ALTER TABLE ONLY public.demo ALTER COLUMN id SET DEFAULT nextval('public.demo_id
 --
 
 COPY public.demo (id, name) FROM stdin;
-1	apple
-2	orange
-3	banana
+1	alex
+2	darshit
+3   samarth
+4   sujil
 \.
 
 

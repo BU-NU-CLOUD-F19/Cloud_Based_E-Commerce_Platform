@@ -140,14 +140,10 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
-# VSCODE
+# VSCode
 .vscode/
 
 # End of https://www.gitignore.io/api/node
 
 db/db-data/
 db/pgadmin/
-
-# Node modules
-graphql-api-gateway-poc/node_modules
-graphql-api-gateway-poc/services/products/node_modules

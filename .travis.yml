@@ -28,6 +28,17 @@ matrix:
         - npm install
       script:
         - npm run lint
-
+    # Members service
+    - before_script:
+        - cd members-graphql-service/
+        - npm install
+      script:
+        - npm run lint
+    # Test
+    - before_script:
+        - cd tests/
+        - npm install
+      script:
+        - npm run lint
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching

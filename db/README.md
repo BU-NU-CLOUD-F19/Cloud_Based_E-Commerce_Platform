@@ -1,4 +1,5 @@
 # Postgres container with web interface
+
 ## Running the container
 
 Build, recreate, and run the containers in the background:
@@ -13,8 +14,8 @@ Start the containers (after stopping):
 docker-compose start
 ```
 
-
 ## Stopping the container
+
 To stop the container:
 
 ```bash
@@ -28,6 +29,7 @@ docker-compose down
 ```
 
 ## Accessing the containers
+
 Web interface: [http://localhost:5050](http://localhost:5050)
 
 Postgres database: localhost:5432
@@ -53,6 +55,7 @@ cat dump_name.sql | docker exec -i postgres psql -Upostgres
 ```
 
 ## Loading the test data
+
 The test data in `test-db/init-test-db.sql` is automatically loaded into the database when the container is created.
 
 You can also manually load it by starting the Postgres container and running:
