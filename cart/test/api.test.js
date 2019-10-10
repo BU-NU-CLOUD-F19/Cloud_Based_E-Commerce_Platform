@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
@@ -9,16 +10,15 @@ const Cart = require('../src/models').cart.Model;
 describe("Cart REST API", () => {
   let product, cartid;
 
-  before(function() {
+  before(function before() {
     product = {
       pid: 1,
       amount: 3
     }
     cartid = 1
   })
-  beforeEach(function() {
+  beforeEach(function beforeEach() {
     Cart.deleteAll();
-    done();
   });
 
   // Functionality
@@ -92,7 +92,7 @@ describe("Cart REST API", () => {
 
   it("responds to an empty-cart request", done => {
     // Insert a few products into the cart
-    for (i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 3; i++) {
       requestCart.post(`/${cartid}`).send({ pid: i, amount: i }).expect(201);
     }
 

@@ -5,11 +5,15 @@
 'use strict';
 
 const Kernel = require('./kernel');
+const Names = require('../constants/modelNames');
 
-class Model {
-  constructor(options) {
-    this.resource = options.resource; // the name of the resource inheriting this class
-    this.repository = options.repository; // the repository of the resource inheriting this class
+// The data repository (database)
+const Repository = require('./repository');
+
+class ShoppingCartModel {
+  constructor(options = {}) {
+    this.resource = Names.cart; // the name of the resource inheriting this class
+    this.repository = options.repository || (new Repository()); // the repository of the resource inheriting this class
   }
 
   /**
@@ -38,6 +42,6 @@ class Model {
 }
 
 // binds base model to the kernel
-Kernel.bind('model', Model);
+Kernel.bind(Names.cart, ShoppingCartModel);
 
-module.exports = Model;
+module.exports = ShoppingCartModel;

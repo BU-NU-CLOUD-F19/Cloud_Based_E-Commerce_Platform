@@ -5,11 +5,11 @@
 
 'use strict';
 
-const PostgreSqlRepository = require('../../repository');
+const PostgreSqlRepository = require('../repository');
 
-const logger = require('../../utils/logger');
-const Names = require('../../constants/modelNames');
-const Kernel = require('../kernel');
+const logger = require('../utils/logger');
+const Names = require('../constants/modelNames');
+const Kernel = require('./kernel');
 
 const resource = Names.cart;
 

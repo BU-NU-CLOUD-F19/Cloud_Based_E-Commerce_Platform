@@ -4,12 +4,9 @@
 
 'use strict';
 
-const Kernel = require('./kernel');
-
 // cart
-const cart = require('./cart');
+const Model = require('./model');
 
 module.exports = {
-  cart,
-  Kernel,
+  Model
 };

@@ -7,7 +7,7 @@
 'use strict';
 
 const logger = require('../utils/logger');
-const Model = require('../models').cart.Model;
+const Model = require('../models').Model;
 
 class Handlers {
   constructor(model) {
