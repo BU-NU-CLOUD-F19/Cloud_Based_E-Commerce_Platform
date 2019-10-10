@@ -28,6 +28,7 @@ matrix:
         - npm install
       script:
         - npm run lint
+        - npm test
 
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching
