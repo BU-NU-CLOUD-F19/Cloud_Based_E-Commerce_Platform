@@ -16,29 +16,33 @@ matrix:
 
   # The jobs to run
   include:
-    # GraphQL
-    - before_script:
+    - stage: "Setup & Lint"
+      # GraphQL
+      before_script:
         - cd graphql-api-gateway-poc/
         - npm install
-      script:
-        - npm run lint
-    # Boilerplate
+      name: "GraphQL"
+      script: npm run lint
+
+      # Boilerplate
     - before_script:
         - cd boilerplate/
         - npm install
-      script:
-        - npm run lint
-    # Members service
+      script: npm run lint
+      name: "Boilerplate"
+
+      # Members service
     - before_script:
         - cd members-graphql-service/
         - npm install
-      script:
-        - npm run lint
-    # Test
-    - before_script:
+      script: npm run lint
+      name: "Members GraphQL Service"
+
+      # Test
+      before_script:
         - cd tests/
         - npm install
-      script:
-        - npm run lint
+      script: npm run lint
+      name: "Tests"
 # node_modules is cached by default by Travis.
 # more info on caching: https://docs.travis-ci.com/user/caching
