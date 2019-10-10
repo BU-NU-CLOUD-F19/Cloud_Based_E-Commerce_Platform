@@ -66,6 +66,7 @@ services:
       - ./cart/registrations.js:/usr/app/registrations.js
       - ./cart/.cartrc:/usr/app/.cartrc
       - ./cart/log:/usr/app/log
+      - ./cart/test:/usr/app/test
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
 

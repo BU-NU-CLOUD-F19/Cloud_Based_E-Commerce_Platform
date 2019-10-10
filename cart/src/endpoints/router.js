@@ -19,7 +19,7 @@ class Router {
     server.route([
       {
         method: 'POST',
-        path: `/cart/{id}/add`,
+        path: `/cart/{id}`,
         handler: this.handler.addProduct.bind(this.handler),
         config: {
           description: `Add a product to the cart.`,
@@ -69,7 +69,7 @@ class Router {
       },
       {
         method: 'PUT',
-        path: '/cart/{id}/change',
+        path: '/cart/{id}',
         handler: this.handler.changeAmount.bind(this.handler),
         config: {
           description: 'Change the amount of product in the cart.',
