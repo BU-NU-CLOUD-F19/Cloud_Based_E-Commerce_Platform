@@ -7,9 +7,9 @@ This gives the following relations:
 - Products (*pid*, pcode, price, sku, amount_in_stock, pname, desc, lang)
 - Users (*uid*, fname, lname, address, phone, email, pass NULLABLE)
 - Carts (*cartid*, date_modified, date_created, uid → User)
-- ProductsInCart (*cartid → Carts*, *pid → Product*, amount_in_cart, date_added)
+- Products_In_Cart (*cartid → Carts*, *pid → Product*, amount_in_cart, date_added)
 - Orders (*oid*, total_price, date, destination, shipping, uid → User)
-- ProductsInOrder (*oid → Orders*, *pid → Products*, amount_in_order)
+- Products_In_Order (*oid → Orders*, *pid → Products*, amount_in_order)
 
 Resulting in the following schema:
 
@@ -49,7 +49,7 @@ CREATE TABLE Carts (
   uid VARCHAR(20) REFERENCES Users(uid) NOT NULL
 );
 
-CREATE TABLE ProductsInCart (
+CREATE TABLE Products_In_Cart (
   cartid VARCHAR(50) REFERENCES Carts(cartid),
   pid INT REFERENCES Products(pid),
   amount_in_cart INT NOT NULL CHECK (amount_in_cart > 0), -- not equal to 0, because otherwise not in cart
@@ -66,7 +66,7 @@ CREATE TABLE Orders (
   uid VARCHAR(20) references Users(uid)
 );
 
-CREATE TABLE ProductsInOrder (
+CREATE TABLE Products_In_Order (
   oid INT references Orders(oid),
   pid INT references Products(pid),
   amount_in_order INT NOT NULL CHECK (amount_in_order > 0),
