@@ -14,31 +14,16 @@ class ShoppingCartModel {
   constructor(options = {}) {
     this.resource = Names.cart; // the name of the resource inheriting this class
     this.repository = options.repository || (new Repository()); // the repository of the resource inheriting this class
+    this.logger = this.repository.logger;
   }
 
-  /**
-   * Insert a record into the db
-   * @param  {Object} value the value to be inserted
-   * @returns the inserted record
-   */
-  insert(value) {
-    return this.repository.insert(value)
-      .then(result => result.value);
+  deleteAll() {
+    return this.repository.deleteAll().then(entity => { return entity });
   }
 
-  /**
-   * Find a record by its id
-    * @param  {String} id the id by which the record needs to be found
-   */
-  async findOneById(id) {
-    // uncomment this code when db is connected
-    return this.repository.findOneById(id)
-      .then(entity => {
-        // you can add some post-querying logic here
-        return entity;
-      });
+  getProducts(cartid) {
+    return this.repository.getProducts(cartid).then(entity => { return entity });
   }
-
 }
 
 // binds base model to the kernel

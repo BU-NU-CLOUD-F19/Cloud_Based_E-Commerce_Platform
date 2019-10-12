@@ -81,8 +81,15 @@ class Handlers {
   getProducts(req, rep) {
     // If cart does not exist, error.
     logger.debug(`Listing all products in ${req.params.id}`);
-    // TODO: getProducts data logic
-    return rep.response("TODO: should list everything in cart").code(200)
+    return this.model.getProducts(req.params.id)
+      .then((result) => {
+        return rep.response({data: result}).code(200);
+      })
+    .catch(err => {
+      logger.error(err.message);
+    });
+
+
   }
 
   /**

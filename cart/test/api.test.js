@@ -5,21 +5,51 @@ const host = "localhost";
 const port = 3000;
 const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
+const Pg = require('../src/repository');
 const Cart = require('../src/models').Model;
+const logger = require('../src/utils/logger');
+const RcProvider = require('kibbutz-rc');
+const Kibbutz = require('kibbutz');
 
 describe("Cart REST API", () => {
-  let product, cartid;
+  let product, cartid, cart;
 
   before(function before() {
     product = {
       pid: 1,
-      amount: 3
+      amount_in_cart: 3
     }
-    cartid = 1
-  })
-  beforeEach(function beforeEach() {
-    Cart.deleteAll();
+    cartid = 1;
+    const pkg = require('../package');
+    const rcLoader = new RcProvider({
+      appName: pkg.config.appName
+    });
+
+    const config = new Kibbutz();
+    config.load([rcLoader], (err, conf) => {
+
+      const {
+        connection
+      } = conf.persistence.postgres;
+
+      let knexInstance = require('knex')({
+        client: 'pg',
+        connection
+      });
+      let repoOpts = {knex: knexInstance, resource: 'products_in_cart', logger: logger};
+      let repository = new Pg(repoOpts);
+      cart = new Cart({repository: repository});
+
+      logger.debug(`Starting test at ${new Date().toLocaleString()}`);
+    })
   });
+
+  beforeEach(function beforeEach() {
+    cart.deleteAll();
+  })
+  after(function after() {
+    cart.deleteAll();
+  })
 
   // Functionality
   it("lists products", done => {
@@ -31,7 +61,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data).to.equal([]);
+        expect(res.body.data).to.eql([]);
         return done();
       });
   });
@@ -46,7 +76,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data[0]).to.equal(product)
+        expect(res.body.data).to.eql(product)
       });
 
     // List the products, expecting to find the one that was added
@@ -57,7 +87,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data).to.equal([product]);
+        expect(res.body.data).to.eql([product]);
         return done();
       });
   });
@@ -85,7 +115,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data.products).to.equal([]);
+        expect(res.body.data.products).to.eql([]);
         return done();
       })
   });
@@ -93,7 +123,7 @@ describe("Cart REST API", () => {
   it("responds to an empty-cart request", done => {
     // Insert a few products into the cart
     for (let i = 1; i <= 3; i++) {
-      requestCart.post(`/${cartid}`).send({ pid: i, amount: i }).expect(201);
+      requestCart.post(`/${cartid}`).send({ pid: i, amount_in_cart: i }).expect(201);
     }
 
     // Check that the cart contains 3 products
@@ -101,7 +131,7 @@ describe("Cart REST API", () => {
       if (err) {
         return done(err);
       }
-      expect(res.body.data.length).to.equal(3)
+      expect(res.body.data.length).to.eql(3)
     });
 
     // Empty the cart
@@ -112,7 +142,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data).to.equal([]);
+        expect(res.body.data).to.eql([]);
       });
 
     // Check that the cart is empty
@@ -120,7 +150,7 @@ describe("Cart REST API", () => {
       if (err) {
         return done(err);
       }
-      expect(res.body.data).to.equal([])
+      expect(res.body.data).to.eql([])
       return done();
     })
   });
@@ -129,7 +159,7 @@ describe("Cart REST API", () => {
     // Define a new product
     let new_product = {
       pid: 1,
-      amount: 2
+      amount_in_cart: 2
     }
 
     // Add a product
@@ -152,7 +182,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data[0].amount).to.equal(3)
+        expect(res.body.data[0].amount_in_cart).to.eql(3)
         return done();
       });
   });
@@ -177,7 +207,7 @@ describe("Cart REST API", () => {
         if (err) {
           return done(err);
         }
-        expect(res.body.data).to.equal([]);
+        expect(res.body.data).to.eql([]);
         return done();
       });
   })

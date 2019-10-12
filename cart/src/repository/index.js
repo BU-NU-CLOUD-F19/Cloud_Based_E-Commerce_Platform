@@ -24,49 +24,32 @@ class PostgreSqlRepository {
     this.resource = options.resource;
   }
 
-  /**
-   * Inserts a record into the database
-   * @param  {String} id of the database to be inserted
-   * @param  {Object} data of the record to be inserted
-   */
-  insert(id, data) {
-    const value = {
-      id,
-      data,
-    };
-    const knexBuilder = this.knex(this.resource);
-    return knexBuilder.insert(value).returning('*')
-      .then((result) => {
-        this.logger.info(`Successfully inserted 1 record into: ${this.resource}`);
-        return result.data;
-      })
-      .catch((err) => {
-        this.logger.error(err.message);
-        throw err;
-      });
-  }
-
-  /**
-   * Finds a db record base on the id
-   * @param  {String} id of the record to be found
-   * @returns the retrieved record
-   */
-  findOneById(id) {
-    this.logger.info(`In index.js`);
-    const knexBuilder = this.knex(this.resource);
-    const query = knexBuilder.select('*').whereRaw('id = ?', parseInt(id));
-    this.logger.info(`Running query ${query}`);
+  deleteAll() {
+    const query = this.knex.raw('truncate table carts cascade');
     return query
       .then((result) => {
-        this.logger.info(`Found ${result.length} record from: ${this.resource}`);
+        this.logger.debug("Successfully truncated the table.")
         return result;
       })
       .catch((err) => {
         this.logger.error(err.message);
-        throw err;
-      });
+      })
   }
 
+  getProducts(cartid) {
+    // If there is a product, the cart must exist due to db constraints
+    const knexBuilder = this.knex(this.resource)
+    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
+    this.logger.debug(`Query: ${query}`);
+    return query
+      .then(result => {
+        this.logger.debug(`Retrieved ${result.length} records.`);
+        return result;
+      })
+    .catch(err => {
+      this.logger.error(err.message);
+    })
+  }
 }
 
 module.exports = PostgreSqlRepository;
