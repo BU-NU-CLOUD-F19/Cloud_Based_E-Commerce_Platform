@@ -72,24 +72,17 @@ describe("Cart REST API", () => {
       .post(`/${cartid}`)
       .send(product)
       .expect(201)
-      .end((err, res) => {
-        if (err) {
-          return done(err);
-        }
-        expect(res.body.data).to.eql(product)
-      });
-
-    // List the products, expecting to find the one that was added
-    requestCart
-      .get(`/${cartid}`)
-      .expect(200)
-      .end((err, res) => {
-        if (err) {
-          return done(err);
-        }
+      .then(res => {
+        expect(res.body.data).to.eql([product])
+        return requestCart.get(`/${cartid}`).expect(200)
+      })
+      .then(res => {
         expect(res.body.data).to.eql([product]);
         return done();
-      });
+      })
+      .catch(err => {
+        return done(err);
+      })
   });
 
   it("removes a product from a cart", done => {

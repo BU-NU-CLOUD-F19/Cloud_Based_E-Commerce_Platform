@@ -12,20 +12,48 @@ const Model = require('../models').Model;
 class Handlers {
   constructor(model) {
     this.model = model || (new Model());
+    this.logger = logger;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   addProduct(req, rep) {
-    // If cart exists, add.
-    // Else, create a new cart and add, incl amount.
+    // Some initial error checking
     if (!req.payload) {
       return rep.response("Body cannot be empty.").code(400);
     }
+    if (!('pid' in req.payload)) {
+      return rep.response("Product id not specified.").code(400);
+    }
+    if (!('amount_in_cart' in req.payload)) {
+      return rep.response("Amount in cart not specified.").code(400);
+    }
 
-    logger.debug(`Adding product ${req.payload} to cart ${req.params.id}`);
+    this.logger.debug(`Handler: Adding product ${JSON.stringify(req.payload)} to cart ${req.params.id}`);
 
-    // TODO: addProduct data logic
-    return rep.response("TODO: product should be added.").code(201);
+    // Add the product to the cart
+    return this.model.addProduct(req.params.id, req.payload)
+      .then(res => {
+        this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
+        // Return the product that was added
+        return rep.response({data: res}).code(201);
+      })
+      // Catch any database errors (e.g. product not found)
+      .catch(err => {
+        if (err.constraint === "products_in_cart_pid_fkey") {
+          let message = '\tProduct does not exist.';
+          this.logger.debug(message);
+          return rep.response(message).code(400);
+        }
+        else if (err.constraint === "carts_uid_fkey") {
+          let message = '\tUser does not exist.';
+          this.logger.debug(`${message} -- ${err.detail}`);
+          return rep.response(message).code(400);
+        }
+        else {
+          this.logger.error(JSON.stringify(err));
+          throw err;
+        }
+      })
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -38,7 +66,7 @@ class Handlers {
       return rep.response("Body cannot be empty.").code(400);
     }
 
-    logger.debug(`Removing product ${req.payload} from cart ${req.params.id}`);
+    this.logger.debug(`Removing product ${req.payload} from cart ${req.params.id}`);
     // TODO: removeProduct data logic
     return rep.response("TODO: product should be removed.").code(200);
   }
@@ -53,7 +81,7 @@ class Handlers {
       return rep.response("Body cannot be empty.").code(400);
     }
 
-    logger.debug(`Changing amount of product in cart ${req.params.id}`);
+    this.logger.debug(`Changing amount of product in cart ${req.params.id}`);
     // TODO: changeAmount data logic
     return rep.response("TODO: amount should be changed");
   }
@@ -61,7 +89,7 @@ class Handlers {
   // eslint-disable-next-line class-methods-use-this
   emptyCart(req, rep) {
     // If cart does not exist, error
-    logger.debug(`Emptying cart ${req.params.id}`);
+    this.logger.debug(`Emptying cart ${req.params.id}`);
     // TODO: emptyCart data logic
     return rep.response("TODO: cart should be emptied.").code(200);
   }
@@ -72,7 +100,7 @@ class Handlers {
     // Empty the cart.
     // Delete the cart.
 
-    logger.debug(`Removing cart ${req.params.id}`);
+    this.logger.debug(`Removing cart ${req.params.id}`);
     // TODO: deleteCart data logic
     return rep.response("TODO: cart should be deleted.").code(200);
   }
@@ -80,14 +108,14 @@ class Handlers {
   // eslint-disable-next-line class-methods-use-this
   getProducts(req, rep) {
     // If cart does not exist, error.
-    logger.debug(`Listing all products in ${req.params.id}`);
+    this.logger.debug(`Handler: Listing all products in ${req.params.id}`);
     return this.model.getProducts(req.params.id)
       .then((result) => {
         return rep.response({data: result}).code(200);
       })
-    .catch(err => {
-      logger.error(err.message);
-    });
+      .catch(err => {
+        this.logger.error(err.message);
+      });
 
 
   }

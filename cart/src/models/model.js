@@ -24,6 +24,10 @@ class ShoppingCartModel {
   getProducts(cartid) {
     return this.repository.getProducts(cartid).then(entity => { return entity });
   }
+
+  addProduct(cartid, product) {
+    return this.repository.addProduct(cartid, product).then(entity => { return entity });
+  }
 }
 
 // binds base model to the kernel
