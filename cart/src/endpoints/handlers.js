@@ -15,16 +15,23 @@ class Handlers {
     this.logger = logger;
   }
 
+  propsPresent(proplist, obj) {
+    this.logger.debug(`Proplist: ${proplist}, for obj ${JSON.stringify(obj)}`);
+    for (let prop of proplist) {
+      if (!(prop in obj)) {
+        return {valid: false, missing: prop};
+      }
+    }
+    return {valid: true};
+  }
   async addProduct(req, rep) {
     // Some initial error checking
     if (!req.payload) {
       return rep.response("Body cannot be empty.").code(400);
     }
-    if (!('pid' in req.payload)) {
-      return rep.response("Product id not specified.").code(400);
-    }
-    if (!('amount_in_cart' in req.payload)) {
-      return rep.response("Amount in cart not specified.").code(400);
+    const isValid = this.propsPresent(['pid', 'amount_in_cart'], req.payload);
+    if (!isValid.valid) {
+      return rep.response(`${isValid.missing} not specified.`).code(400);
     }
 
     this.logger.debug(`Handler: Adding product ${JSON.stringify(req.payload)} to cart ${req.params.id}`);
@@ -39,8 +46,8 @@ class Handlers {
     // Catch any database errors (e.g. product not found)
     catch (err) {
       if (err.constraint === "products_in_cart_pid_fkey") {
-        let message = '\tProduct does not exist.';
-        this.logger.debug(message);
+        let message = 'Product does not exist.';
+        this.logger.debug(`\t${message}`);
         return rep.response(message).code(400);
       }
       else if (err.constraint === "carts_uid_fkey") {
@@ -55,22 +62,39 @@ class Handlers {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  removeProduct(req, rep) {
-    // If cart does not exist, error.
-    // If product not in cart, error.
-    // Else, remove the product.
-
+  async removeProduct(req, rep) {
     if (!req.payload) {
       return rep.response("Body cannot be empty.").code(400);
     }
+    const isValid = this.propsPresent(['pid'], req.payload);
+    if (!isValid.valid) {
+      return rep.response(`${isValid.missing} not specified.`).code(400);
+    }
 
-    this.logger.debug(`Removing product ${req.payload} from cart ${req.params.id}`);
-    // TODO: removeProduct data logic
-    return rep.response("TODO: product should be removed.").code(200);
+
+    this.logger.debug(`Handler: Removing product ${req.payload} from cart ${req.params.id}`);
+
+    try {
+      const res = await this.model.removeProduct(req.params.id, req.payload);
+      this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
+      // If no rows were removed
+      if (res === 0) {
+        return rep.response(`Product ${req.payload.pid} not in cart ${req.params.id}.`);
+      }
+      else {
+        return rep.response({data: res}).code(200);
+      }
+    }
+    catch (err) {
+      this.logger.error(JSON.stringify(err));
+      throw err;
+    }
+
+
+    // return rep.response("TODO: product should be removed.").code(200);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   changeAmount(req, rep) {
     // If product not in cart, error.
     // If cart does not exist, error.
@@ -85,7 +109,6 @@ class Handlers {
     return rep.response("TODO: amount should be changed");
   }
 
-  // eslint-disable-next-line class-methods-use-this
   emptyCart(req, rep) {
     // If cart does not exist, error
     this.logger.debug(`Emptying cart ${req.params.id}`);
@@ -93,7 +116,6 @@ class Handlers {
     return rep.response("TODO: cart should be emptied.").code(200);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   deleteCart(req, rep) {
     // If cart does not exist, error
     // Empty the cart.
@@ -104,19 +126,15 @@ class Handlers {
     return rep.response("TODO: cart should be deleted.").code(200);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getProducts(req, rep) {
-    // If cart does not exist, error.
-    this.logger.debug(`Handler: Listing all products in ${req.params.id}`);
-    return this.model.getProducts(req.params.id)
-      .then((result) => {
-        return rep.response({data: result}).code(200);
-      })
-      .catch(err => {
-        this.logger.error(err.message);
-      });
-
-
+  async getProducts(req, rep) {
+    try {
+      this.logger.debug(`Handler: Listing all products in ${req.params.id}`);
+      const result = await this.model.getProducts(req.params.id);
+      return rep.response({data: result}).code(200);
+    }
+    catch(err)  {
+      this.logger.error(err.message);
+    };
   }
 
   /**

@@ -24,31 +24,31 @@ class PostgreSqlRepository {
     this.resource = options.resource;
   }
 
-  deleteAll() {
-    const query = this.knex.raw('truncate table carts cascade');
-    return query
-      .then((result) => {
-        this.logger.debug("Successfully truncated the table.")
-        return result;
-      })
-      .catch((err) => {
-        this.logger.error(err.message);
-      })
+  async deleteAll() {
+    try {
+      const query = this.knex.raw('truncate table carts cascade');
+      const result = await query;
+      this.logger.debug("Successfully truncated the table.");
+      return result;
+    }
+    catch (err) {
+      this.logger.error(err.message);
+    }
   }
 
-  getProducts(cartid) {
-    // If there is a product, the cart must exist due to db constraints
-    const knexBuilder = this.knex(this.resource)
-    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
-    this.logger.debug(`\tQuery: ${query}`);
-    return query
-      .then(result => {
-        this.logger.debug(`\tRetrieved ${result.length} records.`);
-        return result;
-      })
-    .catch(err => {
+  async getProducts(cartid) {
+    try {
+      // If there is a product, the cart must exist due to db constraints
+      const knexBuilder = this.knex(this.resource)
+      const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
+      this.logger.debug(`\tQuery: ${query}`);
+      const result = await query;
+      this.logger.debug(`\tRetrieved ${result.length} records.`);
+      return result;
+    }
+    catch(err) {
       this.logger.error(err.message);
-    })
+    }
   }
 
   // Add a product to the specified cart
@@ -87,7 +87,19 @@ class PostgreSqlRepository {
     this.logger.debug(`\tQuery: ${addProduct}`);
 
     // And return the promise (since each function here has to return a promise)
-    return await addProduct;
+    return addProduct;
+  }
+
+  async removeProduct(cartid, product) {
+    const productsInCart = this.knex(this.resource);
+
+    const query = productsInCart.where({cartid: cartid, pid: product.pid}).del();
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const nRowsDeleted = await query;
+    this.logger.debug(`\tResult: deleted ${nRowsDeleted} rows.`);
+
+    return nRowsDeleted;
   }
 }
 

@@ -17,16 +17,20 @@ class ShoppingCartModel {
     this.logger = this.repository.logger;
   }
 
-  deleteAll() {
-    return this.repository.deleteAll().then(entity => { return entity });
+  async deleteAll() {
+    return this.repository.deleteAll();
   }
 
   getProducts(cartid) {
-    return this.repository.getProducts(cartid).then(entity => { return entity });
+    return this.repository.getProducts(cartid);
   }
 
   async addProduct(cartid, product) {
-    return await this.repository.addProduct(cartid, product);
+    return this.repository.addProduct(cartid, product);
+  }
+
+  async removeProduct(cartid, product) {
+    return this.repository.removeProduct(cartid, product);
   }
 }
 
