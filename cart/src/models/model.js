@@ -25,8 +25,8 @@ class ShoppingCartModel {
     return this.repository.getProducts(cartid).then(entity => { return entity });
   }
 
-  addProduct(cartid, product) {
-    return this.repository.addProduct(cartid, product).then(entity => { return entity });
+  async addProduct(cartid, product) {
+    return await this.repository.addProduct(cartid, product);
   }
 }
 

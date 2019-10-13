@@ -15,7 +15,7 @@ class Handlers {
     this.logger = logger;
   }
 
-  addProduct(req, rep) {
+  async addProduct(req, rep) {
     // Some initial error checking
     if (!req.payload) {
       return rep.response("Body cannot be empty.").code(400);
@@ -29,31 +29,30 @@ class Handlers {
 
     this.logger.debug(`Handler: Adding product ${JSON.stringify(req.payload)} to cart ${req.params.id}`);
 
-    // Add the product to the cart
-    return this.model.addProduct(req.params.id, req.payload)
-      .then(res => {
-        this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+    try {
+      // Add the product to the cart
+      const res = await this.model.addProduct(req.params.id, req.payload);
+      this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+      return rep.response({data: res}).code(201);
+    }
 
-        // Return the product that was added
-        return rep.response({data: res}).code(201);
-      })
-      // Catch any database errors (e.g. product not found)
-      .catch(err => {
-        if (err.constraint === "products_in_cart_pid_fkey") {
-          let message = '\tProduct does not exist.';
-          this.logger.debug(message);
-          return rep.response(message).code(400);
-        }
-        else if (err.constraint === "carts_uid_fkey") {
-          let message = '\tUser does not exist.';
-          this.logger.debug(`${message} -- ${err.detail}`);
-          return rep.response(message).code(400);
-        }
-        else {
-          this.logger.error(JSON.stringify(err));
-          throw err;
-        }
-      })
+    // Catch any database errors (e.g. product not found)
+    catch (err) {
+      if (err.constraint === "products_in_cart_pid_fkey") {
+        let message = '\tProduct does not exist.';
+        this.logger.debug(message);
+        return rep.response(message).code(400);
+      }
+      else if (err.constraint === "carts_uid_fkey") {
+        let message = '\tUser does not exist.';
+        this.logger.debug(`${message} -- ${err.detail}`);
+        return rep.response(message).code(400);
+      }
+      else {
+        this.logger.error(JSON.stringify(err));
+        throw err;
+      }
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
