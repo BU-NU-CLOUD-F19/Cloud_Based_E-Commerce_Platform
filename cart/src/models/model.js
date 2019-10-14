@@ -26,6 +26,16 @@ class ShoppingCartModel {
   }
 
   async addProduct(cartid, product) {
+    // Check if the cart already exists
+    const cartRow = await this.repository.getCart(cartid);
+
+    // TODO: check user ids
+
+    // Create it if it doesn't
+    if (cartRow.length === 0) {
+      await this.repository.createCart(cartid);
+    }
+
     return this.repository.addProduct(cartid, product);
   }
 

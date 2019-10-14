@@ -51,30 +51,33 @@ class PostgreSqlRepository {
     }
   }
 
-  // Add a product to the specified cart
-  async addProduct(cartid, product) {
-    // Set up the table references
+  async getCart(cartid) {
     const carts = this.knex('carts');
-    const productsInCart = this.knex(this.resource);
-
-
-    // Check if the cart exists
-    const checkCart = carts.select('cartid').where({cartid: cartid});
+    const checkCart = carts.select('*').where({cartid: cartid});
     this.logger.debug(`\tQuery: ${checkCart}`);
     const cartsFound = await checkCart;
     this.logger.debug(`\tResult ${JSON.stringify(cartsFound)}`);
+    return cartsFound;
+  }
 
-    if (cartsFound.length === 0) {
-      const createCart = carts.insert({
-        cartid: cartid,
-        date_created: this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`),
-        uid: 'user1' // TODO: this shouldn't be hardcoded
-      }).returning('*');
+  async createCart(cartid) {
+    const carts = this.knex('carts');
+    const createCart = carts.insert({
+      cartid: cartid,
+      date_created: this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`),
+      uid: 'user1' // TODO: this shouldn't be hardcoded
+    }).returning('*');
 
-      this.logger.debug(`\tQuery: ${createCart}`);
-      const created = await createCart;
-      this.logger.debug(`\tResult: ${created}`);
-    }
+    this.logger.debug(`\tQuery: ${createCart}`);
+    const created = await createCart;
+    this.logger.debug(`\tResult: ${created}`);
+    return created;
+  }
+
+  // Add a product to the specified cart
+  async addProduct(cartid, product) {
+    // Set up the table reference
+    const productsInCart = this.knex(this.resource);
 
     // Then add the product to the cart
     const addProduct = productsInCart.insert({
@@ -86,7 +89,6 @@ class PostgreSqlRepository {
 
     this.logger.debug(`\tQuery: ${addProduct}`);
 
-    // And return the promise (since each function here has to return a promise)
     return addProduct;
   }
 
