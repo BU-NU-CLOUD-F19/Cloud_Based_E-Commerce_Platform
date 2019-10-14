@@ -24,6 +24,11 @@ class PostgreSqlRepository {
     this.resource = options.resource;
   }
 
+  postgresDateStr() {
+    return this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`);
+  }
+
+
   async deleteAll() {
     try {
       const query = this.knex.raw('truncate table carts cascade');
@@ -64,7 +69,7 @@ class PostgreSqlRepository {
     const carts = this.knex('carts');
     const createCart = carts.insert({
       cartid: cartid,
-      date_created: this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`),
+      date_created: this.postgresDateStr(),
       uid: 'user1' // TODO: this shouldn't be hardcoded
     }).returning('*');
 
@@ -84,7 +89,7 @@ class PostgreSqlRepository {
       cartid: cartid,
       amount_in_cart: product.amount_in_cart,
       pid: product.pid,
-      date_added: this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`)
+      date_added: this.postgresDateStr()
     }).returning(['pid', 'amount_in_cart']);
 
     this.logger.debug(`\tQuery: ${addProduct}`);
