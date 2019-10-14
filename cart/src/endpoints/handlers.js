@@ -16,7 +16,6 @@ class Handlers {
   }
 
   propsPresent(proplist, obj) {
-    this.logger.debug(`Proplist: ${proplist}, for obj ${JSON.stringify(obj)}`);
     for (let prop of proplist) {
       if (!(prop in obj)) {
         return {valid: false, missing: prop};
@@ -109,11 +108,18 @@ class Handlers {
     return rep.response("TODO: amount should be changed");
   }
 
-  emptyCart(req, rep) {
+  async emptyCart(req, rep) {
     // If cart does not exist, error
-    this.logger.debug(`Emptying cart ${req.params.id}`);
-    // TODO: emptyCart data logic
-    return rep.response("TODO: cart should be emptied.").code(200);
+    this.logger.debug(`Handler: Emptying cart ${req.params.id}`);
+
+    try {
+      const res = await this.model.emptyCart(req.params.id);
+      return rep.response({message: "Cart emptied.", data: res}).code(200);
+    }
+    catch(err) {
+      this.logger.error(JSON.stringify(err));
+    }
+
   }
 
   deleteCart(req, rep) {

@@ -142,17 +142,17 @@ describe("Cart REST API", () => {
 
   it("responds to an empty-cart request", async () => {
     // Insert a few products into the cart
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 2; i++) {
       await requestCart.post(`/${cartid}`).send({ pid: i, amount_in_cart: i }).expect(201);
     }
 
     // Check that the cart contains 3 products
     let res = await requestCart.get(`/${cartid}`).expect(200);
-    expect(res.body.data.length).to.eql(3)
+    expect(res.body.data.length).to.eql(2)
 
     // Empty the cart
     res = await requestCart.put(`/${cartid}/empty`).expect(200);
-    expect(res.body.data).to.eql([]);
+    expect(res.body.data).to.eql(2);  // rows deleted
 
     // Check that the cart is empty
     res = await requestCart.get(`/${cartid}`).expect(200);
@@ -162,8 +162,8 @@ describe("Cart REST API", () => {
   it("responds to a change request", async () => {
     // Define a new product
     let new_product = {
-      pid: 1,
-      amount_in_cart: 2
+      pid: product.pid,
+      amount_in_cart: product.amount_in_cart+5
     }
 
     // Add a product
@@ -174,7 +174,7 @@ describe("Cart REST API", () => {
 
     // Check that the amount has been updated
     const res = await requestCart.get(`/${cartid}`).expect(200)
-    expect(res.body.data[0].amount_in_cart).to.eql(3)
+    expect(res.body.data[0].amount_in_cart).to.eql(new_product.amount_in_cart)
   });
 
   it("responds to a delete request", async () => {

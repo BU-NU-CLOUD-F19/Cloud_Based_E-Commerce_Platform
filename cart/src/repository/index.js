@@ -105,6 +105,17 @@ class PostgreSqlRepository {
 
     return nRowsDeleted;
   }
+
+  async emptyCart(cartid) {
+    const productsInCart = this.knex(this.resource);
+    const query = await productsInCart.where({cartid: cartid}).del();
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const nRowsDeleted = await query;
+    this.logger.debug(`\tResult: deleted ${nRowsDeleted} rows.`);
+
+    return nRowsDeleted;
+  }
 }
 
 module.exports = PostgreSqlRepository;

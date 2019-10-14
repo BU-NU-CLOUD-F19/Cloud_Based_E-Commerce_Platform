@@ -21,15 +21,13 @@ class ShoppingCartModel {
     return this.repository.deleteAll();
   }
 
-  getProducts(cartid) {
+  async getProducts(cartid) {
     return this.repository.getProducts(cartid);
   }
 
   async addProduct(cartid, product) {
     // Check if the cart already exists
     const cartRow = await this.repository.getCart(cartid);
-
-    // TODO: check user ids
 
     // Create it if it doesn't
     if (cartRow.length === 0) {
@@ -41,6 +39,10 @@ class ShoppingCartModel {
 
   async removeProduct(cartid, product) {
     return this.repository.removeProduct(cartid, product);
+  }
+
+  async emptyCart(cartid) {
+    return this.repository.emptyCart(cartid);
   }
 }
 
