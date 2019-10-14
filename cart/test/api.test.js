@@ -12,14 +12,52 @@ const RcProvider = require('kibbutz-rc');
 const Kibbutz = require('kibbutz');
 
 describe("Cart REST API", () => {
-  let product, cartid, cart;
+  let product, cartid, cart, sample_products, sample_users;
 
+  async function loadSampleData() {
+    // Set up test data
+    sample_users = [
+      {
+        "uid": "user1",
+        "fname": "John",
+        "lname": "Doe",
+        "address": "Some Street 22",
+        "phone": 1231231231,
+        "email": "john@doe.com"
+      }
+    ]
+
+    sample_products = [
+      {
+        "pid": 1,
+        "pcode": "ABC123",
+        "price": 42.5,
+        "sku": "XYZ",
+        "amount_in_stock": 10,
+        "pname": "Something",
+        "description": "This is something very interesting that you want to buy.",
+        "lang": "en_US"
+      },
+      {
+        "pid": 2,
+        "pcode": "FD2",
+        "price": 99.99,
+        "sku": "QWOP",
+        "amount_in_stock": 100,
+        "pname": "Speedos",
+        "description": "I'm too lazy to write a description",
+        "lang": "en_US"
+      }
+    ]
+
+    // Create the records in the database
+    logger.debug(`Inserting sample records`);
+
+    await cart.repository.knex('products').insert(sample_products);
+    await cart.repository.knex('users').insert(sample_users);
+  }
   before(function before() {
-    product = {
-      pid: 1,
-      amount_in_cart: 3
-    }
-    cartid = 1;
+    // Set up the required config
     const pkg = require('../package');
     const rcLoader = new RcProvider({
       appName: pkg.config.appName
@@ -41,14 +79,36 @@ describe("Cart REST API", () => {
       cart = new Cart({repository: repository});
 
       logger.debug(`Starting test at ${new Date().toLocaleString()}`);
+
+      loadSampleData();
+
+      // Create a sample product
+      product = {
+        pid: 1,
+        amount_in_cart: 3
+      }
+      // Choose a sample cart
+      cartid = 1;
     })
   });
 
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
   })
+
   after(async function after() {
     await cart.deleteAll();
+
+    // Remove the sample data created in before()
+    logger.debug("Removing sample data");
+    for (let user of sample_users) {
+      await cart.repository.knex('users').where({uid: user.uid}).del();
+    }
+    for (let product of sample_products) {
+      await cart.repository.knex('products').where({pid: product.pid}).del();
+    }
+
+    logger.debug("Test finished.");
   })
 
   // Functionality

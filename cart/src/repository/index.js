@@ -1,6 +1,8 @@
 /**
  * This is the repository class which talks to the database for all
- * the storage and retrieval functions
+ * the storage and retrieval functions.
+ * Most methods do not have try-catches, as errors are caught in the handler and returned
+ * with the appropriate HTTP code.
  */
 
 'use strict';
@@ -42,18 +44,13 @@ class PostgreSqlRepository {
   }
 
   async getProducts(cartid) {
-    try {
-      // If there is a product, the cart must exist due to db constraints
-      const knexBuilder = this.knex(this.resource)
-      const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
-      this.logger.debug(`\tQuery: ${query}`);
-      const result = await query;
-      this.logger.debug(`\tRetrieved ${result.length} records.`);
-      return result;
-    }
-    catch(err) {
-      this.logger.error(err.message);
-    }
+    // If there is a product, the cart must exist due to db constraints
+    const knexBuilder = this.knex(this.resource)
+    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
+    this.logger.debug(`\tQuery: ${query}`);
+    const result = await query;
+    this.logger.debug(`\tRetrieved ${result.length} records.`);
+    return result;
   }
 
   async getCart(cartid) {
