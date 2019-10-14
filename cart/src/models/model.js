@@ -44,6 +44,24 @@ class ShoppingCartModel {
   async emptyCart(cartid) {
     return this.repository.emptyCart(cartid);
   }
+
+  async changeAmount(cartid, product) {
+    return this.repository.changeAmount(cartid, product);
+  }
+
+  async deleteCart(cartid) {
+    // Check if the cart exists
+    //  (doing this preliminary reduces the amount of db queries in case of error)
+    const cartRow = await this.repository.getCart(cartid);
+
+    // If it doesn't, error
+    if (cartRow.length === 0) {
+      return 0;
+    }
+
+    // If it does, delete it
+    return this.repository.deleteCart(cartid);
+  }
 }
 
 // binds base model to the kernel

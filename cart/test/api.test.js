@@ -14,6 +14,7 @@ const Kibbutz = require('kibbutz');
 describe("Cart REST API", () => {
   let product, cartid, cart, sample_products, sample_users;
 
+  // Utility function to initialize data
   async function loadSampleData() {
     // Set up test data
     sample_users = [
@@ -53,9 +54,12 @@ describe("Cart REST API", () => {
     // Create the records in the database
     logger.debug(`Inserting sample records`);
 
+    await cart.deleteAll();
     await cart.repository.knex('products').insert(sample_products);
     await cart.repository.knex('users').insert(sample_users);
   }
+
+  // Set up the connection and sample data
   before(function before() {
     // Set up the required config
     const pkg = require('../package');
@@ -92,23 +96,9 @@ describe("Cart REST API", () => {
     })
   });
 
+  // Clear the carts and products in cart before each test
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
-  })
-
-  after(async function after() {
-    await cart.deleteAll();
-
-    // Remove the sample data created in before()
-    logger.debug("Removing sample data");
-    for (let user of sample_users) {
-      await cart.repository.knex('users').where({uid: user.uid}).del();
-    }
-    for (let product of sample_products) {
-      await cart.repository.knex('products').where({pid: product.pid}).del();
-    }
-
-    logger.debug("Test finished.");
   })
 
   // Functionality
@@ -181,11 +171,11 @@ describe("Cart REST API", () => {
     // Add a product
     await requestCart.post(`/${cartid}`).send(product).expect(201);
 
-    // Delete it
+    // Delete the cart
     await requestCart.delete(`/${cartid}`).expect(200);
 
     // Check that the product is gone
-    const res = await requestCart.get(`${cartid}`).expect(200);
+    const res = await requestCart.get(`/${cartid}`).expect(200);
     expect(res.body.data).to.eql([]);
   })
 
@@ -201,4 +191,26 @@ describe("Cart REST API", () => {
   it("Rejects a malformed change request", async () => {
     await requestCart.put(`/${cartid}`).expect(400)
   });
+
+
+  // Clean up after all tests
+  after(async function after() {
+    // Remove carts and products in cart
+    await cart.deleteAll();
+
+    // Remove the sample data created in before()
+    logger.debug("Removing sample data");
+    for (let user of sample_users) {
+      await cart.repository.knex('users').where({uid: user.uid}).del();
+    }
+    for (let prod of sample_products) {
+      await cart.repository.knex('products').where({pid: prod.pid}).del();
+    }
+
+    // Close the knex connection
+    cart.repository.knex.destroy();
+
+    logger.debug("Test finished.");
+  })
+
 })

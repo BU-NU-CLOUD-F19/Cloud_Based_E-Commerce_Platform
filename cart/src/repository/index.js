@@ -76,6 +76,17 @@ class PostgreSqlRepository {
     return created;
   }
 
+  async deleteCart(cartid) {
+    await this.emptyCart(cartid);
+    const carts = this.knex('carts');
+
+    const query = carts.where({cartid: cartid}).del();
+    this.logger.debug(`\tQuery: ${query}`);
+    const removed = await query;
+    this.logger.debug(`\tResult: ${removed}`);
+    return removed;
+  }
+
   // Add a product to the specified cart
   async addProduct(cartid, product) {
     // Set up the table reference
@@ -115,6 +126,17 @@ class PostgreSqlRepository {
     this.logger.debug(`\tResult: deleted ${nRowsDeleted} rows.`);
 
     return nRowsDeleted;
+  }
+
+  async changeAmount(cartid, product) {
+    const productsInCart = this.knex(this.resource);
+    const query = await productsInCart.where({cartid: cartid, pid: product.pid})
+                                      .update({amount_in_cart: product.amount_in_cart})
+                                      .returning('*')
+    this.logger.debug(`\tQuery: ${query}`);
+    const res = await query;
+    this.logger.debug(`\tResult ${JSON.stringify(res)}`);
+    return res;
   }
 }
 

@@ -15,7 +15,7 @@ class Handlers {
     this.logger = logger;
   }
 
-  propsPresent(proplist, obj) {
+  static propsPresent(proplist, obj) {
     for (let prop of proplist) {
       if (!(prop in obj)) {
         return {valid: false, missing: prop};
@@ -54,6 +54,11 @@ class Handlers {
         this.logger.debug(`${message} -- ${err.detail}`);
         return rep.response(message).code(400);
       }
+      else if (err.constraint === "products_in_cart_pkey") {
+        let message = '\tProduct already present in cart.';
+        this.logger.debug(`${message} -- ${err.detail}`);
+        return rep.response(message).code(400);
+      }
       else {
         this.logger.error(JSON.stringify(err));
         throw err;
@@ -89,23 +94,45 @@ class Handlers {
       this.logger.error(JSON.stringify(err));
       throw err;
     }
-
-
-    // return rep.response("TODO: product should be removed.").code(200);
   }
 
-  changeAmount(req, rep) {
-    // If product not in cart, error.
-    // If cart does not exist, error.
-    // Should we deal with product not in stock?
+  async changeAmount(req, rep) {
+    // TODO: Should we deal with product not in stock?
 
     if (!req.payload) {
       return rep.response("Body cannot be empty.").code(400);
     }
+    const isValid = this.propsPresent(['pid', 'amount_in_cart'], req.payload);
+    if (!isValid.valid) {
+      return rep.response(`${isValid.missing} not specified.`).code(400);
+    }
+    if (req.payload.amount_in_cart <= 0) {
+      return rep.response("Amount must be greater than 0.").code(400);
+    }
 
-    this.logger.debug(`Changing amount of product in cart ${req.params.id}`);
-    // TODO: changeAmount data logic
-    return rep.response("TODO: amount should be changed");
+    this.logger.debug(`Handler: Changing amount of product in cart ${req.params.id}`);
+
+    try {
+      const res = await this.model.changeAmount(req.params.id, req.payload);
+
+      if (res.length > 0) {
+        return rep.response({message: "Amount updated.", data: res});
+      }
+      else {
+        return rep.response("No such product in cart.").code(400);
+      }
+    }
+    catch(err) {
+      if (err.constraint === "products_in_cart_pid_fkey") {
+        let message = 'Product does not exist.';
+        this.logger.debug(`\t${message}`);
+        return rep.response(message).code(400);
+      }
+      else {
+        this.logger.error(JSON.stringify(err));
+      }
+    }
+
   }
 
   async emptyCart(req, rep) {
@@ -122,14 +149,25 @@ class Handlers {
 
   }
 
-  deleteCart(req, rep) {
+  async deleteCart(req, rep) {
     // If cart does not exist, error
     // Empty the cart.
     // Delete the cart.
+    this.logger.debug(`Handler: Removing cart ${req.params.id}`);
 
-    this.logger.debug(`Removing cart ${req.params.id}`);
-    // TODO: deleteCart data logic
-    return rep.response("TODO: cart should be deleted.").code(200);
+    try {
+      const res = await this.model.deleteCart(req.params.id);
+
+      if (res > 0) {
+        return rep.response({message: "Cart deleted.", data: res})
+      }
+      else {
+        return rep.response("Cart does not exist").code(400);
+      }
+    }
+    catch(err) {
+      this.logger.error(JSON.stringify(err));
+    }
   }
 
   async getProducts(req, rep) {
@@ -140,7 +178,7 @@ class Handlers {
     }
     catch(err)  {
       this.logger.error(err.message);
-    };
+    }
   }
 
   /**
