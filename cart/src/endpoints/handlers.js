@@ -214,7 +214,12 @@ class Handlers {
       return rep.response({message: "Cart emptied.", data: res}).code(200);
     }
     catch(err) {
-      this.logger.error(JSON.stringify(err));
+      if (err instanceof ReferenceError) {
+        return rep.response({message: "Cart does not exist."}).code(400);
+      }
+      else {
+        this.logger.error(JSON.stringify(err));
+      }
     }
   }
 

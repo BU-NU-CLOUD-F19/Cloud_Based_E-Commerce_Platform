@@ -69,7 +69,14 @@ class ShoppingCartModel {
    * @param {number} cartid - the id associated with a cart
    */
   async emptyCart(cartid) {
-    return this.repository.emptyCart(cartid);
+    const cartRow = await this.repository.getCart(cartid);
+
+    if (cartRow.length === 0) {
+      throw new ReferenceError("Cart doesn't exist");
+    }
+    else {
+      return this.repository.emptyCart(cartid);
+    }
   }
 
   /**
