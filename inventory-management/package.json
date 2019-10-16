@@ -1,0 +1,28 @@
+{
+  "name": "inventory-management",
+  "version": "1.0.0",
+  "description": "Micro-service for inventory management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Samarth Parikh",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/glue": "^6.2.0",
+    "jerkface": "^1.0.0",
+    "kibbutz": "^2.0.0",
+    "kibbutz-rc": "^1.0.0",
+    "knex": "^0.19.4",
+    "pg": "^7.12.1",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "nodemon": "^1.19.2",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "supertest": "^4.0.2"
+  }
+}
