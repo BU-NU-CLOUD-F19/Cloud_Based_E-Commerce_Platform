@@ -11,7 +11,10 @@ const Names = require('../constants/modelNames');
 const resource = Names.cart;
 
 
+/**
+ * Create the register function for the Hapi plugin
+ */
 module.exports.register = (server, options) => {
-  new Router(null, options).route(server);
+  new Router(options).route(server);
 };
 module.exports.name = resource;

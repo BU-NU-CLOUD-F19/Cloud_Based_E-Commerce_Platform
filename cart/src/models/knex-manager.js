@@ -1,6 +1,6 @@
 /**
  * Kernel is used to better manage Knex instances across the app.
- Because Kernel bindings must be objects, we created a Knex manager class.
+ * Because Kernel bindings must be objects, we created a Knex manager class.
  */
 
 // Import the defined Jerkface container

@@ -5,11 +5,7 @@ const host = "localhost";
 const port = 3000;
 const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
-const Pg = require('../src/repository');
-const Cart = require('../src/models').Model;
 const logger = require('../src/utils/logger');
-const RcProvider = require('kibbutz-rc');
-const Kibbutz = require('kibbutz');
 
 describe("Cart REST API", () => {
   let product, cartid, cart, sample_products, sample_users;
@@ -53,55 +49,57 @@ describe("Cart REST API", () => {
 
     // Create the records in the database
     logger.debug(`Inserting sample records`);
-
-    await cart.deleteAll();
+    await cart.deleteAll(); // Clear out the existing data
     await cart.repository.knex('products').insert(sample_products);
     await cart.repository.knex('users').insert(sample_users);
   }
 
-  // Set up the connection and sample data
+  // Runs before all tests
   before(function before() {
-    // Set up the required config
-    const pkg = require('../package');
-    const rcLoader = new RcProvider({
-      appName: pkg.config.appName
-    });
 
-    const config = new Kibbutz();
-    config.load([rcLoader], (err, conf) => {
+    // Load the config and wait for it to load
+    const config = require('../src/configs/config');
+    config.then(() => {
 
-      const {
-        connection
-      } = conf.persistence.postgres;
+      // Set up all the required constants
+      const Kernel = require('../src/models/kernel');
+      const Names = require('../src/constants/modelNames');
+      const knexManager = Kernel.resolve(Names.knexManager);
+      const knexInstance = knexManager.knex
+      const Pg = require('../src/models/repository');
+      const Cart = require('../src/models').Model;
 
-      let knexInstance = require('knex')({
-        client: 'pg',
-        connection
-      });
+      // Set up the cart model to be able to call its methods directly
       let repoOpts = {knex: knexInstance, resource: 'products_in_cart', logger: logger};
       let repository = new Pg(repoOpts);
       cart = new Cart({repository: repository});
 
+      // Log the start of the test
       logger.debug(`Starting test at ${new Date().toLocaleString()}`);
 
+      // Load the sample data into the database
       loadSampleData();
 
-      // Create a sample product
+      // Define a sample reference to a product for later use
       product = {
         pid: 1,
         amount_in_cart: 3
       }
-      // Choose a sample cart
+      // Choose a sample cart id
       cartid = 1;
     })
-  });
+    .catch(err => {
+      logger.error(err.message);
+      throw err;
+    })
+  })
 
-  // Clear the carts and products in cart before each test
+  // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
   })
 
-  // Functionality
+  // Test API functionality
   it("lists products", async () => {
     // Check if product listing is possible
     const res = await requestCart.get(`/${cartid}`).expect(200)
@@ -179,7 +177,7 @@ describe("Cart REST API", () => {
     expect(res.body.data).to.eql([]);
   })
 
-  // Error handling
+  // Check API error handling
   it("Rejects a malformed remove request", async () => {
     await requestCart.put(`/${cartid}/remove`).expect(400)
   });
@@ -192,8 +190,7 @@ describe("Cart REST API", () => {
     await requestCart.put(`/${cartid}`).expect(400)
   });
 
-
-  // Clean up after all tests
+  // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
     await cart.deleteAll();

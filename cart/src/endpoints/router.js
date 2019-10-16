@@ -1,26 +1,35 @@
 /**
- * The base class for all the router classes to be implemented.
- * This class defines the basic routes (GET, POST, PUT, PATCH, DELETE)
- * for all the resources.
+ * The Router for the cart, contains all HTTP routes pertaining to cart actions and
+ * links them to the corresponding handlers.
  */
 
 'use strict';
 
+// Handlers for the routes, triggered on request
 const Handlers = require('./handlers.js');
-const resource = require('../constants/modelNames').cart;
 
+/**
+ * The Hapi router, creates HTTP routes
+ */
 class Router {
-  constructor(handler) {
-    this.resource = resource;
-    this.handler = handler || (new Handlers());
+  /**
+   * Constructor to create the class
+   * @param {object} options - options passed to the router during registration in /registrations.js
+   */
+  constructor(options) {
+    this.handlers = new Handlers();
   }
 
+  /**
+   * All HTTP POST route definitions
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routePost(server) {
     server.route([
       {
         method: 'POST',
         path: `/cart/{id}`,
-        handler: this.handler.addProduct.bind(this.handler),
+        handler: this.handlers.addProduct.bind(this.handlers),
         config: {
           description: `Add a product to the cart.`,
           tags: ['api', 'cart'],
@@ -35,12 +44,16 @@ class Router {
     ]);
   }
 
+  /**
+   * All HTTP PUT route definitions
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routePut(server) {
     server.route([
       {
         method: 'PUT',
         path: `/cart/{id}/remove`,
-        handler: this.handler.removeProduct.bind(this.handler),
+        handler: this.handlers.removeProduct.bind(this.handlers),
         config: {
           description: 'Remove a product from the cart.',
           tags: ['api', 'cart'],
@@ -55,7 +68,7 @@ class Router {
       {
         method: 'PUT',
         path: '/cart/{id}/empty',
-        handler: this.handler.emptyCart.bind(this.handler),
+        handler: this.handlers.emptyCart.bind(this.handlers),
         config: {
           description: 'Empty the cart, removing all products (but does not remove the cart).',
           tags: ['api', 'cart'],
@@ -70,7 +83,7 @@ class Router {
       {
         method: 'PUT',
         path: '/cart/{id}',
-        handler: this.handler.changeAmount.bind(this.handler),
+        handler: this.handlers.changeAmount.bind(this.handlers),
         config: {
           description: 'Change the amount of product in the cart.',
           tags: ['api', 'cart'],
@@ -85,12 +98,16 @@ class Router {
     ]);
   }
 
+   /**
+   * All HTTP GET route definitions
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeGet(server) {
     server.route([
       {
         method: 'GET',
         path: `/cart/{id}`,
-        handler: this.handler.getProducts.bind(this.handler),
+        handler: this.handlers.getProducts.bind(this.handlers),
         config: {
           description: 'Get all products in a cart.',
           tags: ['api', 'cart'],
@@ -104,13 +121,16 @@ class Router {
       }
     ]);
   }
-
+   /**
+   * All HTTP DELETE route definitions
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeDelete(server) {
     server.route([
       {
         method: 'DELETE',
         path: '/cart/{id}',
-        handler: this.handler.deleteCart.bind(this.handler),
+        handler: this.handlers.deleteCart.bind(this.handlers),
         config: {
           description: 'Clear and delete the cart.',
           tags: ['api', 'cart'],
@@ -125,53 +145,17 @@ class Router {
     ])
   }
 
+
+  /**
+   * Actually adds the routes to the server
+   * @param {Hapi.server} server - the Hapi server
+   */
   route(server) {
     this.routeGet(server);
     this.routePost(server);
     this.routePut(server);
     this.routeDelete(server);
   }
-
-  // FOR REFERENCE */
-  // routeGet(server) {
-  //   server.route({
-  //     method: 'GET',
-  //     path: `/${this.resource}/{id}`,
-  //     handler: this.handler.findOneById.bind(this.handler), // bind a request handler for this route
-  //     config: {
-  //       description: `Get a ${this.resource} record by id.`,
-  //       tags: ['api'],
-  //       plugins: {
-  //         'hapi-swagger': {
-  //           responses: {
-  //             201: { description: 'Success' },
-  //             400: { description: 'Bad Request' },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
-
-  // routePost(server) {
-  //   server.route({
-  //     method: 'POST',
-  //     path: `/${this.resource}`,
-  //     handler: this.handler.insert.bind(this.handler),
-  //     config: {
-  //       description: `Post to ${this.resource}.`,
-  //       tags: ['api'],
-  //       plugins: {
-  //         'hapi-swagger': {
-  //           responses: {
-  //             201: { description: 'Success' },
-  //             400: { description: 'Bad Request' },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
 }
 
 module.exports = Router;

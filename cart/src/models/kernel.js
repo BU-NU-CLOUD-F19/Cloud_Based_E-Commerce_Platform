@@ -1,5 +1,5 @@
 /**
- * Creates a shared instance of container that can be used anywhere in the application.
+ * Creates a shared instance of Container that can be used anywhere in the application.
  */
 
 'use strict';

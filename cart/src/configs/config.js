@@ -19,7 +19,7 @@ const RcProvider = require('kibbutz-rc');
 const pkg = require('../../package');
 
 // Class that gets the Knex db query builder instance
-const getKnex = require('../repository/knex');
+const getKnex = require('../models/knex');
 
 // Jerkface container that holds names mapped to class isntances
 const Kernel = require('../models/kernel');
