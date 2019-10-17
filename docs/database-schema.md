@@ -6,10 +6,10 @@ The entity-relationship diagram:
 This gives the following relations:
 - Products (*pid*, pcode, price, sku, amount_in_stock, pname, desc, lang)
 - Users (*uid*, fname, lname, address, phone, email, pass NULLABLE)
-- Carts (*cartid*, date_modified, date_created, uid → User)
-- ProductsInCart (*cartid → Carts*, *pid → Product*, amount_in_cart, date_added)
+- Carts (*cart_id*, date_modified, date_created, uid → User)
+- Products_In_Cart (*cart_id → Carts*, *pid → Product*, amount_in_cart, date_added)
 - Orders (*oid*, total_price, date, destination, shipping, uid → User)
-- ProductsInOrder (*oid → Orders*, *pid → Products*, amount_in_order)
+- Products_In_Order (*oid → Orders*, *pid → Products*, amount_in_order)
 
 Resulting in the following schema:
 
@@ -43,18 +43,18 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Carts (
-  cartid VARCHAR(50) PRIMARY KEY,
+  cart_id VARCHAR(50) PRIMARY KEY,
   date_created TIMESTAMPTZ NOT NULL,
   date_modified TIMESTAMPTZ, -- could be NULL if not modified
   uid VARCHAR(20) REFERENCES Users(uid) NOT NULL
 );
 
-CREATE TABLE ProductsInCart (
-  cartid VARCHAR(50) REFERENCES Carts(cartid),
+CREATE TABLE Products_In_Cart (
+  cart_id VARCHAR(50) REFERENCES Carts(cart_id),
   pid INT REFERENCES Products(pid),
   amount_in_cart INT NOT NULL CHECK (amount_in_cart > 0), -- not equal to 0, because otherwise not in cart
   date_added TIMESTAMPTZ NOT NULL,
-  PRIMARY KEY (cartid, pid)
+  PRIMARY KEY (cart_id, pid)
 );
 
 CREATE TABLE Orders (
@@ -66,7 +66,7 @@ CREATE TABLE Orders (
   uid VARCHAR(20) references Users(uid)
 );
 
-CREATE TABLE ProductsInOrder (
+CREATE TABLE Products_In_Order (
   oid INT references Orders(oid),
   pid INT references Products(pid),
   amount_in_order INT NOT NULL CHECK (amount_in_order > 0),

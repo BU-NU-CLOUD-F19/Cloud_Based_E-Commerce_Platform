@@ -25,8 +25,7 @@ services:
       # A place to store postgres data
       - ./db/db-data:/var/lib/postgresql/data
       # Script to initialize a test database
-      - ./db/test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
-      - ./db/test-db/init-demo-db.sql:/docker-entrypoint-initdb.d/init-demo-db.sql
+      - ./db/test-db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
 
   # Pgadmin service (web interface)
@@ -49,10 +48,9 @@ services:
       - "${PGADMIN_PORT:-5050}:80"
     restart: unless-stopped
 
-  # Boilerplate for microservice (Node)
-  boilerplate:
-    build: ./boilerplate
-    container_name: "boilerplate"
+  cart:
+    build: ./cart
+    container_name: "cart"
 
     # Forward ports, format 'container:host'
     ports:
@@ -61,12 +59,13 @@ services:
     # Mount local directories on the container filesystem.
     # Should not happen in production.
     volumes:
-      - ./boilerplate/src:/usr/app/src
-      - ./boilerplate/app.js:/usr/app/app.js
-      - ./boilerplate/process.json:/usr/app/process.json
-      - ./boilerplate/registrations.js:/usr/app/registrations.js
-      - ./boilerplate/.boilerplaterc:/usr/app/.boilerplaterc
-      - ./boilerplate/log:/usr/app/log
+      - ./cart/src:/usr/app/src
+      - ./cart/app.js:/usr/app/app.js
+      - ./cart/process.json:/usr/app/process.json
+      - ./cart/registrations.js:/usr/app/registrations.js
+      - ./cart/.cartrc:/usr/app/.cartrc
+      - ./cart/log:/usr/app/log
+      - ./cart/test:/usr/app/test
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
 
