@@ -80,13 +80,13 @@ class Handlers {
         return rep.response({message: message}).code(400);
       }
       else if (err.constraint === "carts_uid_fkey") {
-        let message = '\tUser does not exist.';
-        this.logger.debug(`${message} -- ${err.detail}`);
+        let message = 'User does not exist.';
+        this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
       }
       else if (err.constraint === "products_in_cart_pkey") {
-        let message = '\tProduct already present in cart.';
-        this.logger.debug(`${message} -- ${err.detail}`);
+        let message = 'Product already present in cart.';
+        this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
       }
       else {
