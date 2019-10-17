@@ -25,14 +25,6 @@ matrix:
         - npm install
       script: npm run lint
       name: "Cart"
-    - stage: "Test"
-      before_script:
-        - cd cart/
-        - npm install
-      # Disabling this for now because I have no idea how to use the database in tests on Travis
-      # script: npm test
-      script: skip
-      name: "Cart"
     - before_script:
         - cd members-graphql-service/
         - npm install
@@ -44,6 +36,14 @@ matrix:
         - npm install
       script: npm run lint
       name: "Tests"
+    - stage: "Test"
+      before_script:
+        - cd cart/
+        - npm install
+      # Disabling this for now because I have no idea how to use the database in tests on Travis
+      # script: npm test
+      script: skip
+      name: "Cart"
 # Since we have multiple subprojects, use a build matrix.
 # https://docs.travis-ci.com/user/build-matrix
 # node_modules is cached by default by Travis.
