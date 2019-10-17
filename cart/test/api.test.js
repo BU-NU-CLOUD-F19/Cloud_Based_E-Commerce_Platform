@@ -7,7 +7,7 @@ const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
 
 describe("Cart REST API", () => {
-  let product, cartid, cart, sample_products, sample_users;
+  let product, cartid, cart, productsInCart, sample_products, sample_users;
 
   // Utility function to initialize data
   async function loadSampleData() {
@@ -49,26 +49,21 @@ describe("Cart REST API", () => {
     // Create the records in the database
     console.log(`Inserting sample records`);
     await cart.deleteAll(); // Clear out the existing data
+    await productsInCart.deleteAll(); // Clear out the existing data
+
+    // Kind of a hack to access the other tables, replace this with models eventually
     await cart.repository.knex('products').insert(sample_products);
     await cart.repository.knex('users').insert(sample_users);
   }
 
-  async function initCart() {
+  async function initModels() {
     try {
       await require('../src/configs/config');
 
       // Set up all the required constants
-      const Kernel = require('../src/models/kernel');
-      const Names = require('../src/constants/modelNames');
-      const knexManager = Kernel.resolve(Names.knexManager);
-      const knexInstance = knexManager.knex
-      const Pg = require('../src/models/repository');
-      const Cart = require('../src/models').Model;
+      const { ProductsInCart, Cart } = require('../src/models/');
 
-      // Set up the cart model to be able to call its methods directly
-      let repoOpts = {knex: knexInstance, resource: 'products_in_cart'};
-      let repository = new Pg(repoOpts);
-      return new Cart({repository: repository});
+      return { cart: new Cart(), productsInCart: new ProductsInCart() }
     }
     catch(err)  {
       console.log(err.message);
@@ -80,9 +75,10 @@ describe("Cart REST API", () => {
   before(function before() {
 
     // Load the config and wait for it to load
-    initCart().then(newCart => {
+    initModels().then(objs => {
 
-      cart = newCart;
+      cart = objs.cart;
+      productsInCart = objs.productsInCart
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
@@ -103,6 +99,7 @@ describe("Cart REST API", () => {
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
+    await productsInCart.deleteAll();
   })
 
   // Test API functionality
@@ -200,6 +197,7 @@ describe("Cart REST API", () => {
   after(async function after() {
     // Remove carts and products in cart
     await cart.deleteAll();
+    await productsInCart.deleteAll();
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
@@ -212,6 +210,7 @@ describe("Cart REST API", () => {
 
     // Close the knex connection
     cart.repository.knex.destroy();
+    productsInCart.repository.knex.destroy();
 
     console.log("Test finished.");
   })

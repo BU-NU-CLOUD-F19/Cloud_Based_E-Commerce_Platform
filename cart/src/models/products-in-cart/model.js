@@ -1,16 +1,15 @@
 'use strict';
 
-const Kernel = require('./kernel');
-const Names = require('../constants/modelNames');
+const Kernel = require('../../repository/').Kernel;
+const Names = require('../../constants/modelNames');
 
 // The data repository (database)
-const Repository = require('./repository');
+const Repository = require('../../repository/').ProductsInCart;
 
 /**
- * The model for the shopping cart acts as an interface between the routes/handlers and the database.
- * It contains all data logic pertaining to the shopping cart.
+ * The model managing the products in carts.
  */
-class ShoppingCartModel {
+class ProductsInCartModel {
   constructor(options = {}) {
     this.resource = Names.cart;
     this.repository = options.repository || (new Repository());
@@ -41,14 +40,6 @@ class ShoppingCartModel {
    * @param {object} product - an object describing the product, containing at least the fields 'pid', 'amount_in_cart'
    */
   async addProduct(cartid, product) {
-    // Check if the cart already exists
-    const cartRow = await this.repository.getCart(cartid);
-
-    // Create it if it doesn't
-    if (cartRow.length === 0) {
-      await this.repository.createCart(cartid);
-    }
-
     // Add the product and return it
     return this.repository.addProduct(cartid, product);
   }
@@ -69,14 +60,7 @@ class ShoppingCartModel {
    * @param {number} cartid - the id associated with a cart
    */
   async emptyCart(cartid) {
-    const cartRow = await this.repository.getCart(cartid);
-
-    if (cartRow.length === 0) {
-      throw new ReferenceError("Cart doesn't exist");
-    }
-    else {
       return this.repository.emptyCart(cartid);
-    }
   }
 
   /**
@@ -88,28 +72,9 @@ class ShoppingCartModel {
   async changeAmount(cartid, product) {
     return this.repository.changeAmount(cartid, product);
   }
-
-  /**
-   * Delete a cart, also removing all products in it.
-   * @async
-   * @param {number} cartid - the id associated with a cart
-   */
-  async deleteCart(cartid) {
-    // Check if the cart exists
-    //  (doing this as a preliminary check reduces the amount of db queries)
-    const cartRow = await this.repository.getCart(cartid);
-
-    // If it doesn't, return 0 records deleted, which makes the route handler generate an error
-    if (cartRow.length === 0) {
-      return 0;
-    }
-
-    // If it does, delete it
-    return this.repository.deleteCart(cartid);
-  }
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.cart, ShoppingCartModel);
+Kernel.bind(Names.cart, ProductsInCartModel);
 
-module.exports = ShoppingCartModel;
+module.exports = ProductsInCartModel;

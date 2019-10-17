@@ -5,8 +5,10 @@
 'use strict';
 
 // cart
-const Model = require('./model');
+const Cart = require('./cart/').Model;
+const ProductsInCart = require('./products-in-cart/').Model;
 
 module.exports = {
-  Model
+  Cart,
+  ProductsInCart
 };

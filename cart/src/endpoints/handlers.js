@@ -6,14 +6,16 @@
 'use strict';
 
 const logger = require('../utils/logger');
-const Model = require('../models').Model;
+const ProductsInCart = require('../models/').ProductsInCart;
+const Carts = require('../models/').Cart;
 
 /**
  * The handler functions for all endpoints defined for the cart
  */
 class Handlers {
   constructor() {
-    this.model = new Model();
+    this.productsInCart = new ProductsInCart();
+    this.carts = new Carts();
     this.logger = logger;
   }
 
@@ -58,7 +60,11 @@ class Handlers {
 
     try {
       // Add the product to the cart
-      const res = await this.model.addProduct(id, payload);
+      if (await this.carts.getCart(id) == 0) {
+        await this.carts.createCart(id);
+      }
+
+      const res = await this.productsInCart.addProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
@@ -113,10 +119,7 @@ class Handlers {
     this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
 
     try {
-      // Remove the product from the cart
-      const { params: { id }, payload } = req;
-
-      const res = await this.model.removeProduct(id, payload);
+      const res = await this.productsInCart.removeProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
@@ -166,7 +169,7 @@ class Handlers {
 
     try {
       // Change the amount in the cart
-      const res = await this.model.changeAmount(id, payload);
+      const res = await this.productsInCart.changeAmount(id, payload);
 
       // Return the new product record
       if (res.length > 0) {
@@ -206,18 +209,17 @@ class Handlers {
 
     try {
       // Empty the cart
-      const res = await this.model.emptyCart(id);
+      if (await this.carts.getCart(id) === 0) {
+        return rep.response({message: "Cart does not exist."}).code(400);
+      }
+
+      const res = await this.productsInCart.emptyCart(id);
 
       // Return the number of products removed
       return rep.response({message: "Cart emptied.", data: res}).code(200);
     }
     catch(err) {
-      if (err instanceof ReferenceError) {
-        return rep.response({message: "Cart does not exist."}).code(400);
-      }
-      else {
-        this.logger.error(JSON.stringify(err));
-      }
+      this.logger.error(JSON.stringify(err));
     }
   }
 
@@ -234,8 +236,11 @@ class Handlers {
     this.logger.debug(`\tHandler: Removing cart ${id}`);
 
     try {
+      // Empty the cart
+      await this.productsInCart.emptyCart(id);
+
       // Delete the cart
-      const res = await this.model.deleteCart(id);
+      const res = await this.carts.deleteCart(id);
 
       // If something has been deleted, return the number of carts deleted (should always be 1)
       if (res === 1) {
@@ -269,7 +274,7 @@ class Handlers {
       this.logger.debug(`\tHandler: Listing all products in ${id}`);
 
       // Get the products in the cart and return them
-      const result = await this.model.getProducts(id);
+      const result = await this.productsInCart.getProducts(id);
       return rep.response({message: "Products retrieved.", data: result}).code(200);
     }
     catch(err)  {

@@ -1,21 +1,21 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `products_in_cart` resource,
  * using query-builder tool
  */
 
 'use strict';
 
-const logger = require('../utils/logger');
-const Names = require('../constants/modelNames');
-const resource = Names.cart;
-const Kernel = require('./kernel');
-const knex = require('./knex');
+const logger = require('../../utils/logger');
+const Names = require('../../constants/modelNames');
+const resource = Names.productsInCart;
+const Kernel = require('../kernel');
+const knex = require('../knex');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
  * They only retrieve and return data, they do not contain any data logic -- that is the responsibility of the model.
  */
-class ShoppingCartRepository {
+class ProductsInCartRepository {
   constructor(options = {}) {
     const knexManager = Kernel.resolve(Names.knexManager);
 
@@ -49,7 +49,7 @@ class ShoppingCartRepository {
   async deleteAll() {
     try {
       // Knex doesn't provide a way to cascade, so have to use a raw query
-      const query = this.knex.raw('TRUNCATE TABLE carts CASCADE');
+      const query = this.knex.raw(`TRUNCATE TABLE ${this.resource} CASCADE`);
       const result = await query;
 
       this.logger.debug("Successfully truncated the table.");
@@ -76,61 +76,6 @@ class ShoppingCartRepository {
     return result;
   }
 
-  /**
-   * Get the cart record
-   * @async
-   * @param {number} cartid - the id associated with a cart
-   */
-  async getCart(cartid) {
-    const carts = this.knex('carts');
-    const checkCart = carts.select('*').where({cartid});
-    this.logger.debug(`\tQuery: ${checkCart}`);
-
-    const cartsFound = await checkCart;
-    this.logger.debug(`\tResult ${JSON.stringify(cartsFound)}`);
-    return cartsFound;
-  }
-
-  /**
-   * Create a new cart
-   * @async
-   * @param {number} cartid - the id associated with a cart
-   */
-  async createCart(cartid) {
-    const carts = this.knex('carts');
-
-    const cartData = {
-      cartid,
-      date_created: this.postgresDateStr(),
-      uid: 'user1' // TODO: this shouldn't be hardcoded
-    }
-
-    const createCart = carts.insert(cartData).returning('*');
-    this.logger.debug(`\tQuery: ${createCart}`);
-
-    const created = await createCart;
-    this.logger.debug(`\tResult: ${created}`);
-    return created;
-  }
-
-  /**
-   * Delete a cart
-   * @async
-   * @param {number} cartid - the id associated with a cart
-   */
-  async deleteCart(cartid) {
-    // Remove all products in the cart
-    await this.emptyCart(cartid);
-
-    // Remove the cart itself
-    const carts = this.knex('carts');
-    const query = carts.where({cartid}).del();
-    this.logger.debug(`\tQuery: ${query}`);
-
-    const removed = await query;
-    this.logger.debug(`\tResult: ${removed}`);
-    return removed;
-  }
 
   /**
    * Add a product to the specified cart
@@ -210,4 +155,4 @@ class ShoppingCartRepository {
   }
 }
 
-module.exports = ShoppingCartRepository;
+module.exports = ProductsInCartRepository;

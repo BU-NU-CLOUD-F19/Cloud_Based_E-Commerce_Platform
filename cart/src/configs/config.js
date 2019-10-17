@@ -19,16 +19,16 @@ const RcProvider = require('kibbutz-rc');
 const pkg = require('../../package');
 
 // Class that gets the Knex db query builder instance
-const getKnex = require('../models/knex');
+const getKnex = require('../repository/knex');
 
 // Jerkface container that holds names mapped to class isntances
-const Kernel = require('../models/kernel');
+const Kernel = require('../repository/kernel');
 
 // A logger for the application, writes to ./log
 const logger = require('../utils/logger');
 
 // Adds the Knex instance to the Kernel container, to be able to access it
-require('../models/knex-manager');
+require('../repository/knex-manager');
 
 // Define global model names
 const Names = require('../constants/modelNames');

@@ -9,7 +9,8 @@ const names = {
     Models
   */
 
-  cart: 'products_in_cart',
+  productsInCart: 'products_in_cart',
+  cart: 'carts',
 
   /*
      Repository
