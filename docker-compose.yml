@@ -27,6 +27,7 @@ services:
       # Script to initialize a test database
       - ./db/test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
       - ./db/test-db/init-demo-db.sql:/docker-entrypoint-initdb.d/init-demo-db.sql
+      - ./db/test-db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
 
   # Pgadmin service (web interface)
@@ -48,25 +49,23 @@ services:
       # port 5050 for the web interface (port 80 in the container).
       - "${PGADMIN_PORT:-5050}:80"
     restart: unless-stopped
-
-  # Boilerplate for microservice (Node)
-  boilerplate:
-    build: ./boilerplate
-    container_name: "boilerplate"
+  inventory-management:
+    build: ./inventory-management
+    container_name: "inventory-management"
 
     # Forward ports, format 'container:host'
     ports:
-      - 3000:3000
+      - 3020:3020
 
     # Mount local directories on the container filesystem.
     # Should not happen in production.
     volumes:
-      - ./boilerplate/src:/usr/app/src
-      - ./boilerplate/app.js:/usr/app/app.js
-      - ./boilerplate/process.json:/usr/app/process.json
-      - ./boilerplate/registrations.js:/usr/app/registrations.js
-      - ./boilerplate/.boilerplaterc:/usr/app/.boilerplaterc
-      - ./boilerplate/log:/usr/app/log
+      - ./inventory-management/src:/usr/app/src
+      - ./inventory-management/app.js:/usr/app/app.js
+      - ./inventory-management/process.json:/usr/app/process.json
+      - ./inventory-management/registrations.js:/usr/app/registrations.js
+      - ./inventory-management/.inventoryrc:/usr/app/.inventoryrc
+      - ./inventory-management/log:/usr/app/log
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
 

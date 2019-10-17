@@ -7,14 +7,23 @@
 'use strict';
 
 const Handlers = require('./handlers.js');
-const resource = require('../constants/modelNames').cart;
 
+/**
+ * The Hapi router, creates HTTP routes
+ */
 class Router {
-    constructor(handler) {
-        this.resource = resource;
-        this.handler = handler || (new Handlers());
+    /**
+    * Constructor to create the class
+    * @param {object} options - options passed to the router during registration in /registrations.js
+    */
+    constructor(options) {
+        this.handler = new Handlers();
     }
 
+    /**
+    * All HTTP POST route definitions
+    * @param {Hapi.server} server - the Hapi server to which to add the route
+    */
     routePost(server) {
         server.route([
             {
@@ -35,45 +44,19 @@ class Router {
         ]);
     }
 
+    /**
+    * All HTTP PUT route definitions
+    * @param {Hapi.server} server - the Hapi server to which to add the route
+    */
     routePut(server) {
         server.route([
             {
                 method: 'PUT',
-                path: `/inventory/remove/{id}`,
-                handler: this.handler.removeProduct.bind(this.handler),
-                config: {
-                    description: 'Remove a product from the inventory.',
-                    tags: ['api', 'inventory'],
-                    plugins: {
-                        'hapi-swagger': {
-                            200: { description: 'Product removed from inventory' },
-                            400: { description: 'Bad request (e.g. body empty)' }
-                        }
-                    }
-                }
-            },
-            {
-                method: 'PUT',
-                path: '/inventory/empty',
-                handler: this.handler.emptyCart.bind(this.handler),
-                config: {
-                    description: 'Empty the inventory.',
-                    tags: ['api', 'inventory'],
-                    plugins: {
-                        'hapi-swagger': {
-                            200: { description: 'Inventory emptied' },
-                            400: { description: 'Bad request.' }
-                        }
-                    }
-                }
-            },
-            {
-                method: 'PUT',
                 path: '/inventory/{id}',
-                handler: this.handler.changeAmount.bind(this.handler),
+                handler: this.handler.updateProduct.bind(this.handler),
                 config: {
                     description: 'Change the details of product in the inventory.',
-                    tags: ['api', 'cart'],
+                    tags: ['api', 'inventory'],
                     plugins: {
                         'hapi-swagger': {
                             200: { description: 'Product details updated' },
@@ -85,6 +68,10 @@ class Router {
         ]);
     }
 
+    /**
+    * All HTTP GET route definitions
+    * @param {Hapi.server} server - the Hapi server to which to add the route
+    */
     routeGet(server) {
         server.route([
             {
@@ -120,30 +107,39 @@ class Router {
         ]);
     }
 
-    // routeDelete(server) {
-    //     server.route([
-    //         {
-    //             method: 'DELETE',
-    //             path: '/cart/{id}',
-    //             handler: this.handler.deleteCart.bind(this.handler),
-    //             config: {
-    //                 description: 'Clear and delete the cart.',
-    //                 tags: ['api', 'cart'],
-    //                 plugins: {
-    //                     'hapi-swagger': {
-    //                         200: { description: 'Cart deleted' },
-    //                         400: { desription: 'Bad request' }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     ])
-    // }
+    /**
+    * All HTTP DELETE route definitions
+    * @param {Hapi.server} server - the Hapi server to which to add the route
+    */
+    routeDelete(server) {
+        server.route([
+            {
+                method: 'DELETE',
+                path: `/inventory/{id}`,
+                handler: this.handler.removeProduct.bind(this.handler),
+                config: {
+                    description: `Remove the product from the inventory.`,
+                    tags: ['api', 'inventory'],
+                    plugins: {
+                        'hapi-swagger': {
+                            201: { description: 'Product removed from the inventory' },
+                            400: { description: 'Bad request' }
+                        }
+                    }
+                }
+            }
+        ]);
+    }
 
+    /**
+    * Actually adds the routes to the server
+    * @param {Hapi.server} server - the Hapi server
+    */
     route(server) {
         this.routeGet(server);
         this.routePost(server);
         this.routePut(server);
+        this.routeDelete(server);
     }
 }
 

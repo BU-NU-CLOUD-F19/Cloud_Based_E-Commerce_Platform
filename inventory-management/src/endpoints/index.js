@@ -8,9 +8,11 @@
 const Router = require('./router');
 const Names = require('../constants/modelNames');
 
-const resource = Names;  // TO-DO add varible to import as Names.
+const resource = Names.inventory;  // TO-DO add varible to import as Names.
 
-
+/**
+ * Create the register function for the Hapi plugin
+ */
 module.exports.register = (server, options) => {
     new Router(null, options).route(server);
 };
