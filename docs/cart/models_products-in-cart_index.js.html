@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: endpoints/index.js</title>
+    <title>JSDoc: Source: models/products-in-cart/index.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: endpoints/index.js</h1>
+    <h1 class="page-title">Source: models/products-in-cart/index.js</h1>
 
     
 
@@ -26,26 +26,17 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * This class sets the hapi routes for the `cart` resource
- * (https://github.com/hapijs/glue)
- */
-
-'use strict';
-
-const Router = require('./router');
-const Names = require('../constants/modelNames');
-
-const resource = Names.cart;
-
+            <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Create the register function for the Hapi plugin
+ * Exports the cart model
  */
-module.exports.register = (server, options) => {
-  new Router(options).route(server);
+const Model = require('./model');
+
+module.exports = {
+    Model,
 };
-module.exports.name = resource;
+
 </code></pre>
         </article>
     </section>

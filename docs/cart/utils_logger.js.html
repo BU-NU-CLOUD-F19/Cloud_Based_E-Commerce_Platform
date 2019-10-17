@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: endpoints/index.js</title>
+    <title>JSDoc: Source: utils/logger.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: endpoints/index.js</h1>
+    <h1 class="page-title">Source: utils/logger.js</h1>
 
     
 
@@ -26,27 +26,36 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * This class sets the hapi routes for the `cart` resource
- * (https://github.com/hapijs/glue)
- */
+            <pre class="prettyprint source linenums"><code>// Use the custom Winston logger
+const logger = require('./winstonLogger');
 
-'use strict';
-
-const Router = require('./router');
-const Names = require('../constants/modelNames');
-
-const resource = Names.cart;
-
-
-/**
- * Create the register function for the Hapi plugin
- */
-module.exports.register = (server, options) => {
-  new Router(options).route(server);
+// Creat convenience methods for logging
+const wrappers = {
+    log: (lvl, data) => {
+        logger.log(lvl, data);
+    },
+    info: (data) => {
+        logger.log('info', data);
+    },
+    error: (data) => {
+        logger.log('error', data);
+    },
+    warn: (data) => {
+        logger.log('warn', data);
+    },
+    debug: (data) => {
+        logger.log('debug', data);
+    },
+    /**
+    * Log a Hapi request
+    * @param {Hapi.request} req - the request object
+    */
+    logRequest: (req) => {
+      logger.log('info', `HTTP ${req.method} ${req.path}`);
+    }
 };
-module.exports.name = resource;
-</code></pre>
+
+module.exports = wrappers;</code></pre>
         </article>
     </section>
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: endpoints/index.js</title>
+    <title>JSDoc: Source: repository/knex.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: endpoints/index.js</h1>
+    <h1 class="page-title">Source: repository/knex.js</h1>
 
     
 
@@ -26,26 +26,31 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * This class sets the hapi routes for the `cart` resource
- * (https://github.com/hapijs/glue)
- */
-
-'use strict';
-
-const Router = require('./router');
-const Names = require('../constants/modelNames');
-
-const resource = Names.cart;
-
+            <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Create the register function for the Hapi plugin
- */
-module.exports.register = (server, options) => {
-  new Router(options).route(server);
-};
-module.exports.name = resource;
+ * This class instantiates knex query-builder object.
+ * For more details: http://knexjs.org/
+*/
+
+// Knex: SQL query builder for JS
+const knex = require('knex');
+
+let _knexInstace;
+
+// Defaults to a PostgreSQL database
+function getKnex(connection, pool) {
+  if (!_knexInstace) {
+    _knexInstace = knex({
+      client: process.env.DB_CLIENT || 'pg',
+      connection,
+      pool,
+    });
+  }
+  return _knexInstace;
+}
+
+module.exports = getKnex;
 </code></pre>
         </article>
     </section>
