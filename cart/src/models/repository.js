@@ -49,7 +49,7 @@ class ShoppingCartRepository {
   async deleteAll() {
     try {
       // Knex doesn't provide a way to cascade, so have to use a raw query
-      const query = this.knex.raw('truncate table carts cascade');
+      const query = this.knex.raw('TRUNCATE TABLE carts CASCADE');
       const result = await query;
 
       this.logger.debug("Successfully truncated the table.");
@@ -67,8 +67,8 @@ class ShoppingCartRepository {
    */
   async getProducts(cartid) {
     // If there is a product, the cart must exist due to db constraints, so we don't check that here.
-    const knexBuilder = this.knex(this.resource)
-    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid: cartid});
+    const knexBuilder = this.knex(this.resource);
+    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid});
     this.logger.debug(`\tQuery: ${query}`);
 
     const result = await query;
@@ -83,7 +83,7 @@ class ShoppingCartRepository {
    */
   async getCart(cartid) {
     const carts = this.knex('carts');
-    const checkCart = carts.select('*').where({cartid: cartid});
+    const checkCart = carts.select('*').where({cartid});
     this.logger.debug(`\tQuery: ${checkCart}`);
 
     const cartsFound = await checkCart;
@@ -100,7 +100,7 @@ class ShoppingCartRepository {
     const carts = this.knex('carts');
 
     const cartData = {
-      cartid: cartid,
+      cartid,
       date_created: this.postgresDateStr(),
       uid: 'user1' // TODO: this shouldn't be hardcoded
     }
@@ -124,7 +124,7 @@ class ShoppingCartRepository {
 
     // Remove the cart itself
     const carts = this.knex('carts');
-    const query = carts.where({cartid: cartid}).del();
+    const query = carts.where({cartid}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const removed = await query;
@@ -144,7 +144,7 @@ class ShoppingCartRepository {
     const productsInCart = this.knex(this.resource);
 
     const productData = {
-      cartid: cartid,
+      cartid,
       amount_in_cart: product.amount_in_cart,
       pid: product.pid,
       date_added: this.postgresDateStr()
@@ -166,7 +166,7 @@ class ShoppingCartRepository {
   async removeProduct(cartid, product) {
     const productsInCart = this.knex(this.resource);
 
-    const query = productsInCart.where({cartid: cartid, pid: product.pid}).del();
+    const query = productsInCart.where({cartid, pid: product.pid}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const nRowsDeleted = await query;
@@ -182,7 +182,7 @@ class ShoppingCartRepository {
    */
   async emptyCart(cartid) {
     const productsInCart = this.knex(this.resource);
-    const query = await productsInCart.where({cartid: cartid}).del();
+    const query = await productsInCart.where({cartid}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const nRowsDeleted = await query;
@@ -199,7 +199,7 @@ class ShoppingCartRepository {
    */
   async changeAmount(cartid, product) {
     const productsInCart = this.knex(this.resource);
-    const query = productsInCart.where({cartid: cartid, pid: product.pid})
+    const query = productsInCart.where({cartid, pid: product.pid})
                                       .update({amount_in_cart: product.amount_in_cart})
                                       .returning(['pid', 'amount_in_cart'])
     this.logger.debug(`\tQuery: ${query}`);

@@ -5,7 +5,6 @@ const host = "localhost";
 const port = 3000;
 const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
-const logger = require('../src/utils/logger');
 
 describe("Cart REST API", () => {
   let product, cartid, cart, sample_products, sample_users;
@@ -19,7 +18,7 @@ describe("Cart REST API", () => {
         "fname": "John",
         "lname": "Doe",
         "address": "Some Street 22",
-        "phone": 1231231231,
+        "phone": 1111111111,
         "email": "john@doe.com"
       }
     ]
@@ -48,18 +47,15 @@ describe("Cart REST API", () => {
     ]
 
     // Create the records in the database
-    logger.debug(`Inserting sample records`);
+    console.log(`Inserting sample records`);
     await cart.deleteAll(); // Clear out the existing data
     await cart.repository.knex('products').insert(sample_products);
     await cart.repository.knex('users').insert(sample_users);
   }
 
-  // Runs before all tests
-  before(function before() {
-
-    // Load the config and wait for it to load
-    const config = require('../src/configs/config');
-    config.then(() => {
+  async function initCart() {
+    try {
+      await require('../src/configs/config');
 
       // Set up all the required constants
       const Kernel = require('../src/models/kernel');
@@ -70,12 +66,26 @@ describe("Cart REST API", () => {
       const Cart = require('../src/models').Model;
 
       // Set up the cart model to be able to call its methods directly
-      let repoOpts = {knex: knexInstance, resource: 'products_in_cart', logger: logger};
+      let repoOpts = {knex: knexInstance, resource: 'products_in_cart'};
       let repository = new Pg(repoOpts);
-      cart = new Cart({repository: repository});
+      return new Cart({repository: repository});
+    }
+    catch(err)  {
+      console.log(err.message);
+      throw err;
+    }
+  }
+
+  // Runs before all tests
+  before(function before() {
+
+    // Load the config and wait for it to load
+    initCart().then(newCart => {
+
+      cart = newCart;
 
       // Log the start of the test
-      logger.debug(`Starting test at ${new Date().toLocaleString()}`);
+      console.log(`Starting test at ${new Date().toLocaleString()}`);
 
       // Load the sample data into the database
       loadSampleData();
@@ -87,10 +97,6 @@ describe("Cart REST API", () => {
       }
       // Choose a sample cart id
       cartid = 1;
-    })
-    .catch(err => {
-      logger.error(err.message);
-      throw err;
     })
   })
 
@@ -196,7 +202,7 @@ describe("Cart REST API", () => {
     await cart.deleteAll();
 
     // Remove the sample data created in before()
-    logger.debug("Removing sample data");
+    console.log("Removing sample data");
     for (let user of sample_users) {
       await cart.repository.knex('users').where({uid: user.uid}).del();
     }
@@ -207,7 +213,7 @@ describe("Cart REST API", () => {
     // Close the knex connection
     cart.repository.knex.destroy();
 
-    logger.debug("Test finished.");
+    console.log("Test finished.");
   })
 
 })

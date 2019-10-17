@@ -7,7 +7,7 @@ This microservice provides REST API endpoints for a shopping cart, and integrate
 ## REST API
 ### POST /cart/{id}
 #### Purpose
-Add a new product to a cart, creating the cart if it doesn't exist.
+Add a new product to a cart (automatically creates a new cart if it doesn't exist).
 
 #### Request body
 A JSON object containing

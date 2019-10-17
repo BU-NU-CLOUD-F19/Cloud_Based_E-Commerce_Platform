@@ -17,6 +17,13 @@ const wrappers = {
     },
     debug: (data) => {
         logger.log('debug', data);
+    },
+    /**
+    * Log a Hapi request
+    * @param {Hapi.request} req - the request object
+    */
+    logRequest: (req) => {
+      logger.log('info', `HTTP ${req.method} ${req.path}`);
     }
 };
 

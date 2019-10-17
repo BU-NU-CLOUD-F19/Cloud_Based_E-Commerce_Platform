@@ -34,38 +34,31 @@ class Handlers {
   }
 
   /**
-   * Log a request using Winston
-   * @param {Hapi.request} req - the request object
-   */
-  logRequest(req) {
-    this.logger.info(`HTTP ${req.method} ${req.path}`)
-  }
-
-  /**
    * Add a product to a cart.
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async addProduct(req, rep) {
-    this.logRequest(req);
+    this.logger.logRequest(req);
+    const { params: { id }, payload } = req;
 
     // Check if request contains a body
-    if (!req.payload) {
+    if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], req.payload);
+    const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Adding product ${JSON.stringify(req.payload)} to cart ${req.params.id}`);
+    this.logger.debug(`\tHandler: Adding product ${JSON.stringify(payload)} to cart ${id}`);
 
     try {
       // Add the product to the cart
-      const res = await this.model.addProduct(req.params.id, req.payload);
+      const res = await this.model.addProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
@@ -76,7 +69,7 @@ class Handlers {
     catch (err) {
       if (err.constraint === "products_in_cart_pid_fkey") {
         let message = 'Product does not exist.';
-        this.logger.debug(`\t${message}`);
+        this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
       }
       else if (err.constraint === "carts_uid_fkey") {
@@ -103,29 +96,32 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async removeProduct(req, rep) {
-    this.logRequest(req);
+    this.logger.logRequest(req);
+    const { params: { id }, payload } = req;
 
     // Check if request contains a body
-    if (!req.payload) {
+    if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['pid'], req.payload);
+    const isValid = Handlers.propsPresent(['pid'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Removing product ${req.payload} from cart ${req.params.id}`);
+    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
 
     try {
       // Remove the product from the cart
-      const res = await this.model.removeProduct(req.params.id, req.payload);
+      const { params: { id }, payload } = req;
+
+      const res = await this.model.removeProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
       if (res === 0) {
-        return rep.response({message: `Product ${req.payload.pid} not in cart ${req.params.id}.`}).code(400);
+        return rep.response({message: `Product ${payload.pid} not in cart ${id}.`}).code(400);
       }
       else {
         // Otherwise, return  how many rows were removed
@@ -145,31 +141,32 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async changeAmount(req, rep) {
-    this.logRequest(req);
+    this.logger.logRequest(req);
+    const { params: { id }, payload } = req;
 
     // TODO: Should we deal with product not in stock?
 
     // Check if request contains a body
-    if (!req.payload) {
+    if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], req.payload);
+    const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
     // Check if the new amount is valid
-    if (req.payload.amount_in_cart <= 0) {
+    if (payload.amount_in_cart <= 0) {
       return rep.response({message: "Amount must be greater than 0."}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Changing amount of product in cart ${req.params.id}`);
+    this.logger.debug(`\tHandler: Changing amount of product in cart ${id}`);
 
     try {
       // Change the amount in the cart
-      const res = await this.model.changeAmount(req.params.id, req.payload);
+      const res = await this.model.changeAmount(id, payload);
 
       // Return the new product record
       if (res.length > 0) {
@@ -184,7 +181,7 @@ class Handlers {
     catch(err) {
       if (err.constraint === "products_in_cart_pid_fkey") {
         let message = 'Product does not exist.';
-        this.logger.debug(`\t${message}`);
+        this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
       }
       else {
@@ -201,14 +198,15 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async emptyCart(req, rep) {
-    this.logRequest(req);
+    this.logger.logRequest(req);
+    const { params: { id }} = req;
 
     // If cart does not exist, error
-    this.logger.debug(`\tHandler: Emptying cart ${req.params.id}`);
+    this.logger.debug(`\tHandler: Emptying cart ${id}`);
 
     try {
       // Empty the cart
-      const res = await this.model.emptyCart(req.params.id);
+      const res = await this.model.emptyCart(id);
 
       // Return the number of products removed
       return rep.response({message: "Cart emptied.", data: res}).code(200);
@@ -230,13 +228,14 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async deleteCart(req, rep) {
-    this.logRequest(req);
+    const { params: { id }} = req;
+    this.logger.logRequest(req);
 
-    this.logger.debug(`\tHandler: Removing cart ${req.params.id}`);
+    this.logger.debug(`\tHandler: Removing cart ${id}`);
 
     try {
       // Delete the cart
-      const res = await this.model.deleteCart(req.params.id);
+      const res = await this.model.deleteCart(id);
 
       // If something has been deleted, return the number of carts deleted (should always be 1)
       if (res === 1) {
@@ -263,13 +262,14 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async getProducts(req, rep) {
-    this.logRequest(req);
+    const { params: { id }} = req;
+    this.logger.logRequest(req);
 
     try {
-      this.logger.debug(`\tHandler: Listing all products in ${req.params.id}`);
+      this.logger.debug(`\tHandler: Listing all products in ${id}`);
 
       // Get the products in the cart and return them
-      const result = await this.model.getProducts(req.params.id);
+      const result = await this.model.getProducts(id);
       return rep.response({message: "Products retrieved.", data: result}).code(200);
     }
     catch(err)  {

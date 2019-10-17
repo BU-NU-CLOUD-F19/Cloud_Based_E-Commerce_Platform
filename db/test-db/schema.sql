@@ -16,24 +16,26 @@ create table users (
   fname varchar(50) not null,
   lname varchar(50) not null,
   address varchar(50) not null,
-  phone numeric(10) not null, -- 10 digits
+  phone varchar(10) not null, -- 10 digits
   email varchar(50) not null,
-  password varchar(100) -- can be null if the user is not registered
+  password varchar(100), -- can be null if the user is not registered
+  constraint valid_phone check (phone ~* '^[0-9]{10}$')
+
 );
 
 create table carts (
-  cartid varchar(50) primary key,
+  cartId varchar(50) primary key,
   date_created timestamptz not null,
   date_modified timestamptz, -- could be null if not modified
   uid varchar(20) references users(uid) not null
 );
 
 create table products_in_cart (
-  cartid varchar(50) references carts(cartid),
+  cartId varchar(50) references carts(cartId),
   pid int references products(pid),
   amount_in_cart int not null check (amount_in_cart > 0), -- not equal to 0, because otherwise not in cart
   date_added timestamptz not null,
-  primary key (cartid, pid)
+  primary key (cartId, pid)
 );
 
 create table orders (
