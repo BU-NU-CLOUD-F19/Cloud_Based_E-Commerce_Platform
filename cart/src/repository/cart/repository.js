@@ -103,6 +103,13 @@ class ShoppingCartRepository {
    * @param {number} cartid - the id associated with a cart
    */
   async deleteCart(cartid) {
+    // Check if the cart exists
+    //  (doing this as a preliminary check reduces the amount of db queries)
+    const cartRow = await this.getCart(cartid);
+    if (cartRow.length === 0) {
+      return 0;
+    }
+
     const carts = this.knex(this.resource);
     const query = carts.where({cartid}).del();
     this.logger.debug(`\tQuery: ${query}`);

@@ -31,16 +31,6 @@ class CartModel {
    * @param {number} cartid - the id associated with a cart
    */
   async deleteCart(cartid) {
-    // Check if the cart exists
-    //  (doing this as a preliminary check reduces the amount of db queries)
-    const cartRow = await this.repository.getCart(cartid);
-
-    // If it doesn't, return 0 records deleted, which makes the route handler generate an error
-    if (cartRow.length === 0) {
-      return 0;
-    }
-
-    // If it does, delete it
     return this.repository.deleteCart(cartid);
   }
 
