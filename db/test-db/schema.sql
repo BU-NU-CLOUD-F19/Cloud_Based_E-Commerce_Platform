@@ -24,18 +24,18 @@ create table users (
 );
 
 create table carts (
-  cartId varchar(50) primary key,
+  cart_id varchar(50) primary key,
   date_created timestamptz not null,
   date_modified timestamptz, -- could be null if not modified
   uid varchar(20) references users(uid) not null
 );
 
 create table products_in_cart (
-  cartId varchar(50) references carts(cartId),
+  cart_id varchar(50) references carts(cart_id),
   pid int references products(pid),
   amount_in_cart int not null check (amount_in_cart > 0), -- not equal to 0, because otherwise not in cart
   date_added timestamptz not null,
-  primary key (cartId, pid)
+  primary key (cart_id, pid)
 );
 
 create table orders (

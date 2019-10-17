@@ -7,7 +7,7 @@ const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
 
 describe("Cart REST API", () => {
-  let product, cartid, cart, productsInCart, sample_products, sample_users;
+  let product, cartId, cart, productsInCart, sample_products, sample_users;
 
   // Utility function to initialize data
   async function loadSampleData() {
@@ -92,7 +92,7 @@ describe("Cart REST API", () => {
         amount_in_cart: 3
       }
       // Choose a sample cart id
-      cartid = 1;
+      cartId = 1;
     })
   })
 
@@ -105,48 +105,48 @@ describe("Cart REST API", () => {
   // Test API functionality
   it("lists products", async () => {
     // Check if product listing is possible
-    const res = await requestCart.get(`/${cartid}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).expect(200)
     expect(res.body.data).to.eql([]);
   });
 
   it("adds a product to a cart", async () => {
     // Add it to the cart, and check response
-    let res = await requestCart.post(`/${cartid}`).send(product).expect(201)
+    let res = await requestCart.post(`/${cartId}`).send(product).expect(201)
     expect(res.body.data).to.eql([product])
 
-    res = await requestCart.get(`/${cartid}`).expect(200)
+    res = await requestCart.get(`/${cartId}`).expect(200)
     expect(res.body.data).to.eql([product]);
   });
 
   it("removes a product from a cart", async () => {
     // Add it to the cart
-    await requestCart.post(`/${cartid}`).send(product).expect(201)
+    await requestCart.post(`/${cartId}`).send(product).expect(201)
 
     // Remove it from the cart
-    await requestCart.put(`/${cartid}/remove`).send({ pid: product.pid }).expect(200)
+    await requestCart.put(`/${cartId}/remove`).send({ pid: product.pid }).expect(200)
 
 
     // List the products, expecting none to be present
-    const res = await requestCart.get(`/${cartid}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).expect(200)
     expect(res.body.data).to.eql([]);
   });
 
   it("responds to an empty-cart request", async () => {
     // Insert a few products into the cart
     for (let i = 1; i <= 2; i++) {
-      await requestCart.post(`/${cartid}`).send({ pid: i, amount_in_cart: i }).expect(201);
+      await requestCart.post(`/${cartId}`).send({ pid: i, amount_in_cart: i }).expect(201);
     }
 
     // Check that the cart contains 3 products
-    let res = await requestCart.get(`/${cartid}`).expect(200);
+    let res = await requestCart.get(`/${cartId}`).expect(200);
     expect(res.body.data.length).to.eql(2)
 
     // Empty the cart
-    res = await requestCart.put(`/${cartid}/empty`).expect(200);
+    res = await requestCart.put(`/${cartId}/empty`).expect(200);
     expect(res.body.data).to.eql(2);  // rows deleted
 
     // Check that the cart is empty
-    res = await requestCart.get(`/${cartid}`).expect(200);
+    res = await requestCart.get(`/${cartId}`).expect(200);
     expect(res.body.data).to.eql([])
   })
 
@@ -158,39 +158,39 @@ describe("Cart REST API", () => {
     }
 
     // Add a product
-    await requestCart.post(`/${cartid}`).send(product).expect(201);
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
 
     // Change the product
-    await requestCart.put(`/${cartid}`).send(new_product).expect(200);
+    await requestCart.put(`/${cartId}`).send(new_product).expect(200);
 
     // Check that the amount has been updated
-    const res = await requestCart.get(`/${cartid}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).expect(200)
     expect(res.body.data[0].amount_in_cart).to.eql(new_product.amount_in_cart)
   });
 
   it("responds to a delete request", async () => {
     // Add a product
-    await requestCart.post(`/${cartid}`).send(product).expect(201);
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
 
     // Delete the cart
-    await requestCart.delete(`/${cartid}`).expect(200);
+    await requestCart.delete(`/${cartId}`).expect(200);
 
     // Check that the product is gone
-    const res = await requestCart.get(`/${cartid}`).expect(200);
+    const res = await requestCart.get(`/${cartId}`).expect(200);
     expect(res.body.data).to.eql([]);
   })
 
   // Check API error handling
   it("Rejects a malformed remove request", async () => {
-    await requestCart.put(`/${cartid}/remove`).expect(400)
+    await requestCart.put(`/${cartId}/remove`).expect(400)
   });
 
   it("Rejects a malformed add request", async () => {
-    await requestCart.post(`/${cartid}`).expect(400)
+    await requestCart.post(`/${cartId}`).expect(400)
   });
 
   it("Rejects a malformed change request", async () => {
-    await requestCart.put(`/${cartid}`).expect(400)
+    await requestCart.put(`/${cartId}`).expect(400)
   });
 
   // Clean up after all tests are done

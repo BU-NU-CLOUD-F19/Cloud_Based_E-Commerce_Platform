@@ -28,28 +28,28 @@ class CartModel {
   /**
    * Delete a cart, also removing all products in it.
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async deleteCart(cartid) {
-    return this.repository.deleteCart(cartid);
+  async deleteCart(cartId) {
+    return this.repository.deleteCart(cartId);
   }
 
   /**
    * Create a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartid) {
-    return this.repository.createCart(cartid);
+  async createCart(cartId) {
+    return this.repository.createCart(cartId);
   }
 
   /**
    * Retrieve the row containing the cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async getCart(cartid) {
-    return this.repository.getCart(cartid);
+  async getCart(cartId) {
+    return this.repository.getCart(cartId);
   }
 
 }

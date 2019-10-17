@@ -63,12 +63,12 @@ class ProductsInCartRepository {
   /**
    * Get products in a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async getProducts(cartid) {
+  async getProducts(cartId) {
     // If there is a product, the cart must exist due to db constraints, so we don't check that here.
     const knexBuilder = this.knex(this.resource);
-    const query = knexBuilder.select('pid', 'amount_in_cart').where({cartid});
+    const query = knexBuilder.select('pid', 'amount_in_cart').where({cart_id: cartId});
     this.logger.debug(`\tQuery: ${query}`);
 
     const result = await query;
@@ -81,15 +81,15 @@ class ProductsInCartRepository {
    * Add a product to the specified cart
    *
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - the product to add, containing at least the fields 'pid' and 'amount_in_cart'
    */
-  async addProduct(cartid, product) {
+  async addProduct(cartId, product) {
     // Set up the table reference
     const productsInCart = this.knex(this.resource);
 
     const productData = {
-      cartid,
+      cart_id: cartId,
       amount_in_cart: product.amount_in_cart,
       pid: product.pid,
       date_added: this.postgresDateStr()
@@ -105,13 +105,13 @@ class ProductsInCartRepository {
   /**
    * Remove a product from a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - the product to remove, containing at least the field 'pid'
    */
-  async removeProduct(cartid, product) {
+  async removeProduct(cartId, product) {
     const productsInCart = this.knex(this.resource);
 
-    const query = productsInCart.where({cartid, pid: product.pid}).del();
+    const query = productsInCart.where({cart_id: cartId, pid: product.pid}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const nRowsDeleted = await query;
@@ -123,11 +123,11 @@ class ProductsInCartRepository {
   /**
    * Empty a cart (remove all products from it)
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async emptyCart(cartid) {
+  async emptyCart(cartId) {
     const productsInCart = this.knex(this.resource);
-    const query = await productsInCart.where({cartid}).del();
+    const query = await productsInCart.where({cart_id: cartId}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const nRowsDeleted = await query;
@@ -139,12 +139,12 @@ class ProductsInCartRepository {
   /**
    * Change the amount of a product in a cart.
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - the product to change, containing at least the fields 'pid' and 'amount_in_cart'
    */
-  async changeAmount(cartid, product) {
+  async changeAmount(cartId, product) {
     const productsInCart = this.knex(this.resource);
-    const query = productsInCart.where({cartid, pid: product.pid})
+    const query = productsInCart.where({cart_id: cartId, pid: product.pid})
                                       .update({amount_in_cart: product.amount_in_cart})
                                       .returning(['pid', 'amount_in_cart'])
     this.logger.debug(`\tQuery: ${query}`);

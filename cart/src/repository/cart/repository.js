@@ -63,11 +63,11 @@ class ShoppingCartRepository {
   /**
    * Get the cart record
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async getCart(cartid) {
+  async getCart(cartId) {
     const carts = this.knex(this.resource);
-    const checkCart = carts.select('*').where({cartid});
+    const checkCart = carts.select('*').where({cart_id: cartId});
     this.logger.debug(`\tQuery: ${checkCart}`);
 
     const cartsFound = await checkCart;
@@ -78,13 +78,13 @@ class ShoppingCartRepository {
   /**
    * Create a new cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartid) {
+  async createCart(cartId) {
     const carts = this.knex(this.resource);
 
     const cartData = {
-      cartid,
+      cart_id: cartId,
       date_created: this.postgresDateStr(),
       uid: 'user1' // TODO: this shouldn't be hardcoded
     }
@@ -100,18 +100,18 @@ class ShoppingCartRepository {
   /**
    * Delete a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async deleteCart(cartid) {
+  async deleteCart(cartId) {
     // Check if the cart exists
     //  (doing this as a preliminary check reduces the amount of db queries)
-    const cartRow = await this.getCart(cartid);
+    const cartRow = await this.getCart(cartId);
     if (cartRow.length === 0) {
       return 0;
     }
 
     const carts = this.knex(this.resource);
-    const query = carts.where({cartid}).del();
+    const query = carts.where({cart_id: cartId}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const removed = await query;

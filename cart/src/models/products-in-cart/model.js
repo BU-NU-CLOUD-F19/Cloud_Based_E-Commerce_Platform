@@ -27,50 +27,50 @@ class ProductsInCartModel {
   /**
    * Get all products in a cart.
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async getProducts(cartid) {
-    return this.repository.getProducts(cartid);
+  async getProducts(cartId) {
+    return this.repository.getProducts(cartId);
   }
 
   /**
    * Add a product to a cart.
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - an object describing the product, containing at least the fields 'pid', 'amount_in_cart'
    */
-  async addProduct(cartid, product) {
+  async addProduct(cartId, product) {
     // Add the product and return it
-    return this.repository.addProduct(cartid, product);
+    return this.repository.addProduct(cartId, product);
   }
 
   /**
    * Remove a product from a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - an object describing the product, containing at least the field 'pid'.
    */
-  async removeProduct(cartid, product) {
-    return this.repository.removeProduct(cartid, product);
+  async removeProduct(cartId, product) {
+    return this.repository.removeProduct(cartId, product);
   }
 
   /**
    * Empty the cart, removing all products
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    */
-  async emptyCart(cartid) {
-      return this.repository.emptyCart(cartid);
+  async emptyCart(cartId) {
+      return this.repository.emptyCart(cartId);
   }
 
   /**
    * Change the amount of a product in a cart
    * @async
-   * @param {number} cartid - the id associated with a cart
+   * @param {number} cartId - the id associated with a cart
    * @param {object} product - an object describing the product, containing at least the fields 'pid', 'amount_in_cart'
    */
-  async changeAmount(cartid, product) {
-    return this.repository.changeAmount(cartid, product);
+  async changeAmount(cartId, product) {
+    return this.repository.changeAmount(cartId, product);
   }
 }
 
