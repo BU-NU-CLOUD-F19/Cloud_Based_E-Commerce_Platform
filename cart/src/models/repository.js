@@ -201,7 +201,7 @@ class ShoppingCartRepository {
     const productsInCart = this.knex(this.resource);
     const query = productsInCart.where({cartid: cartid, pid: product.pid})
                                       .update({amount_in_cart: product.amount_in_cart})
-                                      .returning('*')
+                                      .returning(['pid', 'amount_in_cart'])
     this.logger.debug(`\tQuery: ${query}`);
 
     const res = await query;
