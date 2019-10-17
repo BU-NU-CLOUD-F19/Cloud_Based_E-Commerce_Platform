@@ -80,13 +80,13 @@ class Handlers {
 
     // Check if request contains a body
     if (!req.payload) {
-      return rep.response("Body cannot be empty.").code(400);
+      return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
     const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], req.payload);
     if (!isValid.valid) {
-      return rep.response(`${isValid.missing} not specified.`).code(400);
+      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
     this.logger.debug(`\tHandler: Adding product ${JSON.stringify(req.payload)} to cart ${req.params.id}`);
@@ -97,7 +97,7 @@ class Handlers {
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
-      return rep.response({data: res}).code(201);
+      return rep.response({message: "Product added to cart.", data: res}).code(201);
     }
 
     // Catch any database errors (e.g. product not found) and return the appropriate response
@@ -105,17 +105,17 @@ class Handlers {
       if (err.constraint === "products_in_cart_pid_fkey") {
         let message = 'Product does not exist.';
         this.logger.debug(`\t${message}`);
-        return rep.response(message).code(400);
+        return rep.response({message: message}).code(400);
       }
       else if (err.constraint === "carts_uid_fkey") {
-        let message = '\tUser does not exist.';
-        this.logger.debug(`${message} -- ${err.detail}`);
-        return rep.response(message).code(400);
+        let message = 'User does not exist.';
+        this.logger.debug(`\t${message} -- ${err.detail}`);
+        return rep.response({message: message}).code(400);
       }
       else if (err.constraint === "products_in_cart_pkey") {
-        let message = '\tProduct already present in cart.';
-        this.logger.debug(`${message} -- ${err.detail}`);
-        return rep.response(message).code(400);
+        let message = 'Product already present in cart.';
+        this.logger.debug(`\t${message} -- ${err.detail}`);
+        return rep.response({message: message}).code(400);
       }
       else {
         this.logger.error(JSON.stringify(err));
@@ -135,13 +135,13 @@ class Handlers {
 
     // Check if request contains a body
     if (!req.payload) {
-      return rep.response("Body cannot be empty.").code(400);
+      return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
     const isValid = Handlers.propsPresent(['pid'], req.payload);
     if (!isValid.valid) {
-      return rep.response(`${isValid.missing} not specified.`).code(400);
+      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
     this.logger.debug(`\tHandler: Removing product ${req.payload} from cart ${req.params.id}`);
@@ -153,11 +153,11 @@ class Handlers {
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
       if (res === 0) {
-        return rep.response(`Product ${req.payload.pid} not in cart ${req.params.id}.`).code(400);
+        return rep.response({message: `Product ${req.payload.pid} not in cart ${req.params.id}.`}).code(400);
       }
       else {
         // Otherwise, return  how many rows were removed
-        return rep.response({data: res}).code(200);
+        return rep.response({message: "Product removed from cart.", data: res}).code(200);
       }
     }
     catch (err) {
@@ -179,18 +179,18 @@ class Handlers {
 
     // Check if request contains a body
     if (!req.payload) {
-      return rep.response("Body cannot be empty.").code(400);
+      return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
     // Check if request body contains the required values
     const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], req.payload);
     if (!isValid.valid) {
-      return rep.response(`${isValid.missing} not specified.`).code(400);
+      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
     // Check if the new amount is valid
     if (req.payload.amount_in_cart &lt;= 0) {
-      return rep.response("Amount must be greater than 0.").code(400);
+      return rep.response({message: "Amount must be greater than 0."}).code(400);
     }
 
     this.logger.debug(`\tHandler: Changing amount of product in cart ${req.params.id}`);
@@ -205,7 +205,7 @@ class Handlers {
       }
       // If nothing was updated, the product wasn't in the cart.
       else {
-        return rep.response("No such product in cart.").code(400);
+        return rep.response({message: "No such product in cart."}).code(400);
       }
     }
     // Catch database errors
@@ -213,7 +213,7 @@ class Handlers {
       if (err.constraint === "products_in_cart_pid_fkey") {
         let message = 'Product does not exist.';
         this.logger.debug(`\t${message}`);
-        return rep.response(message).code(400);
+        return rep.response({message: message}).code(400);
       }
       else {
         this.logger.error(JSON.stringify(err));
@@ -242,7 +242,12 @@ class Handlers {
       return rep.response({message: "Cart emptied.", data: res}).code(200);
     }
     catch(err) {
-      this.logger.error(JSON.stringify(err));
+      if (err instanceof ReferenceError) {
+        return rep.response({message: "Cart does not exist."}).code(400);
+      }
+      else {
+        this.logger.error(JSON.stringify(err));
+      }
     }
   }
 
@@ -267,7 +272,7 @@ class Handlers {
       }
       // If nothing was deleted, cart doesn't exist
       else if (res === 0) {
-        return rep.response("Cart does not exist").code(400);
+        return rep.response({message: "Cart does not exist"}).code(400);
       }
       // You should never delete more than one cart
       else {
@@ -293,7 +298,7 @@ class Handlers {
 
       // Get the products in the cart and return them
       const result = await this.model.getProducts(req.params.id);
-      return rep.response({data: result}).code(200);
+      return rep.response({message: "Products retrieved.", data: result}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);
@@ -318,7 +323,7 @@ module.exports = Handlers;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 16 2019 22:50:03 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Oct 17 2019 00:13:11 GMT+0000 (UTC)
 </footer>
 
 <script> prettyPrint(); </script>
