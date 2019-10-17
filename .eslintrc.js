@@ -10,7 +10,8 @@ module.exports = {
   "env": {
     "es6": true,
     "node": true,
-    "browser": true
+    "browser": true,
+    "mocha": true
   },
   "rules": {
     "arrow-body-style": "off", // we don't something like (e => e.y) because it makes debugging harder
@@ -18,7 +19,7 @@ module.exports = {
     "consistent-return": "off",
     "curly": "error",
     "func-names": "error",
-    "func-style": ["error", "declaration", {"allowArrowFunctions": true}],
+    "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
     "max-len": ["error", 120],
     "no-await-in-loop": "off",
     "no-case-declarations": "error",
