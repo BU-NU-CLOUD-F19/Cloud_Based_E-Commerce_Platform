@@ -33,6 +33,17 @@ matrix:
       # script: npm test
       script: skip
       name: "Cart"
+    - before_script:
+        - cd members-graphql-service/
+        - npm install
+      script: npm run lint
+      name: "Members GraphQL Service"
+      # Tests
+    - before_script:
+        - cd tests/
+        - npm install
+      script: npm run lint
+      name: "Tests"
 # Since we have multiple subprojects, use a build matrix.
 # https://docs.travis-ci.com/user/build-matrix
 # node_modules is cached by default by Travis.
