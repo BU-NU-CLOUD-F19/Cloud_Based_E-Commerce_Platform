@@ -25,8 +25,6 @@ services:
       # A place to store postgres data
       - ./db/db-data:/var/lib/postgresql/data
       # Script to initialize a test database
-      - ./db/test-db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
-      - ./db/test-db/init-demo-db.sql:/docker-entrypoint-initdb.d/init-demo-db.sql
       - ./db/test-db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
 
@@ -52,11 +50,9 @@ services:
   inventory-management:
     build: ./inventory-management
     container_name: "inventory-management"
-
     # Forward ports, format 'container:host'
     ports:
       - 3020:3020
-
     # Mount local directories on the container filesystem.
     # Should not happen in production.
     volumes:
@@ -66,6 +62,26 @@ services:
       - ./inventory-management/registrations.js:/usr/app/registrations.js
       - ./inventory-management/.inventoryrc:/usr/app/.inventoryrc
       - ./inventory-management/log:/usr/app/log
+    restart: unless-stopped
+
+  cart:
+    build: ./cart
+    container_name: "cart"
+
+    # Forward ports, format 'container:host'
+    ports:
+      - 3000:3000
+
+    # Mount local directories on the container filesystem.
+    # Should not happen in production.
+    volumes:
+      - ./cart/src:/usr/app/src
+      - ./cart/app.js:/usr/app/app.js
+      - ./cart/process.json:/usr/app/process.json
+      - ./cart/registrations.js:/usr/app/registrations.js
+      - ./cart/.cartrc:/usr/app/.cartrc
+      - ./cart/log:/usr/app/log
+      - ./cart/test:/usr/app/test
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
 
