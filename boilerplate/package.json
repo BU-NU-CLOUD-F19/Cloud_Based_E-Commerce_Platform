@@ -20,7 +20,7 @@
     "elv": "2.2.0",
     "@hapi/glue": "6.2.0",
     "@hapi/hapi": "18.4.0",
-    "@hapi/joi": "16.1.4",
+    "@hapi/joi": "16.1.7",
     "@hapi/inert": "5.2.2",
     "@hapi/vision": "5.5.4",
     "hapi-swagger": "10.1.2",
@@ -30,7 +30,6 @@
     "knex": "0.19.4",
     "lodash": "4.17.15",
     "pg": "7.12.1",
-    "swagger-ui": "3.23.11",
     "winston": "3.2.1",
     "winston-daily-rotate-file": "4.1.0"
   },

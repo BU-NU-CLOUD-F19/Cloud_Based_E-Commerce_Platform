@@ -21,9 +21,9 @@ class Router {
       method: 'GET',
       path: `/${this.resource}/{id}`,
       handler: this.handler.findOneById.bind(this.handler), // bind a request handler for this route
-      config: {
+      options: {
         description: `Get a ${this.resource} record by id.`,
-        tags: ['api'],
+        tags: ['api', 'demo'],
         plugins: {
           'hapi-swagger': {
             responses: {
@@ -33,8 +33,8 @@ class Router {
           },
         },
         validate: {
-          params: Joi.object({
-            id: Joi.string().required().description(`id of the ${this.resource}`),
+          params: Joi.object().keys({
+            id: Joi.number().min(0).description('id of the demo record'),
           })
         }
       },

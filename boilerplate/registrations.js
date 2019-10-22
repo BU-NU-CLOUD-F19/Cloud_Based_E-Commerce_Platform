@@ -10,7 +10,7 @@ const pkg = require('./package');
 
 module.exports = function registrations(config) {
   const swaggerOptions = {
-    swagger: '3.0',
+    swagger: '2.0',
     info: {
             version: pkg.version,
             title: 'Test API Documentation',
@@ -20,7 +20,7 @@ module.exports = function registrations(config) {
     plugins: [
       {
         plugin: './src/endpoints/demo', // copy and paste this line for all the different resources
-        options: { select: ['api'] },
+        options: { select: ['api', 'demo'] },
       },
       Inert,
       Vision,
