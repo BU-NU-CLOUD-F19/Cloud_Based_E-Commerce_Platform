@@ -1,10 +1,10 @@
 'use strict';
 
-const Kernel = require('./kernel');
-const Names = require('../constants/modelNames');
+const Kernel = require('../../repository/').Kernel;
+const Names = require('../../constants/modelNames');
 
 // The data repository (database)
-const Repository = require('./repository');
+const Repository = require('../../repository/').InventoryManagement;
 
 /**
  * The model for inventory management acts as an interface between the routes/handlers and the database.
@@ -62,6 +62,14 @@ class InventoryManagementModel {
      */
     async removeProduct(productId) {
         return this.repository.removeProduct(productId);
+    }
+
+    /**
+    * Delete all records that are related to this model.
+    * @async
+    */
+    async deleteAll() {
+        return this.repository.deleteAll();
     }
 }
 

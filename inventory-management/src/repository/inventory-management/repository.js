@@ -5,11 +5,11 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const Names = require('../constants/modelNames');
+const logger = require('../../utils/logger');
+const Names = require('../../constants/modelNames');
 const resource = Names.inventory;
-const Kernel = require('./kernel');
-const knex = require('./knex');
+const Kernel = require('../kernel');
+const knex = require('../knex');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
@@ -108,6 +108,24 @@ class InventoryManagementRepository {
         this.logger.debug(`\tResult: deleted ${nRowsDeleted} rows.`);
 
         return nRowsDeleted;
+    }
+
+    /**
+    * Delete all products
+    * @async
+    */
+    async deleteAll() {
+        try {
+            // Knex doesn't provide a way to cascade, so have to use a raw query
+            const query = this.knex.raw(`TRUNCATE TABLE ${this.resource} CASCADE`);
+            const result = await query;
+
+            this.logger.debug("Successfully truncated the table.");
+            return result;
+        }
+        catch (err) {
+            this.logger.error(err.message);
+        }
     }
 }
 

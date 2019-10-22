@@ -7,7 +7,7 @@
 'use strict';
 
 const logger = require('../utils/logger');
-const Model = require('../models').Model;
+const Model = require('../models/inventory-management/index').Model;
 
 /**
  * The handler functions for all endpoints defined for the inventory management service
