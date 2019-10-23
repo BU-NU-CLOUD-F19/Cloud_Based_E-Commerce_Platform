@@ -20,7 +20,7 @@
     "jerkface": "^1.0.0",
     "kibbutz": "^2.0.0",
     "kibbutz-rc": "^1.0.0",
-    "knex": "^0.19.4",
+    "knex": "^0.19.5",
     "pg": "^7.12.1",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.1.0"
