@@ -7,8 +7,8 @@ const Names = require('../../constants/modelNames');
 const Repository = require('../../repository/').SecurityGroups;
 
 /**
- * The model for the shopping cart acts as an interface between the routes/handlers and the database.
- * It contains all data logic pertaining to the shopping cart.
+ * The model for the securityGroup acts as an interface between the routes/handlers and the database.
+ * It contains all data logic pertaining to the shopping securityGroup.
  */
 class SecurityGroupModel {
   constructor(options = {}) {
@@ -18,7 +18,7 @@ class SecurityGroupModel {
   }
 
   /**
-   * Delete all records that are related to this model (carts, products_in_cart).
+   * Delete all records that are related to this model
    * @async
    */
   async deleteAll() {
@@ -28,7 +28,7 @@ class SecurityGroupModel {
   /**
    * Delete a securitygroup
    * @async
-   * @param {number} securityGroupId - the id associated with a cart
+   * @param {number} securityGroupId - the id of the securityGroup
    */
   async deleteSecurityGroup(securityGroupId) {
     return this.repository.deleteSecurityGroup(securityGroupId);
@@ -55,6 +55,6 @@ class SecurityGroupModel {
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.cart, SecurityGroupModel);
+Kernel.bind(Names.securityGroups, SecurityGroupModel);
 
 module.exports = SecurityGroupModel;

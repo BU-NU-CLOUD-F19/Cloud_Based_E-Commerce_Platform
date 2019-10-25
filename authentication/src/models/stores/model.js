@@ -4,21 +4,21 @@ const Kernel = require('../../repository/').Kernel;
 const Names = require('../../constants/modelNames');
 
 // The data repository (database)
-const Repository = require('../../repository/').Cart;
+const Repository = require('../../repository/').Stores;
 
 /**
- * The model for the shopping cart acts as an interface between the routes/handlers and the database.
- * It contains all data logic pertaining to the shopping cart.
+ * The model for the stores acts as an interface between the routes/handlers and the database.
+ * It contains all data logic pertaining to the store.
  */
 class StoreModel {
   constructor(options = {}) {
-    this.resource = Names.cart;
+    this.resource = Names.stores;
     this.repository = options.repository || (new Repository());
     this.logger = this.repository.logger;
   }
 
   /**
-   * Delete all records that are related to this model (carts, products_in_cart).
+   * Delete all records that are related to this model
    * @async
    */
   async deleteAll() {
@@ -30,8 +30,8 @@ class StoreModel {
    * @async
    * @param {number} storeId - the id of the store to be deleted
    */
-  async deleteCart(storeId) {
-    return this.repository.deleteCart(storeId);
+  async deleteStore(storeId) {
+    return this.repository.deleteStore(storeId);
   }
 
   /**
@@ -46,7 +46,7 @@ class StoreModel {
   /**
    * Retrieve the store by storeId
    * @async
-   * @param {number} storeId - the id associated with a cart
+   * @param {number} storeId - the id of the store
    */
   async getStoreById(storeId) {
     return this.repository.getStoreById(storeId);
@@ -55,7 +55,7 @@ class StoreModel {
   /**
    * Retrieve the store by its email
    * @async
-   * @param {number} storeEmail - the id associated with a cart
+   * @param {number} storeEmail - the email of the store
    */
   async getStoreByEmail(storeEmail) {
     return this.repository.getStore(storeEmail);
@@ -63,6 +63,6 @@ class StoreModel {
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.cart, CartModel);
+Kernel.bind(Names.stores, StoreModel);
 
-module.exports = CartModel;
+module.exports = StoreModel;

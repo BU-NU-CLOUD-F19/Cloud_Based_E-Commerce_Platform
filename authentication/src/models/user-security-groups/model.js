@@ -7,12 +7,11 @@ const Names = require('../../constants/modelNames');
 const Repository = require('../../repository/').UserSecurityGroups;
 
 /**
- * The model for the shopping cart acts as an interface between the routes/handlers and the database.
- * It contains all data logic pertaining to the shopping cart.
+ * The model for the user security group acts as an interface between the routes/handlers and the database.
  */
 class UserSecurityGroupModel {
   constructor(options = {}) {
-    this.resource = Names.cart;
+    this.resource = Names.userSecurityGroups;
     this.repository = options.repository || (new Repository());
     this.logger = this.repository.logger;
   }
@@ -55,7 +54,7 @@ class UserSecurityGroupModel {
   }
 
   /**
-   * Retrieve the row containing the cart
+   * Retrieve the user security group
    * @async
    * @param {number} userId
    * @param {number} storeId
@@ -67,6 +66,6 @@ class UserSecurityGroupModel {
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.cart, UserSecurityGroupModel);
+Kernel.bind(Names.userSecurityGroups, UserSecurityGroupModel);
 
 module.exports = UserSecurityGroupModel;

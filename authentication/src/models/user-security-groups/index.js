@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Exports the cart model
+ * Exports the User Security Group model
  */
 const Model = require('./model');
 
