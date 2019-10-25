@@ -46,6 +46,13 @@ class Handlers {
             return rep.response("Body cannot be empty.").code(400);
         }
 
+        // Check if request body contains the required values
+
+        const isValid = Handlers.propsPresent(['pid'], req.payload);
+        if (!isValid.valid) {
+            return rep.response({ message: `${isValid.missing} not specified.` }).code(400);
+        }
+
         this.logger.debug(`Handler: Adding product ${JSON.stringify(req.payload)} to inventory`);
 
         try {
@@ -55,10 +62,17 @@ class Handlers {
             return rep.response({ data: res }).code(201);
         }
 
-        // Catch any database errors (e.g. product not found)
+        // Catch any database errors (e.g. product already present)
         catch (err) {
-            this.logger.error(JSON.stringify(err));
-            throw err;
+            if (err.constraint === "products_pkey") {
+                let message = 'Product already present in inventory.';
+                this.logger.debug(`\t${message} -- ${err.detail}`);
+                return rep.response({ message: message }).code(400);
+            }
+            else {
+                this.logger.error(JSON.stringify(err));
+                throw err;
+            }
         }
     }
 
@@ -72,6 +86,12 @@ class Handlers {
         // Some initial error checking
         if (!req.payload) {
             return rep.response("Body cannot be empty.").code(400);
+        }
+
+        // Check if request body contains the required values
+        const isValid = Handlers.propsPresent(['pid'], req.payload);
+        if (!isValid.valid) {
+            return rep.response({ message: `${isValid.missing} not specified.` }).code(400);
         }
 
         this.logger.debug(`Handler: Updating product ${JSON.stringify(req.payload)} in inventory`);
@@ -102,10 +122,6 @@ class Handlers {
     * @param {object} rep - the response toolkit (Hapi.h)
     */
     async removeProduct(req, rep) {
-        const isValid = Handlers.propsPresent(['id'], req.params);
-        if (!isValid.valid) {
-            return rep.response(`${isValid.missing} not specified.`).code(400);
-        }
 
         this.logger.debug(`Handler: Removing product from inventory ${req.params.id}`);
 
@@ -115,10 +131,10 @@ class Handlers {
 
             // If no rows were removed
             if (res === 0) {
-                return rep.response(`Product ${req.payload.pid} not in inventory ${req.params.id}.`);
+                return rep.response({ message: "No such product in inventory." }).code(400);
             }
             else {
-                return rep.response({ data: res }).code(200);
+                return rep.response({ message: "Product deleted.", data: res }).code(200);
             }
         }
         catch (err) {
@@ -151,19 +167,17 @@ class Handlers {
     * @param {object} rep - the response toolkit (Hapi.h)
     */
     async getProduct(req, rep) {
-        const isValid = Handlers.propsPresent(['id'], req.params);
-        if (!isValid.valid) {
-            return rep.response(`${isValid.missing} not specified.`).code(400);
-        }
+
         this.logger.debug(`Handler: Retrieving product with ID ${req.params.id} from inventory`);
 
         try {
             const res = await this.model.getProduct(req.params.id);
             this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-            // If no rows were removed
-            if (res === 0) {
-                return rep.response(`Product not in inventory ${req.params.id}.`);
+            // If no record was found
+            if (res.length == 0) {
+                return rep.response({ message: `Product with id ${req.params.id} not in inventory.`, data: res })
+                    .code(400);
             }
             else {
                 return rep.response({ data: res }).code(200);

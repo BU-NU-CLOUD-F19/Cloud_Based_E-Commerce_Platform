@@ -4,7 +4,7 @@
   "description": "Micro-service for inventory management",
   "main": "app.js",
   "config": {
-    "appName": "inventory"
+    "appName": "inventory-management"
   },
   "scripts": {
     "dev": "nodemon",

@@ -21,11 +21,11 @@ class Router {
     }
 
     /**
-    * All HTTP POST route definitions
+    * POST add product
     * @param {Hapi.server} server - the Hapi server to which to add the route
     */
-    routePost(server) {
-        server.route([
+    routeAddProduct(server) {
+        server.route(
             {
                 method: 'POST',
                 path: `/inventory`,
@@ -41,15 +41,15 @@ class Router {
                     }
                 }
             }
-        ]);
+        );
     }
 
     /**
-    * All HTTP PUT route definitions
+    * PUT update product
     * @param {Hapi.server} server - the Hapi server to which to add the route
     */
-    routePut(server) {
-        server.route([
+    routeUpdateProduct(server) {
+        server.route(
             {
                 method: 'PUT',
                 path: '/inventory/{id}',
@@ -65,15 +65,15 @@ class Router {
                     }
                 }
             }
-        ]);
+        );
     }
 
     /**
-    * All HTTP GET route definitions
+    * GET list of products
     * @param {Hapi.server} server - the Hapi server to which to add the route
     */
-    routeGet(server) {
-        server.route([
+    routeGetProducts(server) {
+        server.route(
             {
                 method: 'GET',
                 path: `/inventory`,
@@ -88,7 +88,14 @@ class Router {
                         }
                     }
                 }
-            },
+            });
+    }
+    /**
+    * GET product given ID
+    * @param {Hapi.server} server - the Hapi server to which to add the route
+    */
+    routeGetProduct(server) {
+        server.route(
             {
                 method: 'GET',
                 path: `/inventory/{id}`,
@@ -104,15 +111,15 @@ class Router {
                     }
                 }
             }
-        ]);
+        );
     }
 
     /**
-    * All HTTP DELETE route definitions
+    * DELETE product given ID
     * @param {Hapi.server} server - the Hapi server to which to add the route
     */
-    routeDelete(server) {
-        server.route([
+    routeRemoveProduct(server) {
+        server.route(
             {
                 method: 'DELETE',
                 path: `/inventory/{id}`,
@@ -128,7 +135,7 @@ class Router {
                     }
                 }
             }
-        ]);
+        );
     }
 
     /**
@@ -136,10 +143,11 @@ class Router {
     * @param {Hapi.server} server - the Hapi server
     */
     route(server) {
-        this.routeGet(server);
-        this.routePost(server);
-        this.routePut(server);
-        this.routeDelete(server);
+        this.routeAddProduct(server);
+        this.routeUpdateProduct(server);
+        this.routeGetProducts(server);
+        this.routeGetProduct(server);
+        this.routeRemoveProduct(server);
     }
 }
 

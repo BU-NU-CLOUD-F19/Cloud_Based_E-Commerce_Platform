@@ -43,7 +43,7 @@ const configName = pkg.config.appName;
 logger.info(`App name: ${configName}`);
 
 
-// finds and loads .boilerplaterc
+// finds and loads .inventory-managementrc
 // via Kibbutz: https://www.npmjs.com/package/kibbutz-rc
 // this uses the rc module: https://www.npmjs.com/package/rc
 const config = new Kibbutz();

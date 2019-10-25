@@ -63,7 +63,6 @@ describe("Inventory management REST API", () => {
 
         // Load the config and wait for it to load
         initModels().then(objs => {
-            console.log("my my1");
             inventory = objs.inventory;
 
             // Log the start of the test
@@ -117,6 +116,14 @@ describe("Inventory management REST API", () => {
         }]);
     });
 
+    it("doesn't allow to add a product if id already exists", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Add it to the inventory, and check response
+        await requestInventory.post('').send(product).expect(400);
+    });
+
     it("updates a product", async () => {
         // Add product
         await requestInventory.post('').send(product).expect(201);
@@ -141,11 +148,56 @@ describe("Inventory management REST API", () => {
         }]);
     });
 
+    it("doesn't allow to update a product that doesn't exist", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Initialize a product to be updated that doesn't exist
+        let editProduct = {
+            "pid": 5,
+            "pcode": "BAG123",
+            "price": 200,
+            "sku": "NIKEBAG",
+            "amount_in_stock": 25,
+            "pname": "Bag",
+            "description": "This is a Nike bag.",
+            "lang": "en_US"
+        };
+
+        // Add it to the inventory, and check response
+        await requestInventory.put(`/${editProduct.pid}`).send(editProduct).expect(400);
+    });
+
     it("removes a product", async () => {
         // Add product
         await requestInventory.post('').send(product).expect(201);
         // Remove it from the inventory and check response
         await requestInventory.delete(`/${productId}`).expect(200);
+    });
+
+    it("doesn't remove a product which doesn't exist", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+        // Remove it from the inventory and check response
+        await requestInventory.delete(`/2`).expect(400);
+    });
+
+    it("retrieves a product from the given id", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+        // Remove it from the inventory and check response
+        let res = await requestInventory.get(`/${product.pid}`).expect(200);
+        expect(res.body.data).to.eql([{
+            "products": "(3,PQR123,100,LMN,20,Watch,\"This is a Tissot classic watch.\",en_US)"
+        }
+        ]);
+    });
+
+    it("doesn't return a product which doesn't exist", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+        // Remove it from the inventory and check response
+        await requestInventory.get(`/2`).expect(400);
     });
 
     // Clean up after all tests are done

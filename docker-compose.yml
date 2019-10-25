@@ -60,8 +60,9 @@ services:
       - ./inventory-management/app.js:/usr/app/app.js
       - ./inventory-management/process.json:/usr/app/process.json
       - ./inventory-management/registrations.js:/usr/app/registrations.js
-      - ./inventory-management/.inventoryrc:/usr/app/.inventoryrc
+      - ./inventory-management/.inventory-managementrc:/usr/app/.inventory-managementrc
       - ./inventory-management/log:/usr/app/log
+      - ./inventory-management/tests:/usr/app/tests
     restart: unless-stopped
 
   cart:
