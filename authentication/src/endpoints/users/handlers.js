@@ -41,7 +41,7 @@ class Handlers {
    */
   async createUser(req, rep) {
     this.logger.logRequest(req);
-    const { payload: { name, email, phone, address, language } } = req;
+    const { payload: { fname, lname, email, phone, address, language } } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -49,7 +49,7 @@ class Handlers {
     }
 
     // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['name', 'email', 'phone', 'address'], payload);
+    const isValid = Handlers.propsPresent(['fname', 'lname', 'email', 'phone', 'address'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
