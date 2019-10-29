@@ -25,6 +25,16 @@ class UserSecurityGroupModel {
   }
 
   /**
+   * Delete all user security groups for a store
+   * @async
+   * @param {number} storeId - the id of the associated store
+   */
+  async deleteUSGroup(userId, storeId) {
+    return this.repository.deleteUSGroup(userId, storeId);
+  }
+
+
+  /**
    * Delete all user security groups for a user
    * @async
    * @param {number} userId - the id of the associated user
@@ -50,6 +60,7 @@ class UserSecurityGroupModel {
    * @param {number} securityGroupId
    */
   async createUSGroup(userId, storeId, securityGroupId) {
+    // TODO: add logic to fetch scope somewhere along this flow
     return this.repository.createUSGroup(userId, storeId, securityGroupId);
   }
 
@@ -60,7 +71,7 @@ class UserSecurityGroupModel {
    * @param {number} storeId
    */
   async getUSGroupByUserIdStoreId(userId, storeId) {
-    return this.repository.getUSGroup(userId, storeId);
+    return this.repository.getUserSecurityGroup(userId, storeId);
   }
 
 }

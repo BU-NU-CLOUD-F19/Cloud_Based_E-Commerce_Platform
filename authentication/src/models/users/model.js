@@ -48,7 +48,7 @@ class UsersModel {
    * @param {object} userData
    */
   async createUser(userData) {
-    // TODO: Create user security group record
+    // TODO: Create user security group record in this flow
     return this.repository.createUser(userData);
   }
 

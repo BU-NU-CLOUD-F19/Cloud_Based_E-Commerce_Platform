@@ -1,11 +1,17 @@
 'use strict';
 
 const Kernel = require('./kernel');
-const ProductsInCart = require('./products-in-cart/').ProductsInCartRepository;
-const Cart = require('./cart/').CartRepository;
+const Memberships = require('./memberships/');
+const SecurityGroups = require('./security-groups/');
+const Stores = require('./stores/');
+const UserSecurityGroups = require('./user-security-groups/');
+const Users = require('./users/');
 
 module.exports = {
   Kernel,
-  ProductsInCart,
-  Cart
+  Memberships,
+  SecurityGroups,
+  Stores,
+  UserSecurityGroups,
+  Users
 }

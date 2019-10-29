@@ -7,15 +7,16 @@
 
 const logger = require('../../utils/logger');
 const Names = require('../../constants/modelNames');
-const resource = Names.cart;
+const resource = Names.stores;
 const Kernel = require('../kernel');
 const knex = require('../knex');
+const shortid = require('shortid');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
  * They only retrieve and return data, they do not contain any data logic -- that is the responsibility of the model.
  */
-class ShoppingCartRepository {
+class StoresRepository {
   constructor(options = {}) {
     const knexManager = Kernel.resolve(Names.knexManager);
 
@@ -61,38 +62,54 @@ class ShoppingCartRepository {
   }
 
   /**
-   * Get the cart record
+   * Get the store by id
    * @async
-   * @param {number} cartId - the id associated with a cart
    */
-  async getCart(cartId) {
-    const carts = this.knex(this.resource);
-    const checkCart = carts.select('*').where({cart_id: cartId});
-    this.logger.debug(`\tQuery: ${checkCart}`);
+  async getStoreById(id) {
+    const stores = this.knex(this.resource);
+    const query = stores.select('*').where({id});
+    this.logger.debug(`\tQuery: ${query}`);
 
-    const cartsFound = await checkCart;
-    this.logger.debug(`\tResult ${JSON.stringify(cartsFound)}`);
+    const store = await query;
+    this.logger.debug(`\tResult ${JSON.stringify(store)}`);
     return cartsFound;
   }
 
   /**
-   * Create a new cart
+   * Get the store by email
+   * @async
+   */
+  async getStoreByEmail(email) {
+    const stores = this.knex(this.resource);
+    const query = stores.select('*').where({email});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const store = await query;
+    this.logger.debug(`\tResult ${JSON.stringify(store)}`);
+    return cartsFound;
+  }
+
+  /**
+   * Create a new store
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartId) {
-    const carts = this.knex(this.resource);
+  async createStore(payload) {
+    const stores = this.knex(this.resource);
+    const { name, phone, email } = payload;
 
-    const cartData = {
-      cart_id: cartId,
-      date_created: this.postgresDateStr(),
-      uid: 'user1' // TODO: this shouldn't be hardcoded
+    const storeData = {
+      id: shortid.generate(),
+      name,
+      phone,
+      email,
+      date_created: this.postgresDateStr()
     }
 
-    const createCart = carts.insert(cartData).returning('*');
-    this.logger.debug(`\tQuery: ${createCart}`);
+    const query = stores.insert(storeData).returning('*');
+    this.logger.debug(`\tQuery: ${query}`);
 
-    const created = await createCart;
+    const created = await query;
     this.logger.debug(`\tResult: ${created}`);
     return created;
   }
@@ -102,16 +119,9 @@ class ShoppingCartRepository {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async deleteCart(cartId) {
-    // Check if the cart exists
-    //  (doing this as a preliminary check reduces the amount of db queries)
-    const cartRow = await this.getCart(cartId);
-    if (cartRow.length === 0) {
-      return 0;
-    }
-
-    const carts = this.knex(this.resource);
-    const query = carts.where({cart_id: cartId}).del();
+  async deleteStore(id) {
+    const stores = this.knex(this.resource);
+    const query = stores.where({id}).del();
     this.logger.debug(`\tQuery: ${query}`);
 
     const removed = await query;
@@ -120,4 +130,4 @@ class ShoppingCartRepository {
   }
 }
 
-module.exports = ShoppingCartRepository;
+module.exports = StoresRepository;

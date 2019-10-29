@@ -39,8 +39,8 @@ class StoreModel {
    * @async
    * @param {number} storeId - the id associated with a store
    */
-  async createStore(name, phone, email) {
-    return this.repository.createStore(name, phone, email);
+  async createStore(payload) {
+    return this.repository.createStore(payload);
   }
 
   /**
@@ -58,7 +58,7 @@ class StoreModel {
    * @param {number} storeEmail - the email of the store
    */
   async getStoreByEmail(storeEmail) {
-    return this.repository.getStore(storeEmail);
+    return this.repository.getStoreByEmail(storeEmail);
   }
 }
 

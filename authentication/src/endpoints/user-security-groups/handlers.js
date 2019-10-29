@@ -79,7 +79,44 @@ class Handlers {
    */
   async removeUserSecurityGroupByUserId(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
+    const { params: { userId }, payload } = req;
+
+    // Check if request contains a body
+    if (!payload) {
+      return rep.response({message: "Body cannot be empty."}).code(400);
+    }
+
+    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
+
+    try {
+      const res = await this.userSecurityGroups.deleteUSGroupByUserId(userId);
+      this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
+      // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
+      if (res === 0) {
+        return rep.response({message: `User Security Group does not exist with user ${userId} and store ${storeId}.`})
+        .code(400);
+      }
+      else {
+        // Otherwise, return  how many rows were removed
+        return rep.response({message: "User security group removed.", data: res}).code(200);
+      }
+    }
+    catch (err) {
+      this.logger.error(JSON.stringify(err));
+      throw err;
+    }
+  }
+
+  /**
+   * Remove a product from a cart
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
+  async removeUserSecurityGroup(req, rep) {
+    this.logger.logRequest(req);
+    const { params: { userId, storeId }, payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -95,7 +132,7 @@ class Handlers {
     this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
 
     try {
-      const res = await this.userSecurityGroups.deleteUSGroupByUserId(id, payload);
+      const res = await this.userSecurityGroups.deleteUSGroup(userId, storeId);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.

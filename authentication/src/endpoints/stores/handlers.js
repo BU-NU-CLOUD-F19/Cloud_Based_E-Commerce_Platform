@@ -57,7 +57,7 @@ class Handlers {
     this.logger.debug(`\tHandler: Adding Store ${JSON.stringify(payload)} to cart ${id}`);
 
     try {
-      const res = await this.stores.createStore(id, payload);
+      const res = await this.stores.createStore(payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
