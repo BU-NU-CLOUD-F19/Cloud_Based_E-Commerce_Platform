@@ -6,7 +6,7 @@
 'use strict';
 
 const logger = require('../utils/logger');
-const Memberships = require('../models/').Memberships;
+const { Memberships } = require('../models/');
 
 /**
  * The handler functions for all endpoints defined for the memberships
@@ -89,7 +89,7 @@ class Handlers {
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
-  async removeMembership(req, rep) {
+  async deleteMembership(req, rep) {
     this.logger.logRequest(req);
     const { payload } = req;
 
@@ -167,59 +167,23 @@ class Handlers {
 
   }
 
+  
   /**
-   * Remove the cart including all products
+   * Get a membership
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
-  async deleteCart(req, rep) {
-    const { params: { id }} = req;
-    this.logger.logRequest(req);
-
-    this.logger.debug(`\tHandler: Removing cart ${id}`);
-
-    try {
-      // Empty the cart
-      await this.productsInCart.emptyCart(id);
-
-      // Delete the cart
-      const res = await this.carts.deleteCart(id);
-
-      // If something has been deleted, return the number of carts deleted (should always be 1)
-      if (res === 1) {
-        return rep.response({message: "Cart deleted.", data: res})
-      }
-      // If nothing was deleted, cart doesn't exist
-      else if (res === 0) {
-        return rep.response({message: "Cart does not exist"}).code(400);
-      }
-      // You should never delete more than one cart
-      else {
-        this.logger.error(`Deleted more than one cart, this shouldn't happen: ${res}`);
-      }
-    }
-    catch(err) {
-      this.logger.error(JSON.stringify(err));
-    }
-  }
-
-  /**
-   * List the products in a cart
-   * @async
-   * @param {Hapi.request} req - the request object
-   * @param {object} rep - the response toolkit (Hapi.h)
-   */
-  async getProducts(req, rep) {
-    const { params: { id }} = req;
+  async getMembership(req, rep) {
+    const { params: { userId, storeId }} = req;
     this.logger.logRequest(req);
 
     try {
-      this.logger.debug(`\tHandler: Listing all products in ${id}`);
+      this.logger.debug(`\tHandler: Getting membership for ${storeId}`);
 
       // Get the products in the cart and return them
-      const result = await this.productsInCart.getProducts(id);
-      return rep.response({message: "Products retrieved.", data: result}).code(200);
+      const result = await this.memberships.getMembership(userId, storeId);
+      return rep.response({message: "Membership retrieved.", data: result}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);

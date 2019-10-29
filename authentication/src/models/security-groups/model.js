@@ -46,10 +46,18 @@ class SecurityGroupModel {
   /**
    * Retrieve the securitygroup based on its scope
    * @async
-   * @param {number} scope - the scope to be found
+   * @param {String} scope - the scope to be found
    */
-  async getSecurityGroup(scope) {
-    return this.repository.getSecurityGroup(scope);
+  async getSecurityGroupByScope(scope) {
+    return this.repository.getSecurityGroupByScope(scope);
+  }
+
+  /**
+   * Retrieve all securitygroups
+   * @async
+   */
+  async getSecurityGroup() {
+    return this.repository.getSecurityGroup();
   }
 
 }
