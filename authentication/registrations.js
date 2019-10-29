@@ -9,7 +9,11 @@ module.exports = function registrations(config) {
   return {
     // Each string in this array is `require`d during composition
     plugins: [
-      './src/endpoints',
+      './src/endpoints/memberships',
+      './src/endpoints/security-groups',
+      './src/endpoints/stores',
+      './src/endpoints/user-security-groups',
+      './src/endpoints/users',
     ],
   };
 };

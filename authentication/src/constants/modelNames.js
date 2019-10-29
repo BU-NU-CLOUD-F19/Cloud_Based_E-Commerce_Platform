@@ -10,7 +10,7 @@ const names = {
   */
 
   memberships: 'memberships',
-  securityGroups: 'security-groups'
+  securityGroups: 'security-groups',
   stores: 'stores',
   users: 'users',
   userSecurityGroups: 'user-security-groups'

@@ -6,9 +6,9 @@
 'use strict';
 
 const Router = require('./router');
-const Names = require('../constants/modelNames');
+const Names = require('../../constants/modelNames');
 
-const resource = Names.cart;
+const resource = Names.stores;
 
 
 /**
