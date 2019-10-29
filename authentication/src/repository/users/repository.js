@@ -66,10 +66,10 @@ class UserRepository {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async getUser(id) {
+  async getUser(uid) {
     const query = this.knex(this.resource)
                     .select('*')
-                    .where({id});
+                    .where({uid});
     this.logger.debug(`\tQuery: ${checkCart}`);
 
     const usersFound = await query;
@@ -99,7 +99,7 @@ class UserRepository {
    * @param {number} cartId - the id associated with a cart
    */
   async createUser(userData) {
-    userData.id = shortid.generate();
+    userData.uid = shortid.generate();
     userData.date_created = this.postgresDateStr();
     
     const query = this.knex(this.resource)
@@ -116,9 +116,9 @@ class UserRepository {
    * @async
    * @param {number} id - the id associated with a cart
    */
-  async deleteUser(id) {
+  async deleteUser(uid) {
     const query = this.knex(this.resource)
-                  .where({id})
+                  .where({uid})
                   .del();
     this.logger.debug(`\tQuery: ${query}`);
 
@@ -146,12 +146,12 @@ class UserRepository {
   /**
    * Update a user
    * @async
-   * @param {number} id
+   * @param {number} uid
    * @param {object} userData
    */
-  async updateUser(id, userData) {
+  async updateUser(uid, userData) {
     const query = this.knex(this.resource)
-                  .where({id})
+                  .where({uid})
                   .update(userData);
     this.logger.debug(`\tQuery: ${query}`);
 
