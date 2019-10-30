@@ -20,7 +20,6 @@ create table users (
   email varchar(50) not null,
   password varchar(100), -- can be null if the user is not registered
   constraint valid_phone check (phone LIKE '^[0-9]{10}$')
-
 );
 
 create table carts (
