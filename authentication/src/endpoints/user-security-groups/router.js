@@ -31,7 +31,7 @@ class Router {
       handler: this.handlers.createUserSecurityGroup.bind(this.handlers),
       config: {
         description: `Create a user security group record.`,
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             201: { description: 'Product added' },
@@ -53,7 +53,7 @@ class Router {
       handler: this.handlers.removeUserSecurityGroupByUserId.bind(this.handlers),
       config: {
         description: 'Remove a user security group record by user id',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group removed'},
@@ -75,7 +75,7 @@ class Router {
       handler: this.handlers.removeUserSecurityGroup.bind(this.handlers),
       config: {
         description: 'Remove a user security group record by user id',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group removed'},
@@ -98,7 +98,7 @@ class Router {
       handler: this.handlers.getUserSecurityGroup.bind(this.handlers),
       config: {
         description: 'Get a user security group given its userId and storeId.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group returned' },

@@ -31,7 +31,7 @@ class Router {
       handler: this.handlers.addProduct.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             201: { description: 'Store added' },
@@ -53,7 +53,7 @@ class Router {
       handler: this.handlers.deleteStore.bind(this.handlers),
       config: {
         description: 'Remove a product from the cart.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'Product removed'},
@@ -75,7 +75,7 @@ class Router {
       handler: this.handlers.getStoreById.bind(this.handlers),
       config: {
         description: 'Get a store.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'Product listing returned' },

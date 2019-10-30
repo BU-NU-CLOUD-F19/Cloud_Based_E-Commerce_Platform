@@ -31,7 +31,8 @@ class Router {
       handler: this.handlers.addMembership.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
             201: { description: 'Product added' },
@@ -53,7 +54,8 @@ class Router {
       handler: this.handlers.deleteMembership.bind(this.handlers),
       config: {
         description: 'Remove a product from the cart.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
             200: { description: 'Product removed'},
@@ -75,7 +77,8 @@ class Router {
       handler: this.handlers.updateSubscription.bind(this.handlers),
       config: {
         description: 'Change the amount of product in the cart.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
             200: { description: 'Amount updated' },
@@ -97,7 +100,8 @@ class Router {
       handler: this.handlers.getMembership.bind(this.handlers),
       config: {
         description: 'Get all products in a cart.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
             200: { description: 'Membership returned' },

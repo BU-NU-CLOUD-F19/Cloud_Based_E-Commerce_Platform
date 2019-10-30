@@ -31,7 +31,7 @@ class Router {
       handler: this.handlers.createUser.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             201: { description: 'User created' },
@@ -53,7 +53,7 @@ class Router {
       handler: this.handlers.deleteUser.bind(this.handlers),
       config: {
         description: 'Remove a user.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User removed'},
@@ -75,7 +75,7 @@ class Router {
       handler: this.handlers.updateUser.bind(this.handlers),
       config: {
         description: 'Update a user.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User updated' },
@@ -97,7 +97,7 @@ class Router {
       handler: this.handlers.getProducts.bind(this.handlers),
       config: {
         description: 'Get a user by email.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'Product listing returned' },
@@ -119,7 +119,7 @@ class Router {
       handler: this.handlers.getUser.bind(this.handlers),
       config: {
         description: 'Get a user.',
-        tags: ['api', 'cart'],
+        tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'Product listing returned' },

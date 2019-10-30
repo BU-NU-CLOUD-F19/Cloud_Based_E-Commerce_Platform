@@ -19,6 +19,7 @@
     "doc": "jsdoc -d ../docs/authentication -r src/"
   },
   "dependencies": {
+    "hapi-firebase-auth":"0.2.0",
     "@hapi/glue": "^6.2.0",
     "jerkface": "^1.0.0",
     "kibbutz": "^2.0.0",

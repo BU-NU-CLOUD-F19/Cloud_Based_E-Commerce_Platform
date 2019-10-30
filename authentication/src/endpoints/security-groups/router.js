@@ -31,6 +31,7 @@ class Router {
       handler: this.handlers.getSecurityGroup.bind(this.handlers),
       config: {
         description: 'Get all products in a cart.',
+        tags: ['api', 'authentication']
       }
     });
   }
