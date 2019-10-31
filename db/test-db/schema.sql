@@ -27,6 +27,7 @@ create table carts (
   cart_id varchar(50) primary key,
   date_created timestamptz not null,
   date_modified timestamptz, -- could be null if not modified
+  locked boolean not null,
   uid varchar(20) references users(uid) not null
 );
 

@@ -154,6 +154,59 @@ class Router {
   }
 
 
+  routeLockCart(server) {
+    server.route({
+      method: 'PUT',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.lockCart.bind(this.handlers),
+      config: {
+        description: 'Lock the cart (prevent further changes).',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart locked' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  routeUnlockCart(server) {
+    server.route({
+      method: 'DELETE',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.unlockCart.bind(this.handlers),
+      config: {
+        description: 'Unlock the cart',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart unlocked' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  routeIsLocked(server) {
+    server.route({
+      method: 'GET',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.isLocked.bind(this.handlers),
+      config: {
+        description: 'Check if a cart is locked',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart status retrieved' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
   /**
    * Actually adds the routes to the server
    * @param {Hapi.server} server - the Hapi server
@@ -165,6 +218,9 @@ class Router {
     this.routeChangeAmount(server);
     this.routeGetProducts(server);
     this.routeDeleteCart(server);
+    this.routeLockCart(server);
+    this.routeUnlockCart(server);
+    this.routeIsLocked(server);
   }
 }
 

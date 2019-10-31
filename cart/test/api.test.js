@@ -180,7 +180,47 @@ describe("Cart REST API", () => {
     expect(res.body.data).to.eql([]);
   })
 
+  it("locks and unlocks correctly", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Lock the cart
+    await requestCart.put(`/${cartId}/lock`).expect(200);
+
+    // Get the locked status
+    let isLocked = await requestCart.get(`/${cartId}/lock`).expect(200);
+    expect(isLocked.body.data.locked).to.equal(true);
+
+    // Unlock the cart
+    await requestCart.delete(`/${cartId}/lock`).expect(200);
+
+    // Get the locked status
+    isLocked = await requestCart.get(`/${cartId}/lock`).expect(200);
+    expect(isLocked.body.data.locked).to.equal(false);
+  })
+
   // Check API error handling
+  it ("does not modify a locked cart", async () => {
+    // Add a product
+    let product2 = {
+      "pid": 2,
+      "amount_in_cart": 5
+    }
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Lock the cart
+    await requestCart.put(`/${cartId}/lock`).expect(200);
+
+    // Adding a product should fail
+    await requestCart.post(`/${cartId}`).send(product2).expect(403);
+
+    // Unlock the cart
+    await requestCart.delete(`/${cartId}/lock`).expect(200);
+
+    // Now the product should be added
+    await requestCart.post(`/${cartId}`).send(product2).expect(201);
+  })
+
   it("Rejects a malformed remove request", async () => {
     await requestCart.put(`/${cartId}/remove`).expect(400)
   });

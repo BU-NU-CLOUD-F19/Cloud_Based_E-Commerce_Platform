@@ -25,6 +25,10 @@ class CartModel {
     return this.repository.deleteAll();
   }
 
+  async modified(cartId) {
+    return this.repository.modified(cartId);
+  }
+
   /**
    * Delete a cart, also removing all products in it.
    * @async
@@ -50,6 +54,18 @@ class CartModel {
    */
   async getCart(cartId) {
     return this.repository.getCart(cartId);
+  }
+
+  async lockCart(cartId) {
+    return this.repository.lockCart(cartId);
+  }
+
+  async unlockCart(cartId) {
+    return this.repository.unlockCart(cartId);
+  }
+
+  async isLocked(cartId) {
+    return this.repository.isLocked(cartId);
   }
 
 }

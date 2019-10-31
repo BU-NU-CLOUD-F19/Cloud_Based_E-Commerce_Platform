@@ -64,8 +64,15 @@ class Handlers {
         await this.carts.createCart(id);
       }
 
+      // Abort if the cart is locked
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked, perhaps a checkout is in progress."}).code(403);
+      }
+
       const res = await this.productsInCart.addProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
+      await this.carts.modified(id);
 
       // Return what was added
       return rep.response({message: "Product added to cart.", data: res}).code(201);
@@ -89,7 +96,7 @@ class Handlers {
         return rep.response({message: message}).code(400);
       }
       else {
-        this.logger.error(JSON.stringify(err));
+        this.logger.error(`Handler: ${JSON.stringify(err)}`);
         throw err;
       }
     }
@@ -116,9 +123,14 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
+    this.logger.debug(`\tHandler: Removing product ${JSON.stringify(payload)} from cart ${id}`);
 
     try {
+      // Abort if the cart is locked
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked, perhaps a checkout is in progress."}).code(403);
+      }
+
       const res = await this.productsInCart.removeProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
@@ -128,6 +140,7 @@ class Handlers {
       }
       else {
         // Otherwise, return  how many rows were removed
+        await this.carts.modified(id);
         return rep.response({message: "Product removed from cart.", data: res}).code(200);
       }
     }
@@ -168,11 +181,17 @@ class Handlers {
     this.logger.debug(`\tHandler: Changing amount of product in cart ${id}`);
 
     try {
+      // Abort if the cart is locked
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked, perhaps a checkout is in progress."}).code(403);
+      }
+
       // Change the amount in the cart
       const res = await this.productsInCart.changeAmount(id, payload);
 
       // Return the new product record
       if (res.length > 0) {
+        await this.carts.modified(id);
         return rep.response({message: "Amount updated.", data: res});
       }
       // If nothing was updated, the product wasn't in the cart.
@@ -213,9 +232,15 @@ class Handlers {
         return rep.response({message: "Cart does not exist."}).code(400);
       }
 
+      // Abort if the cart is locked
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked, perhaps a checkout is in progress."}).code(403);
+      }
+
       const res = await this.productsInCart.emptyCart(id);
 
       // Return the number of products removed
+      await this.carts.modified(id);
       return rep.response({message: "Cart emptied.", data: res}).code(200);
     }
     catch(err) {
@@ -236,6 +261,11 @@ class Handlers {
     this.logger.debug(`\tHandler: Removing cart ${id}`);
 
     try {
+      // Abort if the cart is locked
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked, perhaps a checkout is in progress."}).code(403);
+      }
+
       // Empty the cart
       await this.productsInCart.emptyCart(id);
 
@@ -280,6 +310,58 @@ class Handlers {
     catch(err)  {
       this.logger.error(err.message);
     }
+  }
+
+  async lockCart(req, rep) {
+    const { id } = req.params;
+    this.logger.logRequest(req);
+
+    try {
+      this.logger.debug(`\tHandler: Locking cart ${id}`);
+
+      const result = await this.carts.lockCart(id);
+
+      await this.carts.modified(id);
+      return rep.response({message: "Cart locked."}).code(200);
+    }
+    catch(err) {
+      this.logger.error(err.message);
+    }
+  }
+
+  async unlockCart(req, rep) {
+    const { id } = req.params;
+    this.logger.logRequest(req);
+
+    try {
+      this.logger.debug(`\tHandler: Unlocking cart ${id}`);
+
+      const result = await this.carts.unlockCart(id);
+      await this.carts.modified(id);
+      return rep.response({message: "Cart unlocked."}).code(200);
+    }
+    catch(err) {
+      this.logger.error(err.message);
+    }
+
+  }
+
+  async isLocked(req, rep) {
+    const { id } = req.params;
+    this.logger.logRequest(req);
+
+    try {
+      this.logger.debug(`\tHandler: getting locked status of ${id}`);
+
+      const result = await this.carts.isLocked(id);
+
+      return rep.response({message: "Cart status retrieved.", data: { locked: result }}).code(200);
+
+    }
+    catch(err) {
+      this.logger.error(err.message);
+    }
+
   }
 }
 

@@ -86,6 +86,7 @@ class ShoppingCartRepository {
     const cartData = {
       cart_id: cartId,
       date_created: this.postgresDateStr(),
+      locked: false,
       uid: 'user1' // TODO: this shouldn't be hardcoded
     }
 
@@ -93,7 +94,7 @@ class ShoppingCartRepository {
     this.logger.debug(`\tQuery: ${createCart}`);
 
     const created = await createCart;
-    this.logger.debug(`\tResult: ${created}`);
+    this.logger.debug(`\tResult: ${JSON.stringify(created)}`);
     return created;
   }
 
@@ -118,6 +119,47 @@ class ShoppingCartRepository {
     this.logger.debug(`\tResult: ${removed}`);
     return removed;
   }
+
+  async modified(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({ date_modified: this.postgresDateStr() }, ['cart_id']);
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  async lockCart(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({locked: true}, ['cart_id', 'locked'])
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  async unlockCart(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({locked: false}, ['cart_id', 'locked'])
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  async isLocked(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.select('locked').where({cart_id: cartId});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+    return result[0].locked;
+  }
+
 }
 
 module.exports = ShoppingCartRepository;
