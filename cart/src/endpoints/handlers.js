@@ -319,7 +319,7 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Locking cart ${id}`);
 
-      const result = await this.carts.lockCart(id);
+      await this.carts.lockCart(id);
 
       await this.carts.modified(id);
       return rep.response({message: "Cart locked."}).code(200);
@@ -336,7 +336,7 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Unlocking cart ${id}`);
 
-      const result = await this.carts.unlockCart(id);
+      await this.carts.unlockCart(id);
       await this.carts.modified(id);
       return rep.response({message: "Cart unlocked."}).code(200);
     }

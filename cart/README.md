@@ -51,6 +51,7 @@ Example:
 Errors:
 
 * 400: bad request (e.g. empty request body, or required data not present)
+* 403: forbidden, the cart is locked
 
 ### PUT /cart/{id}/remove
 #### Purpose
@@ -89,6 +90,7 @@ Example:
 Errors:
 
 * 400: bad request (e.g. empty request body, or required data not preset)
+* 403: forbidden, the cart is locked
 
 ### PUT '/cart/{id}/empty'
 #### Purpose
@@ -117,6 +119,7 @@ Example:
 Errors:
 
 * 400: bad request (e.g. cart does not exist)
+* 403: forbidden, the cart is locked
 
 ### PUT '/cart/{id}'
 #### Purpose
@@ -164,6 +167,7 @@ Example:
 Errors:
 
 * 400: bad request (e.g. product not present in cart)
+* 403: forbidden, the cart is locked
 
 ### GET /cart/{id}
 #### Purpose
@@ -221,4 +225,103 @@ Example:
 Errors:
 
 * 400: bad request (e.g. cart does not exist)
+* 403: forbidden, the cart is locked
 
+### DELETE '/cart/{id}'
+#### Purpose
+Delete a cart and all products in it.
+
+#### Request body
+None.
+
+#### Response
+**Status code:** 200.
+
+**Body:** a JSON object containing
+
+* `message`: a message regarding the status of the request
+
+Example:
+
+```json
+{
+  "message": "Cart deleted."
+}
+```
+
+Errors:
+
+* 400: bad request (e.g. cart does not exist)
+* 403: forbidden, the cart is locked
+
+
+### PUT '/cart/{id}/lock'
+#### Purpose
+Lock a cart, preventing any modification.
+
+#### Request body
+None.
+
+#### Response
+**Status code**: 200.
+
+**Body:** a JSON object containing
+
+* `message`: a message regarding the status of the request
+
+Example:
+
+```json
+{
+  "message": "Cart locked."
+}
+```
+
+### DELETE '/cart/{id}/lock'
+#### Purpose
+Unlock a previously locked cart.
+
+#### Request body
+None.
+
+#### Response
+**Status code:** 200.
+
+**Body**: a JSON object containing
+
+* `message`: a message regarding the status of the request
+
+Example:
+
+```json
+{
+  "message": "Cart unlocked."
+}
+```
+
+### GET '/cart/{id}/lock'
+#### Purpose
+Get the status of the lock on the cart (locked or not).
+
+#### Request body
+None.
+
+#### Response
+**Status code:** 200.
+
+**Body:** a JSON object containing
+
+* `message`: a message regarding the status of the request
+* `data`: a JSON object containing:
+  * `locked`: a boolean value indicating whether the cart is locked
+
+Example:
+
+```json
+{
+  "message": "Cart status retrieved.",
+  "data": {
+    "locked": false
+  }
+}
+```
