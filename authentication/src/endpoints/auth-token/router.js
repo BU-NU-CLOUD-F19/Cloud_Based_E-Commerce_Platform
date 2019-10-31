@@ -24,20 +24,14 @@ class Router {
    * POST add product
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
-  routeCreateUserSecurityGroup(server) {
+  routeGetToken(server) {
     server.route({
       method: 'POST',
-      path: `/user-security-groups`,
-      handler: this.handlers.createUserSecurityGroup.bind(this.handlers),
+      path: `/authorization/token/{email}`,
+      handler: this.handlers.generateToken.bind(this.handlers),
       config: {
-        description: `Create a user security group record.`,
-        tags: ['api', 'authentication'],
-        plugins: {
-          'hapi-swagger': {
-            201: { description: 'Product added' },
-            400: { description: 'Bad request (e.g. body empty)' }
-          }
-        }
+        description: `Add a product to the cart.`,
+        tags: ['api', 'authentication']
       }
     });
   }
@@ -46,62 +40,41 @@ class Router {
    * PUT remove product
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
-  routeRemoveUserSecurityGroupByUserId(server) {
+  routeDeleteMembership(server) {
     server.route({
       method: 'DELETE',
-      path: `/user-security-groups/{userId}`,
-      handler: this.handlers.removeUserSecurityGroupByUserId.bind(this.handlers),
+      path: `/memberships/{userId}/{storeId}`,
+      handler: this.handlers.deleteMembership.bind(this.handlers),
       config: {
-        description: 'Remove a user security group record by user id',
+        description: 'Remove a product from the cart.',
         tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
-            200: { description: 'User security group removed'},
+            200: { description: 'Product removed'},
             400: { description: 'Bad request (e.g. body empty)' }
           }
         }
       }
     })
   }
-  
+
   /**
-   * PUT remove product
+   * PUT change the amount of product in the cart
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
-  routeRemoveUserSecurityGroup(server) {
+  routeUpdateSubscription(server) {
     server.route({
-      method: 'DELETE',
-      path: `/user-security-groups/{userId}/{storeId}`,
-      handler: this.handlers.removeUserSecurityGroup.bind(this.handlers),
+      method: 'PATCH',
+      path: '/memberships/{id}',
+      handler: this.handlers.updateSubscription.bind(this.handlers),
       config: {
-        description: 'Remove a user security group record by user id',
+        description: 'Change the amount of product in the cart.',
         tags: ['api', 'authentication'],
+        auth: 'firebase',
         plugins: {
           'hapi-swagger': {
-            200: { description: 'User security group removed'},
-            400: { description: 'Bad request (e.g. body empty)' }
-          }
-        }
-      }
-    })
-  }
-
-
-   /**
-   * GET list the products in the cart
-   * @param {Hapi.server} server - the Hapi server to which to add the route
-   */
-  routeGetUserSecurityGroup(server) {
-    server.route({
-      method: 'GET',
-      path: `/user-security-groups/{userId}/{storeId}`,
-      handler: this.handlers.getUserSecurityGroup.bind(this.handlers),
-      config: {
-        description: 'Get a user security group given its userId and storeId.',
-        tags: ['api', 'authentication'],
-        plugins: {
-          'hapi-swagger': {
-            200: { description: 'User security group returned' },
+            200: { description: 'Amount updated' },
             400: { description: 'Bad request' }
           }
         }
@@ -109,17 +82,39 @@ class Router {
     });
   }
 
-   
+   /**
+   * GET list the products in the cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeGetMembership(server) {
+    server.route({
+      method: 'GET',
+      path: `/memberships/{userId}/{storeId}`,
+      handler: this.handlers.getMembership.bind(this.handlers),
+      config: {
+        description: 'Get all products in a cart.',
+        tags: ['api', 'authentication'],
+        auth: 'firebase',
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Membership returned' },
+            400: { description: 'Bad request' }
+          }
+        }
+      }
+    });
+  }
+
 
   /**
    * Actually adds the routes to the server
    * @param {Hapi.server} server - the Hapi server
    */
   route(server) {
-    this.routeCreateUserSecurityGroup(server);
-    this.routeRemoveUserSecurityGroupByUserId(server);
-    this.routeRemoveUserSecurityGroup(server);
-    this.routeGetUserSecurityGroup(server);
+    this.routeAddMembership(server);
+    this.routeDeleteMembership(server);
+    this.routeGetMembership(server);
+    this.routeUpdateSubscription(server);
   }
 }
 

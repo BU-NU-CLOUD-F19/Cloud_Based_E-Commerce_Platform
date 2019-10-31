@@ -59,7 +59,7 @@ class UserSecurityGroupModel {
    * @param {number} storeId
    * @param {number} securityGroupId
    */
-  async createUSGroup(userId, storeId, securityGroupId) {
+  async createUserSecurityGroup(userId, storeId, securityGroupId) {
     // TODO: add logic to fetch scope somewhere along this flow
     return this.repository.createUSGroup(userId, storeId, securityGroupId);
   }

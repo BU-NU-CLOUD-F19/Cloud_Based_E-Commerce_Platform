@@ -82,6 +82,6 @@ class UsersModel {
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.users, Users);
+Kernel.bind(Names.users, UsersModel);
 
-module.exports = Users;
+module.exports = UsersModel;

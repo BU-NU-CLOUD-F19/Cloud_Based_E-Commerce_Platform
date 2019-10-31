@@ -110,7 +110,7 @@ class UserSecurityGroupRepository {
    * @param {number} userID - the id associated with a cart
    */
   async deleteUSGroup(userId, storeId) {
-    const carts = this.knex(this.resource)
+    const query = this.knex(this.resource)
                     .where({user_id: userId, store_id: storeId})
                     .del();
     this.logger.debug(`\tQuery: ${query}`);
@@ -126,7 +126,7 @@ class UserSecurityGroupRepository {
    * @param {number} userID - the id associated with a cart
    */
   async deleteUSGroupByUserId(userId) {
-    const carts = this.knex(this.resource)
+    const query = this.knex(this.resource)
                     .where({user_id: userId}).del();
     this.logger.debug(`\tQuery: ${query}`);
 

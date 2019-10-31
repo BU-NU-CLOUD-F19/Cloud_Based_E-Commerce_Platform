@@ -5,8 +5,8 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const { SecurityGroups } = require('../models/');
+const logger = require('../../utils/logger');
+const { SecurityGroups } = require('../../models/');
 
 /**
  * The handler functions for all endpoints defined for the cart

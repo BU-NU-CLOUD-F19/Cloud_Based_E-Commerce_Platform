@@ -6,7 +6,7 @@
 'use strict';
 
 // Handlers for the routes, triggered on request
-const Handlers = require('./handlers.js');
+const Handlers = require('./handlers');
 
 /**
  * The Hapi router, creates HTTP routes

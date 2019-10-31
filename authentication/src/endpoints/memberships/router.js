@@ -6,7 +6,7 @@
 'use strict';
 
 // Handlers for the routes, triggered on request
-const Handlers = require('./handlers.js');
+const Handlers = require('./handlers');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -27,7 +27,7 @@ class Router {
   routeAddMembership(server) {
     server.route({
       method: 'POST',
-      path: `/memberships/{userId}/{storeId}/{subscription}`,
+      path: `/memberships`,
       handler: this.handlers.addMembership.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
@@ -49,8 +49,8 @@ class Router {
    */
   routeDeleteMembership(server) {
     server.route({
-      method: 'PUT',
-      path: `/cart/{id}/remove`,
+      method: 'DELETE',
+      path: `/memberships/{userId}/{storeId}`,
       handler: this.handlers.deleteMembership.bind(this.handlers),
       config: {
         description: 'Remove a product from the cart.',
@@ -72,8 +72,8 @@ class Router {
    */
   routeUpdateSubscription(server) {
     server.route({
-      method: 'PUT',
-      path: '/cart/{id}',
+      method: 'PATCH',
+      path: '/memberships/{id}',
       handler: this.handlers.updateSubscription.bind(this.handlers),
       config: {
         description: 'Change the amount of product in the cart.',
@@ -96,7 +96,7 @@ class Router {
   routeGetMembership(server) {
     server.route({
       method: 'GET',
-      path: `/cart/{id}`,
+      path: `/memberships/{userId}/{storeId}`,
       handler: this.handlers.getMembership.bind(this.handlers),
       config: {
         description: 'Get all products in a cart.',

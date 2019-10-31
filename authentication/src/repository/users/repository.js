@@ -70,7 +70,7 @@ class UserRepository {
     const query = this.knex(this.resource)
                     .select('*')
                     .where({uid});
-    this.logger.debug(`\tQuery: ${checkCart}`);
+    this.logger.debug(`\tQuery: ${query}`);
 
     const usersFound = await query;
     this.logger.debug(`\tResult ${JSON.stringify(usersFound)}`);
@@ -86,7 +86,7 @@ class UserRepository {
     const query = this.knex(this.resource)
                     .select('*')
                     .where({email});
-    this.logger.debug(`\tQuery: ${checkCart}`);
+    this.logger.debug(`\tQuery: ${query}`);
 
     const usersFound = await query;
     this.logger.debug(`\tResult ${JSON.stringify(usersFound)}`);

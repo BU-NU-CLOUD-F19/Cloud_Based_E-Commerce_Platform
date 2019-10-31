@@ -5,8 +5,8 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const { Stores } = require('../models/');
+const logger = require('../../utils/logger');
+const { Stores } = require('../../models/');
 
 /**
  * The handler functions for all endpoints defined for the cart
@@ -41,7 +41,7 @@ class Handlers {
    */
   async addStore(req, rep) {
     this.logger.logRequest(req);
-    const { payload: { name, phone, email } } = req;
+    const { payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -54,7 +54,7 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Adding Store ${JSON.stringify(payload)} to cart ${id}`);
+    this.logger.debug(`\tHandler: Creating a Store ${JSON.stringify(payload)}`);
 
     try {
       const res = await this.stores.createStore(payload);
@@ -79,28 +79,17 @@ class Handlers {
    */
   async deleteStore(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
+    const { params: { id } } = req;
 
-    // Check if request contains a body
-    if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
-    }
-
-    // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['pid'], payload);
-    if (!isValid.valid) {
-      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
-    }
-
-    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
+    this.logger.debug(`\tHandler: Removing store ${id}`);
 
     try {
-      const res = await this.stores.deleteStore(id, payload);
+      const res = await this.stores.deleteStore(id);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
       if (res === 0) {
-        return rep.response({message: `Store ${payload.pid} not found`}).code(400);
+        return rep.response({message: `Store ${id} not found`}).code(400);
       }
       else {
         // Otherwise, return  how many rows were removed

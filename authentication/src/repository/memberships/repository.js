@@ -90,7 +90,7 @@ class MembershipRepository {
       date_created: this.postgresDateStr()
     }
 
-    const createMembership = carts.insert(membershipData).returning('*');
+    const createMembership = memberships.insert(membershipData).returning('*');
     this.logger.debug(`\tQuery: ${createMembership}`);
 
     const created = await createMembership;

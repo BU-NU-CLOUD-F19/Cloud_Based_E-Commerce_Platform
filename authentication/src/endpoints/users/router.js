@@ -6,7 +6,7 @@
 'use strict';
 
 // Handlers for the routes, triggered on request
-const Handlers = require('./handlers.js');
+const Handlers = require('./handlers');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -31,7 +31,7 @@ class Router {
       handler: this.handlers.createUser.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
-        tags: ['api', 'authentication'],
+        tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
             201: { description: 'User created' },
@@ -53,7 +53,7 @@ class Router {
       handler: this.handlers.deleteUser.bind(this.handlers),
       config: {
         description: 'Remove a user.',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User removed'},
@@ -75,7 +75,7 @@ class Router {
       handler: this.handlers.updateUser.bind(this.handlers),
       config: {
         description: 'Update a user.',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User updated' },
@@ -93,8 +93,8 @@ class Router {
   routeGetUserByEmail(server) {
     server.route({
       method: 'GET',
-      path: `/users/{email}`,
-      handler: this.handlers.getProducts.bind(this.handlers),
+      path: `/users/byEmail/{email}`,
+      handler: this.handlers.getUserByEmail.bind(this.handlers),
       config: {
         description: 'Get a user by email.',
         tags: ['api', 'authentication'],

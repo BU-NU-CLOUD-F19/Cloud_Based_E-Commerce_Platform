@@ -13,7 +13,7 @@ const names = {
   securityGroups: 'security-groups',
   stores: 'stores',
   users: 'users',
-  userSecurityGroups: 'user-security-groups'
+  userSecurityGroups: 'user-security-groups',
   
   /*
      Repository

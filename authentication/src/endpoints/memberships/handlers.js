@@ -5,8 +5,8 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const { Memberships } = require('../models/');
+const logger = require('../../utils/logger');
+const { Memberships } = require('../../models/');
 
 /**
  * The handler functions for all endpoints defined for the memberships
@@ -42,7 +42,7 @@ class Handlers {
   async addMembership(req, rep) {
     this.logger.logRequest(req);
     const { payload } = req;
-
+    const { userId, storeId, subscriptionStatus = true } = payload;
     // Check if request contains a body
     if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
@@ -57,7 +57,7 @@ class Handlers {
     this.logger.debug(`\tHandler: Adding membership ${JSON.stringify(payload)}`);
 
     try {
-      const res = await this.memberships.addMembership(id, payload);
+      const res = await this.memberships.createMembership(userId, storeId, subscriptionStatus);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
@@ -91,17 +91,11 @@ class Handlers {
    */
   async deleteMembership(req, rep) {
     this.logger.logRequest(req);
-    const { payload } = req;
+    const { params: { userId, storeId }, payload } = req;
 
     // Check if request contains a body
     if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
-    }
-
-    // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['storeId', 'userId'], payload);
-    if (!isValid.valid) {
-      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
     this.logger.debug(`\tHandler: Removing membership of user ${userId} from store ${storeId}`);
@@ -132,7 +126,7 @@ class Handlers {
    */
   async updateSubscription(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
+    const { params: { userId, storeId }, payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -140,17 +134,18 @@ class Handlers {
     }
 
     // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['userId', 'storeId', 'subscriptionStatus'], payload);
+    const isValid = Handlers.propsPresent(['subscriptionStatus'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
+    const { subscriptionStatus } = payload;
     this.logger.debug(`\tHandler: Updating sbscription status for
      user ${userId} in store ${storeId} to ${subscriptionStatus}`);
 
     try {
       // Update subscription status
-      const res = await this.memberships.updateMembershipsSubscription(storeId, userId, subscribed);
+      const res = await this.memberships.updateMembershipsSubscription(storeId, userId, subscriptionStatus);
 
       // Return the new product record
       if (res.length > 0) {

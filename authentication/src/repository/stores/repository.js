@@ -72,7 +72,7 @@ class StoresRepository {
 
     const store = await query;
     this.logger.debug(`\tResult ${JSON.stringify(store)}`);
-    return cartsFound;
+    return store;
   }
 
   /**
@@ -86,7 +86,7 @@ class StoresRepository {
 
     const store = await query;
     this.logger.debug(`\tResult ${JSON.stringify(store)}`);
-    return cartsFound;
+    return store;
   }
 
   /**

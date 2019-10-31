@@ -5,8 +5,8 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const { UserSecurityGroups } = require('../models/');
+const logger = require('../../utils/logger');
+const { UserSecurityGroups } = require('../../models/');
 
 /**
  * The handler functions for all endpoints defined for the cart
@@ -41,7 +41,7 @@ class Handlers {
    */
   async createUserSecurityGroup(req, rep) {
     this.logger.logRequest(req);
-    const { params: { userId, storeId, securityGroupId } } = req;
+    const { payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -54,7 +54,8 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Creating User Security group ${JSON.stringify(payload)} to cart ${id}`);
+    const { userId, storeId, securityGroupId } = payload;
+    this.logger.debug(`\tHandler: Creating User Security group ${JSON.stringify(payload)}`);
 
     try {
       const res = await this.userSecurityGroups.createUserSecurityGroup(userId, storeId, securityGroupId);
@@ -86,7 +87,7 @@ class Handlers {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
-    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
+    this.logger.debug(`\tHandler: Removing product ${payload}`);
 
     try {
       const res = await this.userSecurityGroups.deleteUSGroupByUserId(userId);
@@ -94,7 +95,7 @@ class Handlers {
 
       // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
       if (res === 0) {
-        return rep.response({message: `User Security Group does not exist with user ${userId} and store ${storeId}.`})
+        return rep.response({message: `User Security Group does not exist for user ${userId}`})
         .code(400);
       }
       else {
@@ -116,20 +117,9 @@ class Handlers {
    */
   async removeUserSecurityGroup(req, rep) {
     this.logger.logRequest(req);
-    const { params: { userId, storeId }, payload } = req;
+    const { params: { userId, storeId } } = req;
 
-    // Check if request contains a body
-    if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
-    }
-
-    // Check if request body contains the required values
-    const isValid = Handlers.propsPresent(['pid'], payload);
-    if (!isValid.valid) {
-      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
-    }
-
-    this.logger.debug(`\tHandler: Removing product ${payload} from cart ${id}`);
+    this.logger.debug(`\tHandler: Removing user security group for user ${userId} in store ${storeId}`);
 
     try {
       const res = await this.userSecurityGroups.deleteUSGroup(userId, storeId);
@@ -165,7 +155,7 @@ class Handlers {
       this.logger.debug(`\tHandler: Get user security Group for user ${userId} in store ${storeId}`);
 
       // Get the products in the cart and return them
-      const result = await this.userSecurityGroups.getUSGroupByUserIdStoreId(id);
+      const result = await this.userSecurityGroups.getUSGroupByUserIdStoreId(userId, storeId);
       return rep.response({message: "Products retrieved.", data: result}).code(200);
     }
     catch(err)  {

@@ -1,5 +1,5 @@
 'use strict';
 
-const Rrepository = require('./repository');
+const Repository = require('./repository');
 
 module.exports = Repository

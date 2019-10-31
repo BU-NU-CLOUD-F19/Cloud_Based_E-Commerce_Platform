@@ -5,8 +5,8 @@
 
 'use strict';
 
-const logger = require('../utils/logger');
-const { Users } = require('../models/');
+const logger = require('../../utils/logger');
+const { Users } = require('../../models/');
 
 /**
  * The handler functions for all endpoints defined for the cart
@@ -41,7 +41,7 @@ class Handlers {
    */
   async createUser(req, rep) {
     this.logger.logRequest(req);
-    const { payload: { fname, lname, email, phone, address, language } } = req;
+    const { payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -80,17 +80,7 @@ class Handlers {
    */
   async deleteUser(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
-
-    // Check if request contains a body
-    if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
-    }
-
-    
-    if (!isValid.valid) {
-      return rep.response({message: `${isValid.missing} not specified.`}).code(400);
-    }
+    const { params: { id } } = req;
 
     this.logger.debug(`\tHandler: Deleting user ${id}`);
 
@@ -122,8 +112,6 @@ class Handlers {
   async updateUser(req, rep) {
     this.logger.logRequest(req);
     const { params: { id }, payload } = req;
-
-    // TODO: Should we deal with product not in stock?
 
     // Check if request contains a body
     if (!payload) {

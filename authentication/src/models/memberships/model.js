@@ -88,6 +88,6 @@ class MembershipsModel {
 }
 
 // binds base model to the kernel
-Kernel.bind(Names.Memberships, MembershipsModel);
+Kernel.bind(Names.memberships, MembershipsModel);
 
 module.exports = MembershipsModel;

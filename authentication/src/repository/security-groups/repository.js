@@ -73,7 +73,7 @@ class SecurityGroupRepository {
 
     const listSecurityGroups = await query;
     this.logger.debug(`\tResult ${JSON.stringify(listSecurityGroups)}`);
-    return cartsFound;
+    return listSecurityGroups;
   }
 
 
@@ -82,14 +82,14 @@ class SecurityGroupRepository {
    * @async
    * @param {string} scope - the id associated with a cart
    */
-  async getSecurityGroupByScope() {
+  async getSecurityGroupByScope(scope) {
     const securityGroups = this.knex(this.resource);
     const query = securityGroups.select('*').where({scope});
     this.logger.debug(`\tQuery: ${query}`);
 
     const listSecurityGroups = await query;
     this.logger.debug(`\tResult ${JSON.stringify(listSecurityGroups)}`);
-    return cartsFound;
+    return listSecurityGroups;
   }
 
   /**

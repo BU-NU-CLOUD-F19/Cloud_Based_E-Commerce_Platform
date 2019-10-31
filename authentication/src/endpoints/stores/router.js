@@ -6,7 +6,7 @@
 'use strict';
 
 // Handlers for the routes, triggered on request
-const Handlers = require('./handlers.js');
+const Handlers = require('./handlers');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -28,7 +28,7 @@ class Router {
     server.route({
       method: 'POST',
       path: `/stores`,
-      handler: this.handlers.addProduct.bind(this.handlers),
+      handler: this.handlers.addStore.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
         tags: ['api', 'authentication'],
@@ -52,7 +52,7 @@ class Router {
       path: `/stores/{id}`,
       handler: this.handlers.deleteStore.bind(this.handlers),
       config: {
-        description: 'Remove a product from the cart.',
+        description: 'Remove a store.',
         tags: ['api', 'authentication'],
         plugins: {
           'hapi-swagger': {
