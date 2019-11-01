@@ -71,7 +71,7 @@ class UsersModel {
   }
 
   /**
-   * Retrieve the user
+   * Update the user
    * @async
    * @param {number} userId
    * @param {object} userData

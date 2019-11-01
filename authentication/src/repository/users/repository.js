@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `user` resource,
  * using query-builder tool
  */
 
@@ -44,7 +44,7 @@ class UserRepository {
 
 
   /**
-   * Delete all carts and their products
+   * Delete all users and their products
    * @async
    */
   async deleteAll() {
@@ -62,9 +62,9 @@ class UserRepository {
   }
 
   /**
-   * Get the cart record
+   * Get the user record
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {string} uid - the id associated with a user
    */
   async getUser(uid) {
     const query = this.knex(this.resource)
@@ -78,9 +78,9 @@ class UserRepository {
   }
 
   /**
-   * Get the cart record
+   * Get the user record by email
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {string} email
    */
   async getUserByEmail(email) {
     const query = this.knex(this.resource)
@@ -94,9 +94,9 @@ class UserRepository {
   }
 
   /**
-   * Create a new cart
+   * Create a new user
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {object} userData
    */
   async createUser(userData) {
     userData.uid = shortid.generate();
@@ -112,9 +112,9 @@ class UserRepository {
   }
 
   /**
-   * Delete a cart
+   * Delete a user
    * @async
-   * @param {number} id - the id associated with a cart
+   * @param {string} uid - the id associated with a user
    */
   async deleteUser(uid) {
     const query = this.knex(this.resource)
@@ -128,9 +128,9 @@ class UserRepository {
   }
 
   /**
-   * Delete a cart
+   * Delete a user by email
    * @async
-   * @param {number} id - the id associated with a cart
+   * @param {string} email
    */
   async deleteUserByEmail(email) {
     const query = this.knex(this.resource)
@@ -146,7 +146,7 @@ class UserRepository {
   /**
    * Update a user
    * @async
-   * @param {number} uid
+   * @param {string} uid
    * @param {object} userData
    */
   async updateUser(uid, userData) {

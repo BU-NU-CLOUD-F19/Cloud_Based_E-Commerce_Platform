@@ -1,5 +1,5 @@
 /**
- * This class sets the hapi routes for the `cart` resource
+ * This class sets the hapi routes for the `user-security-groups` resource
  * (https://github.com/hapijs/glue)
  */
 

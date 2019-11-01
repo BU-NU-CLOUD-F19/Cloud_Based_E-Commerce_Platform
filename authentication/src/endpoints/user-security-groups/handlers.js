@@ -1,5 +1,5 @@
 /**
- * These are the handlers for the endpoints for the cart.
+ * These are the handlers for the endpoints for the user-security-groups.
  * It's the code that actually contains the logic for each endpoint.
  */
 
@@ -9,7 +9,7 @@ const logger = require('../../utils/logger');
 const { UserSecurityGroups } = require('../../models/');
 
 /**
- * The handler functions for all endpoints defined for the cart
+ * The handler functions for all endpoints defined for the user-security-groups
  */
 class Handlers {
   constructor() {
@@ -34,7 +34,7 @@ class Handlers {
   }
 
   /**
-   * Add a product to a cart.
+   * Add a user-security-groups.
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -73,27 +73,22 @@ class Handlers {
   }
 
   /**
-   * Remove a product from a cart
+   * Remove a user-security-groups by user id
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async removeUserSecurityGroupByUserId(req, rep) {
     this.logger.logRequest(req);
-    const { params: { userId }, payload } = req;
+    const { params: { userId } } = req;
 
-    // Check if request contains a body
-    if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
-    }
-
-    this.logger.debug(`\tHandler: Removing product ${payload}`);
+    this.logger.debug(`\tHandler: Removing user security group by user ${userId}`);
 
     try {
       const res = await this.userSecurityGroups.deleteUSGroupByUserId(userId);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
+      // If no rows were removed (i.e. the products wasn't in user-security-groups), respond with a 400.
       if (res === 0) {
         return rep.response({message: `User Security Group does not exist for user ${userId}`})
         .code(400);
@@ -110,7 +105,7 @@ class Handlers {
   }
 
   /**
-   * Remove a product from a cart
+   * Remove a user-security-groups
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -125,13 +120,13 @@ class Handlers {
       const res = await this.userSecurityGroups.deleteUSGroup(userId, storeId);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
+      // If no rows were removed, respond with a 400.
       if (res === 0) {
         return rep.response({message: `User Security Group does not exist with user ${userId} and store ${storeId}.`})
         .code(400);
       }
       else {
-        // Otherwise, return  how many rows were removed
+        // Otherwise, return how many rows were removed
         return rep.response({message: "User security group removed.", data: res}).code(200);
       }
     }
@@ -142,7 +137,7 @@ class Handlers {
   }
 
   /**
-   * List the products in a cart
+   * Get a user-security-group
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -154,9 +149,9 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Get user security Group for user ${userId} in store ${storeId}`);
 
-      // Get the products in the cart and return them
+      // Get the products in the user-security-groups and return them
       const result = await this.userSecurityGroups.getUSGroupByUserIdStoreId(userId, storeId);
-      return rep.response({message: "Products retrieved.", data: result}).code(200);
+      return rep.response({message: "User Security Group retrieved.", data: result}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);

@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `stores` resource,
  * using query-builder tool
  */
 
@@ -44,7 +44,7 @@ class StoresRepository {
 
 
   /**
-   * Delete all carts and their products
+   * Delete all storess and their products
    * @async
    */
   async deleteAll() {
@@ -64,6 +64,7 @@ class StoresRepository {
   /**
    * Get the store by id
    * @async
+   * @param {string} id
    */
   async getStoreById(id) {
     const stores = this.knex(this.resource);
@@ -78,6 +79,7 @@ class StoresRepository {
   /**
    * Get the store by email
    * @async
+   * @param {string} email
    */
   async getStoreByEmail(email) {
     const stores = this.knex(this.resource);
@@ -92,19 +94,12 @@ class StoresRepository {
   /**
    * Create a new store
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {object} storeData
    */
-  async createStore(payload) {
+  async createStore(storeData) {
     const stores = this.knex(this.resource);
-    const { name, phone, email } = payload;
-
-    const storeData = {
-      id: shortid.generate(),
-      name,
-      phone,
-      email,
-      date_created: this.postgresDateStr()
-    }
+    storeData.id = shortid.generate(),
+    storeData.date_created = this.postgresDateStr();
 
     const query = stores.insert(storeData).returning('*');
     this.logger.debug(`\tQuery: ${query}`);
@@ -115,9 +110,9 @@ class StoresRepository {
   }
 
   /**
-   * Delete a cart
+   * Delete a stores
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {String} id
    */
   async deleteStore(id) {
     const stores = this.knex(this.resource);

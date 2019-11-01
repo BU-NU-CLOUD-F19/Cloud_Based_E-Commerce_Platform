@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Exports the Memeberships model
+ * Exports the Memberships model
  */
 const Model = require('./model');
 

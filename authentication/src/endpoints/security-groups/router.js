@@ -1,5 +1,5 @@
 /**
- * The Router for the cart, contains all HTTP routes pertaining to cart actions and
+ * The Router for the security-groups, contains all HTTP routes pertaining to security-groups actions and
  * links them to the corresponding handlers.
  */
 
@@ -21,17 +21,17 @@ class Router {
   }
 
    /**
-   * GET list the products in the cart
+   * GET all the security-groups
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
-  routeGetSecurityGroup(server) {
+  routeGetSecurityGroups(server) {
     server.route({
       method: 'GET',
       path: `/security-groups`,
-      handler: this.handlers.getSecurityGroup.bind(this.handlers),
+      handler: this.handlers.getSecurityGroups.bind(this.handlers),
       config: {
-        description: 'Get all products in a cart.',
-        tags: ['api', 'authentication']
+        description: 'Get all products in a security-groups.',
+        tags: ['api', 'security-groups']
       }
     });
   }
@@ -42,7 +42,7 @@ class Router {
    * @param {Hapi.server} server - the Hapi server
    */
   route(server) {
-    this.routeGetSecurityGroup(server);
+    this.routeGetSecurityGroups(server);
   }
 }
 

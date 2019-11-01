@@ -39,15 +39,15 @@ class Handlers {
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
-  async getSecurityGroup(req, rep) {
+  async getSecurityGroups(req, rep) {
     this.logger.logRequest(req);
 
     try {
       this.logger.debug(`\tHandler: Listing all securityGroups`);
 
-      // Get the products in the cart and return them
-      const result = await this.securityGroups.getSecurityGroup();
-      return rep.response({message: "Products retrieved.", data: result}).code(200);
+      // Get all security groups
+      const result = await this.securityGroups.getSecurityGroups();
+      return rep.response({message: "Security groups retrieved.", data: result}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);

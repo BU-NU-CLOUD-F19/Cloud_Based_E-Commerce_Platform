@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `security-groups` resource,
  * using query-builder tool
  */
 
@@ -44,7 +44,7 @@ class SecurityGroupRepository {
 
 
   /**
-   * Delete all carts and their products
+   * Delete all security-groupss
    * @async
    */
   async deleteAll() {
@@ -64,7 +64,6 @@ class SecurityGroupRepository {
   /**
    * Get all security-groups
    * @async
-   * @param {number} cartId - the id associated with a cart
    */
   async getSecurityGroup() {
     const securityGroups = this.knex(this.resource);
@@ -80,7 +79,7 @@ class SecurityGroupRepository {
   /**
    * Get the security group by its scope
    * @async
-   * @param {string} scope - the id associated with a cart
+   * @param {string} scope - the id associated with a security-groups
    */
   async getSecurityGroupByScope(scope) {
     const securityGroups = this.knex(this.resource);
@@ -95,7 +94,7 @@ class SecurityGroupRepository {
   /**
    * Create a new security group
    * @async
-   * @param {number} scope
+   * @param {String} scope - scope of this security group
    */
   async createSecurityGroup(scope) {
 

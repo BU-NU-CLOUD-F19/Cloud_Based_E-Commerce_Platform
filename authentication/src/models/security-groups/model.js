@@ -56,8 +56,8 @@ class SecurityGroupModel {
    * Retrieve all securitygroups
    * @async
    */
-  async getSecurityGroup() {
-    return this.repository.getSecurityGroup();
+  async getSecurityGroups() {
+    return this.repository.getSecurityGroups();
   }
 
 }

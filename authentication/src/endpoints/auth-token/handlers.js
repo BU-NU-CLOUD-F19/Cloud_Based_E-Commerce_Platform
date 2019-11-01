@@ -1,13 +1,12 @@
 /**
- * These are the handlers for the endpoints for the memberships.
- * It's the code that actually contains the logic for each endpoint.
+ * These are the handlers for the endpoints for generating authentication token.
  */
 
 'use strict';
 
 const logger = require('../../utils/logger');
 const { Users } = require('../../models/');
-const firebase = require('firebase');
+const firebase = require('../../../firebase-client');
 
 /**
  * The handler functions for all endpoints defined for the memberships
@@ -17,22 +16,6 @@ class Handlers {
     this.users = new Users();
     this.logger = logger;
   }
-
-  /**
-   * Check if properties are present in an object, returns an object with a boolean value.
-   * When a property is missing, it also returns the missing property.
-   * @static
-   * @param {array} proplist - an array of properties that you want to check
-   * @param {object} obj - the object to check
-   */
-  static propsPresent(proplist, obj) {
-    for (let prop of proplist) {
-      if (!(prop in obj)) {
-        return {valid: false, missing: prop};
-      }
-    }
-    return {valid: true};
-  }
   
   /**
    * Get a membership
@@ -41,7 +24,7 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async generateToken(req, rep) {
-    const { params: { email }} = req;
+    const { payload: { email }} = req;
     this.logger.logRequest(req);
 
     try {
@@ -52,23 +35,16 @@ class Handlers {
         url: 'https://localhost:4050/',
         // This must be true.
         handleCodeInApp: true,
-        iOS: {
-          bundleId: 'com.example.ios'
-        },
-        android: {
-          packageName: 'com.example.android',
-          installApp: true,
-          minimumVersion: '12'
-        },
-        dynamicLinkDomain: 'example.page.link'
       };
 
-      // Get the products in the cart and return them
-      const result = await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+      // Send the sign-in link to the user
+      await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+
+      // TODO: get the auth token here and send it in the result. Look in `auth.js` file
       
-      window.localStorage.setItem('emailForSignIn', email);
+      // window.localStorage.setItem('emailForSignIn', email);
       
-      return rep.response({message: "Membership retrieved.", data: result}).code(200);
+      return rep.response({message: "Email link sent."}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);

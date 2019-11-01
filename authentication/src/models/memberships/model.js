@@ -12,7 +12,7 @@ const Repository = require('../../repository/').Memberships;
  */
 class MembershipsModel {
   constructor(options = {}) {
-    this.resource = Names.Memberships;
+    this.resource = Names.memberships;
     this.repository = options.repository || (new Repository());
     this.logger = this.repository.logger;
   }
@@ -49,8 +49,8 @@ class MembershipsModel {
    * @async
    * @param {number} storeId - the id of the store whose membership is to be deleted
    */
-  async deleteMembershipsByStoreId(userId) {
-    return this.repository.deleteMembershipsByStoreId(userId);
+  async deleteMembershipsByStoreId(storeId) {
+    return this.repository.deleteMembershipsByStoreId(storeId);
   }
 
   /**
@@ -58,9 +58,13 @@ class MembershipsModel {
    * @async
    * @param {number} userId
    * @param {number} storeId
-   * @param {number} subscriptionStatus
+   * @param {number} subscriptionStatus - status for email notifications
    */
   async createMembership(userId, storeId, subscriptionStatus) {
+    const res = await this.getMembership(storeId, userId);
+    if (res.length > 0) {
+      return res;
+    }
     return this.repository.createMembership(userId, storeId, subscriptionStatus);
   }
 
@@ -79,10 +83,10 @@ class MembershipsModel {
    * @async
    * @param {number} storeId
    * @param {number} userId
-   * @param {number} subscribed
+   * @param {number} isSubscribed - status of email notifications
    */
-  async updateMembershipSubscription(storeId, userId, subscribed) {
-    return this.repository.updateSubscription(storeId, userId, subscribed);
+  async updateMembershipSubscription(storeId, userId, isSubscribed) {
+    return this.repository.updateSubscription(storeId, userId, isSubscribed);
   }
 
 }

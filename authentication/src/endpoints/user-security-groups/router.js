@@ -1,5 +1,5 @@
 /**
- * The Router for the cart, contains all HTTP routes pertaining to cart actions and
+ * The Router for the user-security-groups, contains all HTTP routes pertaining to user-security-groups actions and
  * links them to the corresponding handlers.
  */
 
@@ -7,6 +7,7 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
+const Joi = require('@hapi/joi');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -21,7 +22,7 @@ class Router {
   }
 
   /**
-   * POST add product
+   * POST create user security group record
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeCreateUserSecurityGroup(server) {
@@ -31,19 +32,29 @@ class Router {
       handler: this.handlers.createUserSecurityGroup.bind(this.handlers),
       config: {
         description: `Create a user security group record.`,
-        tags: ['api', 'authentication'],
+        tags: ['api', 'user-security-groups'],
         plugins: {
           'hapi-swagger': {
-            201: { description: 'Product added' },
+            201: { description: 'User Security Group created' },
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          payload: Joi.object().keys({
+            userId: Joi.string().required()
+                      .description('id of the user'),
+            storeId: Joi.string().required()
+                      .description('id of the store'),
+            securityGroupId: Joi.string().required()
+                              .description('id of the security group'),
+          }),
         }
       }
     });
   }
 
   /**
-   * PUT remove product
+   * DELETE remove user security group by user
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeRemoveUserSecurityGroupByUserId(server) {
@@ -53,19 +64,25 @@ class Router {
       handler: this.handlers.removeUserSecurityGroupByUserId.bind(this.handlers),
       config: {
         description: 'Remove a user security group record by user id',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'user-security-groups'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group removed'},
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+            userId: Joi.string().required()
+                      .description('id of the user')
+          }),
         }
       }
     })
   }
   
   /**
-   * PUT remove product
+   * DELETE remove user security groups
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeRemoveUserSecurityGroup(server) {
@@ -74,13 +91,21 @@ class Router {
       path: `/user-security-groups/{userId}/{storeId}`,
       handler: this.handlers.removeUserSecurityGroup.bind(this.handlers),
       config: {
-        description: 'Remove a user security group record by user id',
-        tags: ['api', 'authentication'],
+        description: 'Remove a user security group record',
+        tags: ['api', 'user-security-groups'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group removed'},
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+            userId: Joi.string().required()
+                      .description('id of the user'),
+            storeId: Joi.string().required()
+                      .description('id of the store'),
+          }),
         }
       }
     })
@@ -88,7 +113,7 @@ class Router {
 
 
    /**
-   * GET list the products in the cart
+   * GET user-security-group by user id and store id
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeGetUserSecurityGroup(server) {
@@ -98,12 +123,20 @@ class Router {
       handler: this.handlers.getUserSecurityGroup.bind(this.handlers),
       config: {
         description: 'Get a user security group given its userId and storeId.',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'user-security-groups'],
         plugins: {
           'hapi-swagger': {
             200: { description: 'User security group returned' },
             400: { description: 'Bad request' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+            userId: Joi.string().required()
+                      .description('id of the user'),
+            storeId: Joi.string().required()
+                      .description('id of the store'),
+          }),
         }
       }
     });

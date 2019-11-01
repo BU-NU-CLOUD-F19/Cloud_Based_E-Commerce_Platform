@@ -1,5 +1,5 @@
 /**
- * The Router for the cart, contains all HTTP routes pertaining to cart actions and
+ * The Router for the memberships, contains all HTTP routes pertaining to memberships actions and
  * links them to the corresponding handlers.
  */
 
@@ -7,6 +7,7 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
+const Joi = require('@hapi/joi')
 
 /**
  * The Hapi router, creates HTTP routes
@@ -21,7 +22,7 @@ class Router {
   }
 
   /**
-   * POST add product
+   * POST add memberships
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeAddMembership(server) {
@@ -31,20 +32,30 @@ class Router {
       handler: this.handlers.addMembership.bind(this.handlers),
       config: {
         description: `Add a product to the cart.`,
-        tags: ['api', 'authentication'],
+        tags: ['api', 'memberships'],
         auth: 'firebase',
         plugins: {
           'hapi-swagger': {
             201: { description: 'Product added' },
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          payload: Joi.object().keys({
+              userId : Joi.string()
+                      .required()
+                      .description('The user id whose membership is to be created'),
+              storeId : Joi.string()
+                        .required()
+                        .description('The store id for which the membership is to be created'),
+          }),
         }
-      }
+      },
     });
   }
 
   /**
-   * PUT remove product
+   * DELETE remove a membership
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeDeleteMembership(server) {
@@ -53,21 +64,31 @@ class Router {
       path: `/memberships/{userId}/{storeId}`,
       handler: this.handlers.deleteMembership.bind(this.handlers),
       config: {
-        description: 'Remove a product from the cart.',
-        tags: ['api', 'authentication'],
+        description: 'Remove a membership.',
+        tags: ['api', 'memberships'],
         auth: 'firebase',
         plugins: {
           'hapi-swagger': {
-            200: { description: 'Product removed'},
+            200: { description: 'Membership removed'},
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+              userId : Joi.string()
+                      .required()
+                      .description('The user id whose membership is to be created'),
+              storeId : Joi.string()
+                        .required()
+                        .description('The store id for which the membership is to be created'),
+          }),
         }
-      }
+      },
     })
   }
 
   /**
-   * PUT change the amount of product in the cart
+   * PATCH update the subscription status of a membership
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeUpdateSubscription(server) {
@@ -76,21 +97,32 @@ class Router {
       path: '/memberships/{id}',
       handler: this.handlers.updateSubscription.bind(this.handlers),
       config: {
-        description: 'Change the amount of product in the cart.',
-        tags: ['api', 'authentication'],
+        description: 'Change the subscription of membership.',
+        tags: ['api', 'memberships'],
         auth: 'firebase',
         plugins: {
           'hapi-swagger': {
-            200: { description: 'Amount updated' },
+            200: { description: 'Subscription updated' },
             400: { description: 'Bad request' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+              id : Joi.string()
+                      .required()
+                      .description('The user id whose membership is to be created'),
+          }),
+          payload: Joi.object().keys({
+            subscriptionStatus : Joi.boolean().required()
+                                  .description('The new subscription status to be updated the membership to.')
+          }),
         }
-      }
+      },
     });
   }
 
    /**
-   * GET list the products in the cart
+   * GET a user membership by its store
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeGetMembership(server) {
@@ -107,6 +139,16 @@ class Router {
             200: { description: 'Membership returned' },
             400: { description: 'Bad request' }
           }
+        },
+        validate: {
+          params: Joi.object().keys({
+              userId : Joi.string()
+                      .required()
+                      .description('The user id whose membership is to be retrieved'),
+              storeId : Joi.string()
+                        .required()
+                        .description('The store id for which the membership is to be retrieved'),
+          }),
         }
       }
     });

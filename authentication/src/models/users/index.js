@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Exports the User Security Group model
+ * Exports the Users model
  */
 const Model = require('./model');
 

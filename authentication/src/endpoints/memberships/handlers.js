@@ -58,10 +58,11 @@ class Handlers {
 
     try {
       const res = await this.memberships.createMembership(userId, storeId, subscriptionStatus);
+
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
-      return rep.response({message: "Memberhip created for user"}).code(201);
+      return rep.response({message: "Membership created for user", data: res}).code(201);
     }
 
     // Catch any database errors (e.g. product not found) and return the appropriate response
@@ -84,24 +85,19 @@ class Handlers {
   }
 
   /**
-   * Remove a membership
+   * Delete a membership
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async deleteMembership(req, rep) {
     this.logger.logRequest(req);
-    const { params: { userId, storeId }, payload } = req;
-
-    // Check if request contains a body
-    if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
-    }
+    const { params: { userId, storeId } } = req;
 
     this.logger.debug(`\tHandler: Removing membership of user ${userId} from store ${storeId}`);
 
     try {
-      const res = await this.memberships.removeMembership(storeId, userId);
+      const res = await this.memberships.deleteMembership(storeId, userId);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       if (res === 0) {
@@ -119,7 +115,7 @@ class Handlers {
   }
 
   /**
-   * Update subscription status
+   * Update subscription status for a user's membership
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -145,7 +141,7 @@ class Handlers {
 
     try {
       // Update subscription status
-      const res = await this.memberships.updateMembershipsSubscription(storeId, userId, subscriptionStatus);
+      const res = await this.memberships.updateMembershipSubscription(storeId, userId, subscriptionStatus);
 
       // Return the new product record
       if (res.length > 0) {

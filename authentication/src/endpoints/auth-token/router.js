@@ -1,6 +1,5 @@
 /**
- * The Router for the cart, contains all HTTP routes pertaining to cart actions and
- * links them to the corresponding handlers.
+ * The Router for the auth-token
  */
 
 'use strict';
@@ -21,86 +20,17 @@ class Router {
   }
 
   /**
-   * POST add product
+   * POST generate token
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
-  routeGetToken(server) {
+  routeGenerateToken(server) {
     server.route({
       method: 'POST',
-      path: `/authorization/token/{email}`,
+      path: `/authorization/token`,
       handler: this.handlers.generateToken.bind(this.handlers),
       config: {
-        description: `Add a product to the cart.`,
-        tags: ['api', 'authentication']
-      }
-    });
-  }
-
-  /**
-   * PUT remove product
-   * @param {Hapi.server} server - the Hapi server to which to add the route
-   */
-  routeDeleteMembership(server) {
-    server.route({
-      method: 'DELETE',
-      path: `/memberships/{userId}/{storeId}`,
-      handler: this.handlers.deleteMembership.bind(this.handlers),
-      config: {
-        description: 'Remove a product from the cart.',
-        tags: ['api', 'authentication'],
-        auth: 'firebase',
-        plugins: {
-          'hapi-swagger': {
-            200: { description: 'Product removed'},
-            400: { description: 'Bad request (e.g. body empty)' }
-          }
-        }
-      }
-    })
-  }
-
-  /**
-   * PUT change the amount of product in the cart
-   * @param {Hapi.server} server - the Hapi server to which to add the route
-   */
-  routeUpdateSubscription(server) {
-    server.route({
-      method: 'PATCH',
-      path: '/memberships/{id}',
-      handler: this.handlers.updateSubscription.bind(this.handlers),
-      config: {
-        description: 'Change the amount of product in the cart.',
-        tags: ['api', 'authentication'],
-        auth: 'firebase',
-        plugins: {
-          'hapi-swagger': {
-            200: { description: 'Amount updated' },
-            400: { description: 'Bad request' }
-          }
-        }
-      }
-    });
-  }
-
-   /**
-   * GET list the products in the cart
-   * @param {Hapi.server} server - the Hapi server to which to add the route
-   */
-  routeGetMembership(server) {
-    server.route({
-      method: 'GET',
-      path: `/memberships/{userId}/{storeId}`,
-      handler: this.handlers.getMembership.bind(this.handlers),
-      config: {
-        description: 'Get all products in a cart.',
-        tags: ['api', 'authentication'],
-        auth: 'firebase',
-        plugins: {
-          'hapi-swagger': {
-            200: { description: 'Membership returned' },
-            400: { description: 'Bad request' }
-          }
-        }
+        description: `Generate a token.`,
+        tags: ['auth-token']
       }
     });
   }
@@ -111,10 +41,7 @@ class Router {
    * @param {Hapi.server} server - the Hapi server
    */
   route(server) {
-    this.routeAddMembership(server);
-    this.routeDeleteMembership(server);
-    this.routeGetMembership(server);
-    this.routeUpdateSubscription(server);
+    this.routeGenerateToken(server);
   }
 }
 

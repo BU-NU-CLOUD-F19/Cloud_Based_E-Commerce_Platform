@@ -1,5 +1,5 @@
 /**
- * These are the handlers for the endpoints for the cart.
+ * These are the handlers for the endpoints for the users.
  * It's the code that actually contains the logic for each endpoint.
  */
 
@@ -9,7 +9,7 @@ const logger = require('../../utils/logger');
 const { Users } = require('../../models/');
 
 /**
- * The handler functions for all endpoints defined for the cart
+ * The handler functions for all endpoints defined for the users
  */
 class Handlers {
   constructor() {
@@ -34,7 +34,7 @@ class Handlers {
   }
 
   /**
-   * Add a product to a cart.
+   * Create a user.
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -73,7 +73,7 @@ class Handlers {
   }
 
   /**
-   * Remove a product from a cart
+   * Remove a user
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -88,7 +88,7 @@ class Handlers {
       const res = await this.users.deleteUser(id);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
+      // If no rows were removed, respond with a 400.
       if (res === 0) {
         return rep.response({message: `User ${id} not found.`}).code(400);
       }
@@ -104,7 +104,7 @@ class Handlers {
   }
 
   /**
-   * Change the amount of a product in a cart.
+   * Update a user
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -118,23 +118,17 @@ class Handlers {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
 
-    // Check if request body contains the required values
-    // const isValid = Handlers.propsPresent(['pid', 'amount_in_cart'], payload);
-    // if (!isValid.valid) {
-    //   return rep.response({message: `${isValid.missing} not specified.`}).code(400);
-    // }
-
-    this.logger.debug(`\tHandler: Changing amount of product in cart ${id}`);
+    this.logger.debug(`\tHandler: Updating user ${id}`);
 
     try {
-      // Change the amount in the cart
+      // Update the user
       const res = await this.users.updateUser(id, payload);
 
       // Return the new product record
       if (res.length > 0) {
         return rep.response({message: "User updated.", data: res});
       }
-      // If nothing was updated, the product wasn't in the cart.
+      // If nothing was updated, the product wasn't in the users.
       else {
         return rep.response({message: `No such user ${id} found.`}).code(400);
       }
@@ -147,7 +141,7 @@ class Handlers {
   }
 
   /**
-   * List the products in a cart
+   * Get a user by their email
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -159,7 +153,6 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Get user with email ${email}`);
 
-      // Get the products in the cart and return them
       const result = await this.users.getUserByEmail(email);
       return rep.response({message: "User retrieved.", data: result}).code(200);
     }
@@ -169,7 +162,7 @@ class Handlers {
   }
 
   /**
-   * List the products in a cart
+   * Get a user with their id
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -180,8 +173,6 @@ class Handlers {
 
     try {
       this.logger.debug(`\tHandler: Get user with id ${id}`);
-
-      // Get the products in the cart and return them
       const result = await this.users.getUser(id);
       return rep.response({message: "User retrieved.", data: result}).code(200);
     }

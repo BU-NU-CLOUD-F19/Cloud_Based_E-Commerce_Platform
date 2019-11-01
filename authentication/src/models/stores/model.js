@@ -28,7 +28,7 @@ class StoreModel {
   /**
    * Delete a Store, also removing all of its members
    * @async
-   * @param {number} storeId - the id of the store to be deleted
+   * @param {string} storeId - the id of the store to be deleted
    */
   async deleteStore(storeId) {
     return this.repository.deleteStore(storeId);
@@ -37,10 +37,10 @@ class StoreModel {
   /**
    * Create a store
    * @async
-   * @param {number} storeId - the id associated with a store
+   * @param {number} storeData - data of the store
    */
-  async createStore(payload) {
-    return this.repository.createStore(payload);
+  async createStore(storeData) {
+    return this.repository.createStore(storeData);
   }
 
   /**

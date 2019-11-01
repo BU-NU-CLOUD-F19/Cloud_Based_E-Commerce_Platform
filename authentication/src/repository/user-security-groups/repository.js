@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `user-security-group` resource,
  * using query-builder tool
  */
 
@@ -44,7 +44,7 @@ class UserSecurityGroupRepository {
 
 
   /**
-   * Delete all carts and their products
+   * Delete all user-security-groups and their products
    * @async
    */
   async deleteAll() {
@@ -73,13 +73,13 @@ class UserSecurityGroupRepository {
                   .where({store_id: storeId, user_id: userId});
     this.logger.debug(`\tQuery: ${query}`);
 
-    const cartsFound = await query;
-    this.logger.debug(`\tResult ${JSON.stringify(cartsFound)}`);
-    return cartsFound;
+    const userSecurityGroupsFound = await query;
+    this.logger.debug(`\tResult ${JSON.stringify(userSecurityGroupsFound)}`);
+    return userSecurityGroupsFound;
   }
 
   /**
-   * Create a new cart
+   * Create a new user-security-group
    * @async
    * @param {string} userId
    * @param {string} storeId
@@ -105,9 +105,10 @@ class UserSecurityGroupRepository {
   }
 
   /**
-   * Delete a cart
+   * Delete a user-security-group
    * @async
-   * @param {number} userID - the id associated with a cart
+   * @param {string} userId
+   * @param {string} storeId
    */
   async deleteUSGroup(userId, storeId) {
     const query = this.knex(this.resource)
@@ -121,9 +122,9 @@ class UserSecurityGroupRepository {
   }
 
   /**
-   * Delete a cart
+   * Delete a user-security-group
    * @async
-   * @param {number} userID - the id associated with a cart
+   * @param {number} userId
    */
   async deleteUSGroupByUserId(userId) {
     const query = this.knex(this.resource)

@@ -1,5 +1,5 @@
 /**
- * This class defines all the methods to handle calls to db for `cart` resource,
+ * This class defines all the methods to handle calls to db for `memberships` resource,
  * using query-builder tool
  */
 
@@ -43,7 +43,7 @@ class MembershipRepository {
 
 
   /**
-   * Delete all carts and their products
+   * Delete all memberships
    * @async
    */
   async deleteAll() {
@@ -63,11 +63,13 @@ class MembershipRepository {
   /**
    * Get the membership record
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {String} storeId
+   * @param {String} userId
    */
   async getMembership(storeId, userId) {
     const memberships = this.knex(this.resource);
-    const getMemberships = memberships.select('*').where({store_id: storeId, user_id: userId});
+    const id = `${userId}:${storeId}`;
+    const getMemberships = memberships.select('*').where({id});
     this.logger.debug(`\tQuery: ${getMemberships}`);
 
     const membershipsFound = await getMemberships;
@@ -78,12 +80,14 @@ class MembershipRepository {
   /**
    * Create a new membership
    * @async
-   * @param {number} cartId - the id associated with a cart
+   * @param {String} userId
+   * @param {String} storeId
+   * @param {Boolean} subscriptionStatus
    */
   async createMembership(userId, storeId, subscriptionStatus) {
     const memberships = this.knex(this.resource);
     const membershipData = {
-      id: shortid.generate(), // generate a random id
+      id: `${userId}:${storeId}`, // making sure there is only one membership per user per store
       user_id: userId,
       store_id: storeId,
       subscription_status: subscriptionStatus,
@@ -106,7 +110,8 @@ class MembershipRepository {
    */
   async deleteMembership(storeId, userId) {
     const memberships = this.knex(this.resource);
-    const query = memberships.where({store_id: storeId, user_id: userId})
+    const id = `${userId}:${storeId}`;
+    const query = memberships.where({id})
                               .del();
     this.logger.debug(`\tQuery: ${query}`);
 
@@ -150,11 +155,14 @@ class MembershipRepository {
   /**
    * Update subscription
    * @async
-   * @param {number} id - the id associated with a cart
+   * @param {String} userId
+   * @param {String} storeId
+   * @param {Boolean} subscriptionStatus
    */
   async updateSubscription(storeId, userId, subscriptionStatus) {
+    const id = `${userId}:${storeId}`;
     const query = this.knex(this.resource)
-                  .where({user_id: userId, store_id: storeId})
+                  .where({id})
                   .update({ subscription_status: subscriptionStatus});
     this.logger.debug(`\tQuery: ${query}`);
 

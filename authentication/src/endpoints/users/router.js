@@ -1,5 +1,5 @@
 /**
- * The Router for the cart, contains all HTTP routes pertaining to cart actions and
+ * The Router for the users, contains all HTTP routes pertaining to users actions and
  * links them to the corresponding handlers.
  */
 
@@ -7,7 +7,7 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
-
+const Joi = require('@hapi/joi');
 /**
  * The Hapi router, creates HTTP routes
  */
@@ -21,7 +21,7 @@ class Router {
   }
 
   /**
-   * POST add product
+   * POST add users
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeCreateUser(server) {
@@ -30,20 +30,34 @@ class Router {
       path: `/users`,
       handler: this.handlers.createUser.bind(this.handlers),
       config: {
-        description: `Add a product to the cart.`,
+        description: 'Add a  user.',
         tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
             201: { description: 'User created' },
             400: { description: 'Bad request (e.g. body empty)' }
           }
+        },
+        validate: {
+          payload: Joi.object().keys({
+            fname: Joi.string().required()
+                      .description('first name of the user'),
+            lname: Joi.string().required()
+                      .description('last name of the user'),
+            email: Joi.string().required()
+                      .description('email of the user'),
+            phone: Joi.string().required()
+                      .description('phone of the user'),
+            address: Joi.string().required()
+                      .description('address of the user'),
+          }),
         }
       }
     });
   }
 
   /**
-   * DELETE remove user
+   * DELETE a user
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeDeleteUser(server) {
@@ -59,13 +73,19 @@ class Router {
             200: { description: 'User removed'},
             400: { description: 'Bad request (e.g. body empty)' }
           }
-        }
+        },
+        validate: {
+          params: Joi.object().keys({
+            id: Joi.string().required()
+                  .description('Id of the user to be deleted'),
+          }),
+        },
       }
     })
   }
 
   /**
-   * PATCH update user
+   * PATCH a user
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routePatchUser(server) {
@@ -81,13 +101,19 @@ class Router {
             200: { description: 'User updated' },
             400: { description: 'Bad request' }
           }
-        }
+        },
+        validate: {
+          params: Joi.object().keys({
+            id: Joi.string().required()
+                  .description('Id of the user to be updated'),
+          }),
+        },
       }
     });
   }
 
    /**
-   * GET list the products in the cart
+   * GET list the products in the users
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeGetUserByEmail(server) {
@@ -97,19 +123,25 @@ class Router {
       handler: this.handlers.getUserByEmail.bind(this.handlers),
       config: {
         description: 'Get a user by email.',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
-            200: { description: 'Product listing returned' },
+            200: { description: 'user retrieved' },
             400: { description: 'Bad request' }
           }
-        }
+        },
+        validate: {
+          params: Joi.object().keys({
+            email: Joi.string().required()
+                  .description('email of the user to be deleted'),
+          }),
+        },
       }
     });
   }
   
   /**
-   * GET list the products in the cart
+   * GET a user
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeGetUser(server) {
@@ -119,13 +151,19 @@ class Router {
       handler: this.handlers.getUser.bind(this.handlers),
       config: {
         description: 'Get a user.',
-        tags: ['api', 'authentication'],
+        tags: ['api', 'users'],
         plugins: {
           'hapi-swagger': {
-            200: { description: 'Product listing returned' },
+            200: { description: 'user retrieved' },
             400: { description: 'Bad request' }
           }
-        }
+        },
+        validate: {
+          params: Joi.object().keys({
+            id: Joi.string().required()
+                  .description('Id of the user to be retrieved'),
+          }),
+        },
       }
     });
   }

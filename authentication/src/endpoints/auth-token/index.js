@@ -1,5 +1,5 @@
 /**
- * This class sets the hapi routes for the `cart` resource
+ * This class sets the hapi routes for the `auth-token` resource
  * (https://github.com/hapijs/glue)
  */
 
@@ -7,7 +7,7 @@
 
 const Router = require('./router');
 
-const resource = 'auth';
+const resource = 'auth-token';
 
 
 /**

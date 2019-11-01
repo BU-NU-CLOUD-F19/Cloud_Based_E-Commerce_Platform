@@ -1,5 +1,5 @@
 /**
- * These are the handlers for the endpoints for the cart.
+ * These are the handlers for the endpoints for the stores.
  * It's the code that actually contains the logic for each endpoint.
  */
 
@@ -9,7 +9,7 @@ const logger = require('../../utils/logger');
 const { Stores } = require('../../models/');
 
 /**
- * The handler functions for all endpoints defined for the cart
+ * The handler functions for all endpoints defined for the stores
  */
 class Handlers {
   constructor() {
@@ -87,7 +87,7 @@ class Handlers {
       const res = await this.stores.deleteStore(id);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in cart), respond with a 400.
+      // If no rows were removed (i.e. the products wasn't in stores), respond with a 400.
       if (res === 0) {
         return rep.response({message: `Store ${id} not found`}).code(400);
       }
@@ -116,14 +116,50 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Get a store with id: ${id}`);
 
-      // Get the products in the cart and return them
+      // Get the products in the stores and return them
       const result = await this.stores.getStoreById(id);
-      return rep.response({message: "Products retrieved.", data: result}).code(200);
+      return rep.response({message: "Stores retrieved.", data: result}).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);
     }
   }
+
+   /**
+   * Update the store
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
+  async updateStore(req, rep) {
+    this.logger.logRequest(req);
+    const { params: { id }, payload } = req;
+
+    // Check if request contains a body
+    if (!payload) {
+      return rep.response({message: "Body cannot be empty."}).code(400);
+    }
+
+    this.logger.debug(`\tHandler: Updating store ${id}`);
+
+    try {
+      // Update store information
+      const res = await this.stores.updateStore(id, payload);
+
+      if (res.length > 0) {
+        return rep.response({message: "Store updated.", data: res});
+      }
+      else {
+        return rep.response({message: `No such store ${id} found.`}).code(400);
+      }
+    }
+    // Catch database errors
+    catch(err) {
+      this.logger.error(JSON.stringify(err));
+    }
+
+  }
+
 }
 
 module.exports = Handlers;
