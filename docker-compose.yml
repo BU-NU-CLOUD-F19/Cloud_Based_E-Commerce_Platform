@@ -95,13 +95,28 @@ services:
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
       - ./graphql-api-gateway-poc/log:/usr/app/log
     links:
-      - members-graphql-service
+      - inventory-management-graphql-service
     expose:
       - 3050
     ports:
       - 3050:3050
     environment:
-      GRAPHQL_SERVICE: members-graphql-service
+      GRAPHQL_SERVICE: inventory-management-graphql-service
+  inventory-management-graphql-service:
+    build: ./inventory-management/graphql-service
+    container_name: "inventory-management-graphql-service"
+    volumes:
+      - ./inventory-management/graphql-service/index.js:/usr/app/index.js
+      - ./inventory-management/graphql-service/datasource.js:/usr/app/datasource.js
+      - ./inventory-management/graphql-service/process.json:/usr/app/process.json
+      - ./inventory-management/graphql-service/src:/usr/app/src
+      - ./inventory-management/graphql-service/log:/usr/app/log
+    expose:
+      - 6000
+    ports:
+      - 6000:6000
+    environment:
+      INVENTORY_SERVICE: inventory-management
   members-graphql-service:
     build: ./members-graphql-service
     container_name: "members-graphql-service"

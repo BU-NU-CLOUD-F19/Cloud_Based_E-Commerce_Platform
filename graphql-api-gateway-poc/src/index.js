@@ -9,14 +9,18 @@ const logger = require('./utils/logger');
 
 const PORT = process.env.PORT || 3050;
 const host = process.env.GRAPHQL_SERVICE;
-const GRAPHQL_SERVICE_PORT = process.env.GRAPHQL_SERVICE_PORT || 5000;
+const GRAPHQL_SERVICE_PORT = process.env.GRAPHQL_SERVICE_PORT || 6000;
 
 const gateway = new ApolloGateway({
   // Add different microservices here with thier server (with schema, resolvers, data sources) url
   serviceList: [
+    // {
+    //   name: "members",
+    //   url: `http://${host}:${GRAPHQL_SERVICE_PORT}/members`
+    // }
     {
-      name: "members",
-      url: `http://${host}:${GRAPHQL_SERVICE_PORT}/members`
+      name: "inventory-management",
+      url: `http://${host}:${GRAPHQL_SERVICE_PORT}/inventory-management`
     }
     // add other services here
   ]
