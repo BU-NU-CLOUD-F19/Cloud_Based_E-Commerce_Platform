@@ -87,6 +87,7 @@ services:
       #   handled differently in production.
 
     restart: unless-stopped
+
   api-gateway:
     build: ./graphql-api-gateway-poc
     container_name: "api-gateway"
@@ -102,6 +103,7 @@ services:
       - 3050:3050
     environment:
       GRAPHQL_SERVICE: members-graphql-service
+
   members-graphql-service:
     build: ./members-graphql-service
     container_name: "members-graphql-service"
@@ -117,3 +119,26 @@ services:
       - 5000:5000
     environment:
       BOILERPLATE_SERVICE: boilerplate
+
+  checkout:
+    build: ./checkout
+    container_name: "checkout"
+
+    # Forward ports, format 'container:host'
+    ports:
+      - 3010:3010
+
+    # Mount local directories on the container filesystem.
+    # Should not happen in production.
+    volumes:
+      - ./checkout/src:/usr/app/src
+      - ./checkout/app.js:/usr/app/app.js
+      - ./checkout/process.json:/usr/app/process.json
+      - ./checkout/registrations.js:/usr/app/registrations.js
+      - ./checkout/.checkoutrc:/usr/app/.checkoutrc
+      - ./checkout/log:/usr/app/log
+      - ./checkout/test:/usr/app/test
+      # The above line takes care of making the log dir accessible, but should be
+      #   handled differently in production.
+
+    restart: unless-stopped
