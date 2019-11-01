@@ -22,7 +22,7 @@ COPY package*.json ./
 RUN npm install
 
 # Setup ports
-ENV API_PORT 3000
+ENV API_PORT 4050
 EXPOSE $API_PORT
 
 # Run it
