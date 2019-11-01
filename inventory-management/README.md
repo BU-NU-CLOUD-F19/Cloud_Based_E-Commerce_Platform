@@ -208,3 +208,64 @@ Errors:
 
 * 400: bad request (e.g. product does not exist)
 
+### DELETE '/inventory/{id}/{amount}'
+#### Purpose
+Remove `{amount}` of product from the inventory.
+
+#### Request body
+None.
+
+#### Response
+**Status code:** 200.
+
+**Body:** a JSON object containing
+
+* `message`: a message regarding the status of the request
+* `data`: JSON object of the modified product, containing
+  * `amount_in_stock`
+  * `pid`
+
+
+Example:
+
+```json
+{
+  "message": "Amount subtracted",
+  "data": {
+    "amount_in_stock": 120,
+    "pid": 1
+  }
+}
+```
+
+Errors:
+
+* 400: bad request (e.g. not enough in stock)
+
+### PUT '/inventory/{id}/{amount}`
+#### Purpose
+Add `{amount}` of product to the inventory.
+
+#### Request body
+None.
+
+#### Response
+**Status code:** 200.
+
+**Body:** a JSON object containing
+
+* `message`: a message regarding the status of the request
+* `data`: JSON object of the modified product, containing
+* `amount_in_stock`
+* `pid`
+
+Example:
+
+```json
+{
+  "message": "Amount added",
+  "data": {
+    "amount_in_stock": 125,
+    "pid": 1
+  }`
+}

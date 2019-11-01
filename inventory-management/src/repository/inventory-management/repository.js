@@ -77,11 +77,11 @@ class InventoryManagementRepository {
         return addProduct;
     }
     /**
-    * Update a product in the inventory.
-    * @async
-    * @param {number} productId - the id of the product
-    * @param {object} product - the object containing the details of the product
-    */
+     * Update a product in the inventory.
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {object} product - the object containing the details of the product
+     */
     async updateProduct(productId, product) {
         const knexBuilder = this.knex(this.resource);
         const query = knexBuilder.where({ pid: productId })
@@ -111,9 +111,9 @@ class InventoryManagementRepository {
     }
 
     /**
-    * Delete all products
-    * @async
-    */
+     * Delete all products
+     * @async
+     */
     async deleteAll() {
         try {
             // Knex doesn't provide a way to cascade, so have to use a raw query
@@ -126,6 +126,92 @@ class InventoryManagementRepository {
         catch (err) {
             this.logger.error(err.message);
         }
+    }
+
+    /**
+     * Subtract amount of a product from the inventory
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {number} amount - the amount to subtract from the inventory
+     */
+    async subtractAmount(productId, amount) {
+        const inventory = this.knex(this.resource);
+
+        // Get the urrent amount in stock
+        const getAmount = inventory.select('amount_in_stock').where({pid: productId});
+        this.logger.debug(`\tQuery: ${getAmount}`);
+
+        const { amount_in_stock: currentAmount } = (await getAmount)[0];
+        this.logger.debug(`\tResult: ${JSON.stringify(currentAmount)}`);
+
+        // Calculate the new amount
+        const newAmount = currentAmount-amount;
+
+        // Create the query
+        const query = inventory.where({pid: productId}).update({amount_in_stock: newAmount}, ['pid', 'amount_in_stock']);
+        this.logger.debug(`\tQuery: ${query}`);
+
+        // Try to subtract the amount
+        try {
+            const res = await query;
+            this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+            return res[0];
+        }
+        catch(err) {
+            // Error handling if it fails because of a constraint check on the amount in stock.
+            //    Note: these checks could also be done beforehand, once the current amount in stock is known.
+            //    The reason I opted to do it this way is because we can use the generated database error object
+            //    from knex. I haven't figured out how to throw the knex error directly; if that's figured out, the
+            //    checks can be done without transacting with the database.
+            if (err.constraint === "products_amount_in_stock_check") {
+                // If there is nothing in stock
+                if (currentAmount == 0) {
+                    // Add a custom property to the error that states so
+                    err.amount_in_stock_error = "none_in_stock";
+                }
+                // Else, if there's not enough in stock
+                else {
+                    // Add a custom property to the error that states so, as well
+                    // as the amount that is currently in stock.
+                    err.amount_in_stock_error = "not_enough_in_stock";
+                    err.amount_in_stock_current = parseInt(currentAmount);
+                }
+            }
+
+            // Then re-throw the error up to the HTTP request handler, which will return the appropriate
+            //   HTTP response.
+            throw err;
+        }
+
+    }
+
+    /**
+     * Add amount of a product to the inventory
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {number} amount - the amount to add to the inventory
+     */
+    async addAmount(productId, amount) {
+        const inventory = this.knex(this.resource);
+
+        // Get the current amount in stock
+        const getAmount = inventory.select('amount_in_stock').where({pid: productId});
+        this.logger.debug(`\tQuery: ${getAmount}`);
+
+        const { amount_in_stock: currentAmount } = (await getAmount)[0];
+        this.logger.debug(`\tResult: ${JSON.stringify(currentAmount)}`);
+
+        // Calculate the new amount in stock
+        const newAmount = parseInt(currentAmount)+parseInt(amount);
+
+        // Update the database
+        const query = inventory.where({pid: productId}).update({amount_in_stock: newAmount}, ['pid', 'amount_in_stock']);
+        this.logger.debug(`\tQuery: ${query}`);
+
+        const res = await query;
+        this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
+        return res[0];
     }
 }
 
