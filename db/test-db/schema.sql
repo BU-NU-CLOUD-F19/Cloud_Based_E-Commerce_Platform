@@ -18,8 +18,9 @@ create table users (
   address varchar(50) not null,
   phone varchar(10) not null, -- 10 digits
   email varchar(50) not null,
-  password varchar(100), -- can be null if the user is not registered
-  constraint valid_phone check (phone LIKE '^[0-9]{10}$')
+  date_created timestamptz not null,
+  -- password varchar(100), -- can be null if the user is not registered
+  constraint valid_phone check (phone ~* '^[0-9]{10}$')
 );
 
 create table carts (
@@ -56,28 +57,29 @@ create table products_in_order (
 create table stores (
   id varchar primary key,
   name varchar(200) not null,
-  phone varchar(10) check(phone between 0000000000 and 9999999999),
+  phone varchar(10) check(phone ~* '^[0-9]{10}$'),
+  email varchar(50) not null,
   address varchar,
-  date_created timestamptz,
-)
+  date_created timestamptz
+);
 
-create table security_groups(
+create table security_groups (
   id varchar primary key,
   scope varchar check(scope IN ('SUPER_ADMIN','STORE_ADMIN', 'CUSTOMER', 'GUEST'))
-)
+);
 
 create table memberships (
   id varchar primary key,
   user_id varchar references users(uid),
   store_id varchar references stores(id),
   subscription_status boolean,
-  date_created timestamptz,
-)
+  date_created timestamptz
+);
 
 create table user_security_groups (
   id varchar primary key,
   user_id varchar references users(uid),
   store_id varchar references stores(id),
   security_group_id varchar references security_groups(id),
-  date_created timestamptz,
-)
+  date_created timestamptz
+);
