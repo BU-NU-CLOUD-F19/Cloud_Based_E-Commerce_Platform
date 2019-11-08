@@ -8,6 +8,7 @@
 const logger = require('../utils/logger');
 const fetch = require('node-fetch');
 
+// TODO: set from docker-compose.yml
 const cartUrl = "http://cart:3000/cart"
 const invUrl = "http://inventory-management:3020/inventory"
 
@@ -49,9 +50,16 @@ class Handlers {
     const cart = await fetch(`${cartUrl}/${cartId}`).then(res => res.json());
     this.logger.debug(`\tCart: ${Object.keys(cart)}`);
 
+    // Add checkout time to cart
     // Lock the cart
     await fetch(`${cartUrl}/${cartId}/lock`, { method: 'PUT' });
 
+    // doPayment()
+    // if (not payment successful) {
+    //  unlock cart
+    //  remove checkout time
+    //  respond with error
+    // }
     // Subtract the products from the inventory
     for (let product of cart.data) {
       this.logger.debug(`Subtracting ${JSON.stringify(product)} from inventory`);
@@ -61,7 +69,9 @@ class Handlers {
       // })
     }
 
-    // Start some sort of timer
+    // Create the order
+    // Unlock the cart
+    // Remove the cart
     //
 
     return rep.response("TODO").code(200);
