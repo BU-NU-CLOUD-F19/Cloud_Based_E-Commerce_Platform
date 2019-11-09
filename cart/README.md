@@ -325,3 +325,49 @@ Example:
   }
 }
 ```
+
+### PUT '/cart/{id}/checkout'
+#### Purpose
+Begin the checkout of a cart (add the checkout start time and lock the cart).
+
+
+#### Request body
+None.
+
+#### Response
+**Status code**: 200.
+
+**Body**: a JSON object containing
+
+* `message`: a message regarding the status of the request
+
+
+Example:
+
+```json
+{
+  "message": "Checkout started."
+}
+```
+
+### DELETE 'cart/{id}/checkout'
+#### Purpose
+Finish the checkout of a cart (remove the checkout start time, lock the cart).
+
+#### Request body
+None.
+
+#### Response
+**Status code**: 200.
+
+**Body**: a JSON object containing
+
+* `message`: a message regarding the status of the request
+
+Example:
+
+```json
+{
+  "message": "Checkout finished."
+}
+```

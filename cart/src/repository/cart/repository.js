@@ -157,9 +157,34 @@ class ShoppingCartRepository {
 
     const result = await query;
     this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+
+    if (result.length == 0) {
+      throw {message: `Cart ${cartId} does not exist.`, what: "cart_does_not_exist"};
+    }
+
+
     return result[0].locked;
   }
+  async updateCheckoutTime(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({date_checkout: this.postgresDateStr()});
+    this.logger.debug(`\tQuery: ${query}`);
 
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+    return result;
+  }
+
+  async clearCheckoutTime(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({date_checkout: null});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+    return result;
+
+  }
 }
 
 module.exports = ShoppingCartRepository;

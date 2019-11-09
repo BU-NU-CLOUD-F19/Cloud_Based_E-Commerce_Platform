@@ -56,16 +56,51 @@ class CartModel {
     return this.repository.getCart(cartId);
   }
 
+  /**
+   * Lock a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async lockCart(cartId) {
     return this.repository.lockCart(cartId);
   }
 
+  /**
+   * Unlock a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async unlockCart(cartId) {
     return this.repository.unlockCart(cartId);
   }
 
+  /**
+   * Check if a cart is locked
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async isLocked(cartId) {
     return this.repository.isLocked(cartId);
+  }
+
+  /**
+   * Start the checkout for a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async beginCheckout(cartId) {
+    await this.repository.updateCheckoutTime(cartId);
+    return this.repository.lockCart(cartId);
+  }
+
+  /**
+   * End the checkout process for a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async endCheckout(cartId) {
+    await this.repository.unlockCart(cartId);
+    return this.repository.clearCheckoutTime(cartId);
   }
 
 }

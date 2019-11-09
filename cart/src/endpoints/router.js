@@ -154,6 +154,10 @@ class Router {
   }
 
 
+  /**
+   * PUT lock a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeLockCart(server) {
     server.route({
       method: 'PUT',
@@ -172,6 +176,10 @@ class Router {
     })
   }
 
+  /**
+   * DELETE unlock a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeUnlockCart(server) {
     server.route({
       method: 'DELETE',
@@ -190,6 +198,10 @@ class Router {
     })
   }
 
+  /**
+   * GET check if a cart is locked
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeIsLocked(server) {
     server.route({
       method: 'GET',
@@ -201,6 +213,51 @@ class Router {
         plugins: {
           'hapi-swagger': {
             200: { description: 'Cart status retrieved' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * PUT start the checkout for a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeStartCheckout(server) {
+    server.route({
+      method: 'PUT',
+      path: '/cart/{id}/checkout',
+      handler: this.handlers.startCheckout.bind(this.handlers),
+      config: {
+        description: 'Lock a cart and add the checkout time',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart checkout started' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+
+  /**
+   * DELETE end the checkout for a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeEndCheckout(server) {
+    server.route({
+      method: 'DELETE',
+      path: '/cart/{id}/checkout',
+      handler: this.handlers.endCheckout.bind(this.handlers),
+      config: {
+        description: 'Unlock a cart and remove the checkout time',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart checkout started' },
             400: { desription: 'Bad request' }
           }
         }
@@ -221,6 +278,8 @@ class Router {
     this.routeLockCart(server);
     this.routeUnlockCart(server);
     this.routeIsLocked(server);
+    this.routeStartCheckout(server);
+    this.routeEndCheckout(server);
   }
 }
 

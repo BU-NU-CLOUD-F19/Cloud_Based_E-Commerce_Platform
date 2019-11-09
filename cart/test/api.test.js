@@ -199,6 +199,47 @@ describe("Cart REST API", () => {
     expect(isLocked.body.data.locked).to.equal(false);
   })
 
+
+  it("can start and end a checkout", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Begin checkout
+    await requestCart.put(`/${cartId}/checkout`).expect(200);
+
+    // Cart should be locked
+    let isLocked = await requestCart.get(`/${cartId}/lock`).expect(200);
+    expect(isLocked.body.data.locked).to.equal(true);
+
+    // End checkout
+    await requestCart.delete(`/${cartId}/checkout`).expect(200);
+
+    // Cart should be unlocked
+    isLocked = await requestCart.get(`/${cartId}/lock`).expect(200);
+    expect(isLocked.body.data.locked).to.equal(false);
+  })
+
+  it("does not allow checking out a cart that's being checked out", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Begin checkout
+    await requestCart.put(`/${cartId}/checkout`).expect(200);
+
+    // Don't allow a second checkout
+    await requestCart.put(`/${cartId}/checkout`).expect(403);
+  })
+
+
+  it("can't end a checkout if there is none", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Can't end a nonexisting checkout process
+    await requestCart.delete(`/${cartId}/checkout`).expect(400);
+  })
+
+
   // Check API error handling
   it ("does not modify a locked cart", async () => {
     // Add a product

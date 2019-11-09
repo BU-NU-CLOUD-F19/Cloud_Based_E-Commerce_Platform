@@ -82,6 +82,7 @@ class Handlers {
     catch (err) {
       if (err.constraint === "products_in_cart_pid_fkey") {
         let message = 'Product does not exist.';
+
         this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
       }
@@ -94,6 +95,10 @@ class Handlers {
         let message = 'Product already present in cart.';
         this.logger.debug(`\t${message} -- ${err.detail}`);
         return rep.response({message: message}).code(400);
+      }
+      else if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
       }
       else {
         this.logger.error(`Handler: ${JSON.stringify(err)}`);
@@ -145,6 +150,10 @@ class Handlers {
       }
     }
     catch (err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
       this.logger.error(JSON.stringify(err));
       throw err;
     }
@@ -244,6 +253,10 @@ class Handlers {
       return rep.response({message: "Cart emptied.", data: res}).code(200);
     }
     catch(err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
       this.logger.error(JSON.stringify(err));
     }
   }
@@ -286,6 +299,10 @@ class Handlers {
       }
     }
     catch(err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
       this.logger.error(JSON.stringify(err));
     }
   }
@@ -359,9 +376,70 @@ class Handlers {
 
     }
     catch(err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
       this.logger.error(err.message);
     }
 
+  }
+
+  /**
+   * Start the checkout for a cart (lock and update its begin checkout field to the current time)
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
+  async startCheckout(req, rep) {
+    const { id } = req.params;
+
+    try {
+      // If the cart is locked, do nothing
+      if (await this.carts.isLocked(id)) {
+        return rep.response({message: "Cart is locked."}).code(403);
+      }
+
+      await this.carts.beginCheckout(id);
+
+      return rep.response({message: "Checkout started."}).code(200);
+    }
+
+    catch (err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
+      this.logger.error(JSON.stringify(err));
+    }
+  }
+
+
+  /**
+   * End the checkout for a cart (unlock and clear its checkout time field)
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
+  async endCheckout(req, rep) {
+    const { id } = req.params;
+    try {
+      if (!(await this.carts.isLocked(id))) {
+        return rep.response({message: "No checkout in progress."}).code(400);
+      }
+
+      await this.carts.endCheckout(id);
+
+      return rep.response({message: "Checkout finished."}).code(200);
+    }
+
+    catch (err) {
+      if (err.what == "cart_does_not_exist") {
+        this.logger.error(`${err.message}`);
+        return rep.response(`${err.message}`).code(400);
+      }
+      this.logger.error(JSON.stringify(err));
+    }
   }
 }
 
