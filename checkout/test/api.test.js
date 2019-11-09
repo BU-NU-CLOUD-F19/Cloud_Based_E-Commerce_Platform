@@ -11,7 +11,7 @@ const checkoutUrl = 'http://localhost:3010/checkout';
 const requestCheckout = require("supertest")(checkoutUrl);
 
 describe("Checkout REST API", () => {
-  let checkout, sample_users, sample_products, sample_cart;
+  let orders, sample_users, sample_products, sample_cart;
 
   // Utility function to initialize data
   async function loadSampleData() {
@@ -70,7 +70,7 @@ describe("Checkout REST API", () => {
 
     // Kind of a hack to access the other tables, replace this with models eventually
     console.log(`\tCreating users...`);
-    await checkout.repository.knex('users').insert(sample_users);
+    await orders.repository.knex('users').insert(sample_users);
 
   }
 
@@ -79,9 +79,9 @@ describe("Checkout REST API", () => {
       await require('../src/configs/config');
 
       // Set up all the required constants
-      const { Checkout } = require('../src/models/');
+      const { Orders } = require('../src/models/');
 
-      return { checkout: new Checkout() };
+      return { orders: new Orders() };
     }
     catch(err)  {
       console.log(err.message);
@@ -94,7 +94,7 @@ describe("Checkout REST API", () => {
     // Load the config and wait for it to load
     initModels().then(objs => {
 
-      checkout = objs.checkout;
+      orders = objs.orders;
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
@@ -108,14 +108,15 @@ describe("Checkout REST API", () => {
   beforeEach(async function beforeEach() {
     console.log(`Setting up test data`)
     console.log(`\tClearing previous inventory and cart...`);
+    await requestCart.delete(`/${sample_cart.cartId}/lock`);
+    await requestCart.delete(`/${sample_cart.cartId}`);
+
     for (let prod of sample_products) {
       await requestInv.delete(`/${prod.pid}`);
     }
-    await requestCart.delete(`/${sample_cart.cartId}`);
-
     console.log(`\tCreating products...`);
     for (let prod of sample_products) {
-      await requestInv.post('').send(prod);
+      await requestInv.post('').send(prod).expect(201);
     }
 
     console.log(`\tAdding products to cart...`);
@@ -128,8 +129,21 @@ describe("Checkout REST API", () => {
     expect(body.data.length).to.equal(2);
   })
 
-  it("does nothing", async () => {
+  it("initiates a checkout", async () => {
+    await requestCheckout.post(`/${sample_cart.cartId}`).send().expect(200);
+  })
+
+  it("completes the checkout flow", async () => {
     await requestCheckout.post(`/${sample_cart.cartId}`).expect(200);
+
+    const { data: order } = await requestCheckout.put(`/${sample_cart.cartId}`).expect(201);
+
+    expect(order.oid).to.equal(1);
+  })
+
+  it("aborts a checkout", async () => {
+    await requestCart.post(`/${sample_cart.cartId}`).send(prod).expect(200);
+    requestCheckout.delete(`/${sample_cart.cartId}`).expect(200);
   })
 
   // Clean up after all tests are done
@@ -137,21 +151,21 @@ describe("Checkout REST API", () => {
     // Remove carts and products in cart
     console.log(`Clearing test data...`);
     console.log(`\tDeleting products and cart...`);
-    for (let prod of sample_products) {
-      await requestInv.delete(`/${prod.pid}`);
-    }
+    await requestCart.delete(`/${sample_cart.cartId}/lock`).expect(200);
+    await requestCart.delete(`/${sample_cart.cartId}`).expect(200);
 
-    await requestCart.delete(`/${sample_cart.cartId}/lock`);
-    await requestCart.delete(`/${sample_cart.cartId}`);
+    for (let prod of sample_products) {
+      await requestInv.delete(`/${prod.pid}`).expect(200);
+    }
 
     // Remove the sample data created in before()
     console.log(`\tDeleting users...`);
     for (let user of sample_users) {
-      await checkout.repository.knex('users').where({uid: user.uid}).del();
+      await orders.repository.knex('users').where({uid: user.uid}).del();
     }
 
     // Close the knex connection
-    checkout.repository.knex.destroy();
+    orders.repository.knex.destroy();
 
     console.log("Test finished.");
   })

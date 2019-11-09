@@ -41,7 +41,7 @@ create table products_in_cart (
 );
 
 create table orders (
-  oid int primary key,
+  oid serial primary key,
   total_price float(2) not null check (total_price >= 0),
   date timestamptz not null,
   destination varchar(50) not null,

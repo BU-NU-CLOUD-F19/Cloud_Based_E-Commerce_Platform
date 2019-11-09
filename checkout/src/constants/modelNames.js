@@ -9,6 +9,7 @@ const names = {
     Models
   */
 
+  orders: 'orders',
   checkout: 'checkout',
 
   /*

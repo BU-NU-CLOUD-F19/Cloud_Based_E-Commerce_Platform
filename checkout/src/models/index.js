@@ -4,8 +4,8 @@
 
 'use strict';
 
-const Checkout = require('./checkout/').Model;
+const Orders = require('./orders/').Model;
 
 module.exports = {
-  Checkout
+  Orders
 };

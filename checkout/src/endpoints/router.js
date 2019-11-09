@@ -56,13 +56,13 @@ class Router {
     });
   }
 
-  routeFinishCheckout(server) {
+  routeBuy(server) {
     server.route({
       method: 'PUT',
       path: `/checkout/{id}`,
-      handler: this.handlers.abortCheckout.bind(this.handlers),
+      handler: this.handlers.buy.bind(this.handlers),
       config: {
-        description: `Finish a checkout process.`,
+        description: `Commence buying.`,
         tags: ['api', 'checkout'],
         plugins: {
           'hapi-swagger': {
@@ -81,7 +81,7 @@ class Router {
   route(server) {
     this.routeBeginCheckout(server);
     this.routeAbortCheckout(server);
-    this.routeFinishCheckout(server);
+    this.routeBuy(server);
   }
 }
 
