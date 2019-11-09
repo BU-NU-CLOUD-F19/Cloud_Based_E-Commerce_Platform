@@ -69,9 +69,11 @@ class Handlers {
   }
 
   async doPayment() {
+    this.logger.debug("\tPayment sucessful");
     return Promise.resolve(true);
   }
   calculatePrice(cart) {
+    this.logger.debug("\tCalculating price");
     return { total: 42, shipping: 3.50 };
   }
 
