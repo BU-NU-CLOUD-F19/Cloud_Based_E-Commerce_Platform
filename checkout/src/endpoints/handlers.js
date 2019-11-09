@@ -8,9 +8,8 @@
 const logger = require('../utils/logger');
 const fetch = require('node-fetch');
 
-// TODO: set from docker-compose.yml
-const cartUrl = "http://cart:3000/cart"
-const invUrl = "http://inventory-management:3020/inventory"
+const cartUrl = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`
+const invUrl = `http://${process.env.INVENTORY_HOST}:${process.env.INVENTORY_PORT}/inventory`
 
 const Orders = require('../models/').Orders;
 /**
@@ -49,23 +48,28 @@ class Handlers {
       this.logger.debug(`\t${message}`);
       return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500});
     }
-
     const { data: { locked: cartLocked } } = await response.json();
     if (cartLocked) {
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: "Cart is locked, perhaps a checkout is in progress.", code: 400 });
+      let message = "Cart is locked, perhaps a checkout is in progress.";
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
     }
 
     // Add checkout time to cart and lock it
     response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'PUT' });
     if (!response.ok) {
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: `Cannot get locked status of cart ${cartId}`, code: 500 });
+      let message = `Cannot get locked status of cart ${cartId}`
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
     }
 
-    return rep.response("Checkout initiated successfully.").code(200);
+    let message ="Checkout initiated successfully.";
+    this.logger.debug(`\t${message}`);
+    return rep.response({ message }).code(200);
   }
 
   async doPayment() {
-    Promise.resolve(true);
+    return Promise.resolve(true);
   }
   calculatePrice(cart) {
     return { total: 42, shipping: 3.50 };
@@ -75,23 +79,31 @@ class Handlers {
     const { id: cartId } = req.params;
     this.logger.debug(`Handler: buy on cart ${cartId}`);
 
-    // If cart is not, don't do anything
+    // If cart is not locked, don't do anything
     let response = await fetch(`${cartUrl}/${cartId}/lock`);
     if (!response.ok) {
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: `Cannot get locked status of cart ${cartId}`, code: 500 });
+      let message = `Cannot get locked status of cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
     }
-
     const { data: { locked: cartLocked } } = await response.json();
     if (!cartLocked) {
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: "Cart is not locked, maybe a checkout wasn't started.", code: 400 });
+      let message = "Cart is not locked, maybe a checkout wasn't started.";
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
     }
+
     // Get cart data
     response = await fetch(`${cartUrl}/${cartId}`)
     if (!response.ok) {
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: `Could not get contents of cart ${cartId}`, code: 500 });
+      let message = `Could not get contents of cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
     }
     const cart = await response.json();
-    this.logger.debug(`\tCart: ${Object.keys(cart)}`);
+    this.logger.debug(`\tGot cart: ${JSON.stringify(cart)}`);
+
+    cart.cartId = cartId
 
     // Subtract the products from the inventory
     for (let product of cart.data) {
@@ -101,12 +113,15 @@ class Handlers {
       })
 
       if (!response.ok) {
-        return this.abortCheckout({params: {id: cartId}}, rep, { reason: `Could not subtract ${product.amount_in_cart} of ${product.pid} from inventory.`, code: 500 });
+        let message = `Could not subtract ${product.amount_in_cart} of ${product.pid} from inventory.`;
+        this.logger.debug(`\t${message}`);
+        return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
       }
     }
 
     const price = this.calculatePrice(cart);
     const paymentSuccessful = await this.doPayment(price.total+price.shipping);
+    this.logger.debug(JSON.stringify(paymentSuccessful));
 
     if (!paymentSuccessful) {
       // Re-add the products to the inventory
@@ -117,14 +132,19 @@ class Handlers {
         })
 
         if (!response.ok) {
-          return this.abortCheckout({params: {id: cartId}}, rep, { reason: `Could not add ${product.amount_in_cart} of ${product.pid} to inventory.`, code: 500 });
+          let message = `Could not add ${product.amount_in_cart} of ${product.pid} to inventory.`;
+          this.logger.debug(`\t${message}`);
+          return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
         }
       }
 
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: "Payment unsuccessful", code: 402 });
+      let message = "Payment unsuccessful";
+      this.logger.debug(`\t${message}`);
+      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 402 });
     }
     else {
-      return this.finishCheckout(cart, price);
+      this.logger.debug(`\tFinishing checkout...`);
+      return this.finishCheckout(rep, cart, price);
     }
   }
   async abortCheckout(req, rep, why) {
@@ -138,48 +158,66 @@ class Handlers {
     // If cart not locked, don't do anything
     let response = await fetch(`${cartUrl}/${cartId}/lock`);
     if (!response.ok) {
-      return rep.response(`Cannot get locked status of cart ${cartId}`).code(500);
+      let message =`Cannot get locked status of cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(500);
     }
     const { data: { locked: cartLocked } } = await response.json();
 
     if (!cartLocked) {
-      return rep.response("Cart is not locked, no checkout to abort.").code(400);
+      let message = "Cart is not locked, no checkout to abort.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
     }
 
     response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'DELETE' });
     if (!response.ok) {
-      return rep.response(`Could not abort checkout for cart ${cartId}`).code(500);
+      let message =`Could not abort checkout for cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(500);
     }
 
     if (reason) {
-      return rep.response({ message: `Checkout aborted: ${reason}` }).code(code);
+      let message = `Checkout aborted: ${reason}` ;
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(code);
     }
     else {
-      return rep.response({ message: "Checkout aborted." }).code(200);
+      let message = "Checkout aborted.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(200);
     }
   }
 
-  async finishCheckout(cart, price) {
+  async finishCheckout(rep, cart, price) {
     // If cart not locked, don't do anything
-    const { cart_id: cartId } = cart;
+    const { cartId } = cart;
     let response = await fetch(`${cartUrl}/${cartId}/lock`);
     if (!response.ok) {
-      return rep.response(`Cannot get locked status of cart ${cartId}`).code(500);
+      let message = `Cannot get locked status of cart ${cartId}`
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(500);
     }
     const { data: { locked: cartLocked } } = await response.json();
 
     if (!cartLocked) {
-      return rep.response("Cart is not locked, no checkout to abort.").code(400);
+      let message = "Cart is not locked, no checkout to abort."
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
     }
 
     response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'DELETE' });
     if (!response.ok) {
-      return rep.response(`Cannot finish checkout on cart ${cartId}`).code(500);
+      let message = `Cannot finish checkout on cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(500);
     }
 
     response = await fetch(`${cartUrl}/${cartId}`, { method: 'DELETE' });
     if (!response.ok) {
-      return rep.response(`Cannot delete cart ${cartId}`).code(500);
+      let message = `Cannot delete cart ${cartId}`;
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(500);
     }
 
     const order = await this.orders.createOrder({
@@ -187,7 +225,10 @@ class Handlers {
       destination: "Easter Island",
       shipping: price.shipping,
       uid: 'user1' // TODO: shouldn't be hardcoded
-    })
+    });
+
+    this.logger.debug(`\tOrder created: ${JSON.stringify(order)}`);
+    this.logger.debug(`Checkout complete`);
 
     return rep.response({ message: "Checkout complete", data: order }).code(201);
   }

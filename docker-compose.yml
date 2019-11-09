@@ -1,6 +1,9 @@
 # TODO: the actual usernames/passwords shouldn't be stored in this file. We need
 # a way to put those somewhere that's not in version control.
 #
+# Environment variables come from .env
+# https://docs.docker.com/compose/compose-file/#variable-substitution
+#
 # Use docker-compose file version 3
 version: "3"
 services:
@@ -8,17 +11,13 @@ services:
   postgres:
     # Image based on Alpine is smaller
     image: "postgres:12-alpine"
-    container_name: "postgres"
-    environment:
-      # The password for the database, can be changed to whatever.
-      # Default username is 'postgres', can be changed with POSTGRES_USER.
-      # Another useful variable is POSTGRES_DB, the name of the database.
-      # Ref: https://hub.docker.com/_/postgres
-      POSTGRES_PASSWORD: northeastern
+    container_name: "${POSTGRES_HOST}"
+    env_file:
+      - .env
 
     # Forward ports, format 'container:host'
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
     # Mount local directories on the container filesystem
     volumes:
@@ -35,24 +34,21 @@ services:
     # Can't have the web interface without a database
     depends_on:
       - postgres
-    container_name: "pgadmin"
-    environment:
-      # Credentials used to sign in to the web interface
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    container_name: "${PGADMIN_HOST}"
+    env_file:
+      - .env
     volumes:
       - ./db/pgadmin:/var/lib/pgadmin
     ports:
-      # Use the value of an environment variable if it's set. If not, use local
-      # port 5050 for the web interface (port 80 in the container).
-      - "${PGADMIN_PORT:-5050}:80"
+      - "${PGADMIN_PORT}:80"
     restart: unless-stopped
+
   inventory-management:
     build: ./inventory-management
-    container_name: "inventory-management"
+    container_name: "${INVENTORY_HOST}"
     # Forward ports, format 'container:host'
     ports:
-      - 3020:3020
+      - ${INVENTORY_PORT}:${INVENTORY_PORT}
     # Mount local directories on the container filesystem.
     # Should not happen in production.
     volumes:
@@ -67,11 +63,14 @@ services:
 
   cart:
     build: ./cart
-    container_name: "cart"
+    container_name: "${CART_HOST}"
 
     # Forward ports, format 'container:host'
     ports:
-      - 3000:3000
+      - ${CART_PORT}:${CART_PORT}
+
+    env_file:
+      - .env
 
     # Mount local directories on the container filesystem.
     # Should not happen in production.
@@ -90,7 +89,7 @@ services:
 
   api-gateway:
     build: ./graphql-api-gateway-poc
-    container_name: "api-gateway"
+    container_name: "${API_GW_HOST}"
     volumes:
       - ./graphql-api-gateway-poc/src:/usr/app/src
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
@@ -98,15 +97,15 @@ services:
     links:
       - members-graphql-service
     expose:
-      - 3050
+      - ${API_GW_PORT}
     ports:
-      - 3050:3050
-    environment:
-      GRAPHQL_SERVICE: members-graphql-service
+      - ${API_GW_PORT}:${API_GW_PORT}
+    env_file:
+      - .env
 
   members-graphql-service:
     build: ./members-graphql-service
-    container_name: "members-graphql-service"
+    container_name: "${MEMBERS_GQL_HOST}"
     volumes:
       - ./members-graphql-service/index.js:/usr/app/index.js
       - ./members-graphql-service/datasource.js:/usr/app/datasource.js
@@ -114,19 +113,22 @@ services:
       - ./members-graphql-service/src:/usr/app/src
       - ./members-graphql-service/log:/usr/app/log
     expose:
-      - 5000
+      - ${MEMBERS_GQL_PORT}
     ports:
-      - 5000:5000
-    environment:
-      BOILERPLATE_SERVICE: boilerplate
+      - ${MEMBERS_GQL_PORT}:${MEMBERS_GQL_PORT}
+    env_file:
+      - .env
 
   checkout:
     build: ./checkout
-    container_name: "checkout"
+    container_name: "${CHECKOUT_HOST}"
 
     # Forward ports, format 'container:host'
     ports:
-      - 3010:3010
+      - ${CHECKOUT_PORT}:${CHECKOUT_PORT}
+
+    env_file:
+      - .env
 
     # Mount local directories on the container filesystem.
     # Should not happen in production.

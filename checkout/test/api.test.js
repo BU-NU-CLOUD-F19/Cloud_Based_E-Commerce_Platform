@@ -2,12 +2,12 @@
 const chai = require("chai");
 const { expect } = chai;
 
-const cartUrl = 'http://cart:3000/cart';
-const inventoryUrl = 'http://inventory-management:3020/inventory';
+const cartUrl = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`;
+const inventoryUrl = `http://${process.env.INVENTORY_HOST}:${process.env.INVENTORY_PORT}/inventory`;
 const requestInv = require("supertest")(inventoryUrl);
 const requestCart = require("supertest")(cartUrl);
 
-const checkoutUrl = 'http://localhost:3010/checkout';
+const checkoutUrl = `http://${process.env.CHECKOUT_HOST}:${process.env.CHECKOUT_PORT}/checkout`;
 const requestCheckout = require("supertest")(checkoutUrl);
 
 describe("Checkout REST API", () => {
@@ -111,6 +111,10 @@ describe("Checkout REST API", () => {
     await requestCart.delete(`/${sample_cart.cartId}/lock`);
     await requestCart.delete(`/${sample_cart.cartId}`);
 
+
+    console.log(`\tClearing orders...`);
+    await orders.repository.knex.raw("truncate table orders cascade");
+
     for (let prod of sample_products) {
       await requestInv.delete(`/${prod.pid}`);
     }
@@ -127,6 +131,7 @@ describe("Checkout REST API", () => {
     console.log(`\tChecking consistency...`);
     const { body } = await requestCart.get(`/${sample_cart.cartId}`).expect(200);
     expect(body.data.length).to.equal(2);
+
   })
 
   it("initiates a checkout", async () => {
@@ -136,13 +141,14 @@ describe("Checkout REST API", () => {
   it("completes the checkout flow", async () => {
     await requestCheckout.post(`/${sample_cart.cartId}`).expect(200);
 
-    const { data: order } = await requestCheckout.put(`/${sample_cart.cartId}`).expect(201);
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_cart.cartId}`).expect(201);
 
-    expect(order.oid).to.equal(1);
+    expect(order.uid).to.equal(sample_users[0].uid);
+    expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
   })
 
   it("aborts a checkout", async () => {
-    await requestCart.post(`/${sample_cart.cartId}`).send(prod).expect(200);
+    await requestCheckout.post(`/${sample_cart.cartId}`).expect(200);
     requestCheckout.delete(`/${sample_cart.cartId}`).expect(200);
   })
 

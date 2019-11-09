@@ -1,9 +1,7 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-const host = "localhost";
-const port = 3000;
-const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
+const cartURL = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
 
 describe("Cart REST API", () => {
