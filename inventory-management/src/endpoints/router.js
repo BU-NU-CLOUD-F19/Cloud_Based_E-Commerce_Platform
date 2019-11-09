@@ -13,17 +13,17 @@ const Handlers = require('./handlers.js');
  */
 class Router {
     /**
-    * Constructor to create the class
-    * @param {object} options - options passed to the router during registration in /registrations.js
-    */
+     * Constructor to create the class
+     * @param {object} options - options passed to the router during registration in /registrations.js
+     */
     constructor(options) {
         this.handler = new Handlers();
     }
 
     /**
-    * POST add product
-    * @param {Hapi.server} server - the Hapi server to which to add the route
-    */
+     * POST add product
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
     routeAddProduct(server) {
         server.route(
             {
@@ -45,9 +45,9 @@ class Router {
     }
 
     /**
-    * PUT update product
-    * @param {Hapi.server} server - the Hapi server to which to add the route
-    */
+     * PUT update product
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
     routeUpdateProduct(server) {
         server.route(
             {
@@ -69,9 +69,9 @@ class Router {
     }
 
     /**
-    * GET list of products
-    * @param {Hapi.server} server - the Hapi server to which to add the route
-    */
+     * GET list of products
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
     routeGetProducts(server) {
         server.route(
             {
@@ -91,9 +91,9 @@ class Router {
             });
     }
     /**
-    * GET product given ID
-    * @param {Hapi.server} server - the Hapi server to which to add the route
-    */
+     * GET product given ID
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
     routeGetProduct(server) {
         server.route(
             {
@@ -115,9 +115,9 @@ class Router {
     }
 
     /**
-    * DELETE product given ID
-    * @param {Hapi.server} server - the Hapi server to which to add the route
-    */
+     * DELETE product given ID
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
     routeRemoveProduct(server) {
         server.route(
             {
@@ -138,16 +138,63 @@ class Router {
         );
     }
 
+
     /**
-    * Actually adds the routes to the server
-    * @param {Hapi.server} server - the Hapi server
-    */
+     * DELETE amount of product from the inventory
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
+    routeSubtractAmount(server) {
+        server.route({
+            method: 'DELETE',
+            path: '/inventory/{id}/{amount}',
+            handler: this.handler.subtractAmount.bind(this.handler),
+            config: {
+                description: 'Subtract some amount of a specific product from the inventory.',
+                tags: ['api', 'inventory'],
+                plugins: {
+                    'hapi-swagger': {
+                        200: { description: 'Amount subtracted from inventory.' },
+                        400: { description: 'Bad request.' }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * PUT amount of product to the inventory
+     * @param {Hapi.server} server - the Hapi server to which to add the route
+     */
+    routeAddAmount(server) {
+        server.route({
+            method: 'PUT',
+            path: '/inventory/{id}/{amount}',
+            handler: this.handler.addAmount.bind(this.handler),
+            config: {
+                description: 'Add some amount of a specific product from the inventory.',
+                tags: ['api', 'inventory'],
+                plugins: {
+                    'hapi-swagger': {
+                        200: { description: 'Amount added to inventory.' },
+                        400: { description: 'Bad request.' }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * Actually adds the routes to the server
+     * @param {Hapi.server} server - the Hapi server
+     */
     route(server) {
         this.routeAddProduct(server);
         this.routeUpdateProduct(server);
         this.routeGetProducts(server);
         this.routeGetProduct(server);
         this.routeRemoveProduct(server);
+        this.routeSubtractAmount(server);
+        this.routeAddAmount(server);
     }
 }
 

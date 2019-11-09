@@ -200,6 +200,71 @@ describe("Inventory management REST API", () => {
         await requestInventory.get(`/2`).expect(400);
     });
 
+    it("decrements the amount of a product in the inventory", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Subtract some amount from the product
+        const toSubtract = 5;
+        await requestInventory.delete(`/${product.pid}/${toSubtract}`).expect(200);
+
+        // Check that the database was updated
+        const res = await requestInventory.get(`/${product.pid}`).expect(200);
+        expect(res.body.data).to.eql([{
+            "products": `(3,PQR123,100,LMN,${product.amount_in_stock-toSubtract},Watch,\"This is a Tissot classic watch.\",en_US)`
+        }]);
+    })
+
+    it("increments the amount of a product in the inventory", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Add some amount to the product
+        const toAdd = 5;
+        await requestInventory.put(`/${product.pid}/${toAdd}`).expect(200);
+
+        // Check that the database was updated
+        const res = await requestInventory.get(`/${product.pid}`).expect(200);
+        expect(res.body.data).to.eql([{
+            "products": `(3,PQR123,100,LMN,${product.amount_in_stock+toAdd},Watch,\"This is a Tissot classic watch.\",en_US)`
+        }]);
+    })
+
+    it("cannot remove more than is in stock", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Try to remove more than is in stock, expect an error
+        const toRemove = product.amount_in_stock+1;
+        await requestInventory.delete(`/${product.pid}/${toRemove}`).expect(400);
+
+        // Check that the database didn't change
+        const res = await requestInventory.get(`/${product.pid}`).expect(200);
+        expect(res.body.data).to.eql([{
+            "products": `(3,PQR123,100,LMN,${product.amount_in_stock},Watch,\"This is a Tissot classic watch.\",en_US)`
+        }]);
+    })
+
+    it("cannot remove if there is nothing in stock", async () => {
+        // Add product
+        await requestInventory.post('').send(product).expect(201);
+
+        // Remove as much as is in stock (bringing amount_in_stock to 0)
+        let toRemove = product.amount_in_stock;
+        await requestInventory.delete(`/${product.pid}/${toRemove}`).expect(200);
+
+        // Try to remove from a product that's not in stock, expect an error
+        toRemove = 1;
+        await requestInventory.delete(`/${product.pid}/${toRemove}`).expect(400);
+
+
+        // Check that the database didn't change
+        const res = await requestInventory.get(`/${product.pid}`).expect(200);
+        expect(res.body.data).to.eql([{
+            "products": `(3,PQR123,100,LMN,0,Watch,\"This is a Tissot classic watch.\",en_US)`
+        }]);
+    })
+
     // Clean up after all tests are done
     after(async function after() {
         // Remove all products
