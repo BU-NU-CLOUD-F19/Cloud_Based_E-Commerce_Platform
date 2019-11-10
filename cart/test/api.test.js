@@ -6,6 +6,10 @@ const port = 3000;
 const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
 
+const gatewayHost = process.env.API_GATEWAY || "localhost";
+const urlGateway = `http://${gatewayHost}:3050/`; // URL for GraphQL API Gateway
+const requestGateway = require("supertest")(urlGateway);
+
 describe("Cart REST API", () => {
   let product, cartId, cart, productsInCart, sample_products, sample_users;
 
@@ -65,7 +69,7 @@ describe("Cart REST API", () => {
 
       return { cart: new Cart(), productsInCart: new ProductsInCart() }
     }
-    catch(err)  {
+    catch (err) {
       console.log(err.message);
       throw err;
     }
@@ -154,7 +158,7 @@ describe("Cart REST API", () => {
     // Define a new product
     let new_product = {
       pid: product.pid,
-      amount_in_cart: product.amount_in_cart+5
+      amount_in_cart: product.amount_in_cart + 5
     }
 
     // Add a product
@@ -193,6 +197,139 @@ describe("Cart REST API", () => {
     await requestCart.put(`/${cartId}`).expect(400)
   });
 
+  it("gateway lists all products in cart", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    // console.log(inventory.getProducts());
+    const res = await requestGateway.post('').send({ query: `{ getProducts(id: ${cartId}){ message, data{ pid, amount_in_cart } }}` }).expect(200);
+    expect(res.body.data.getProducts).to.have.property("message");
+    expect(res.body.data.getProducts).to.have.property("data");
+    expect(res.body.data.getProducts.data[0]).to.have.property("pid");
+    expect(res.body.data.getProducts.data[0].pid).to.equal(1);
+    expect(res.body.data.getProducts.data[0]).to.have.property("amount_in_cart");
+  });
+
+  it("gateway adds a product to the cart", async () => {
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      addProductToCart(id: ${cartId}, input: {
+        pid: 1,
+        amount_in_cart: 1
+      }){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` }).expect(200);
+    expect(res.body.data.addProductToCart).to.have.property("message");
+    expect(res.body.data.addProductToCart).to.have.property("data");
+    expect(res.body.data.addProductToCart.data[0].pid).to.equal(1);
+    expect(res.body.data.addProductToCart.data[0].amount_in_cart).to.equal(1);
+  });
+
+  it("gateway removes a product from the cart", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      removeProduct(id: ${cartId}, input: {
+        pid: 1
+      }){
+        message,
+        data 
+      }
+    }` }).expect(200);
+    expect(res.body.data.removeProduct.message).to.equal("Product removed from cart.");
+    expect(res.body.data.removeProduct.data).to.equal(1);
+  });
+
+  it("gateway responds to an empty-cart request", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      emptyCart(id: ${cartId}){
+        message,
+        data 
+      }
+    }` }).expect(200);
+    expect(res.body.data.emptyCart.message).to.equal("Cart emptied.");
+    expect(res.body.data.emptyCart.data).to.equal(1);
+  });
+
+  it("gateway responds to a change request", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      changeAmount(id: ${cartId}, input: {
+        pid: 1,
+        amount_in_cart: 3
+      }){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` }).expect(200);
+    expect(res.body.data.changeAmount.message).to.equal("Amount updated.");
+    expect(res.body.data.changeAmount.data[0].amount_in_cart).to.equal(3);
+  });
+
+  it("Gateway rejects a malformed remove request", async () => {
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      removeProduct(id: ${cartId}){
+        message,
+        data 
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  it("Gateway rejects a malformed add request", async () => {
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      addProductToCart(id: ${cartId}){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  it("Gateway rejects a malformed change request", async () => {
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      changeAmount(id: ${cartId}){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  // it("gateway responds to a delete request", async () => {
+  //   const res = await requestGateway.post('').send({
+  //     query: `mutation {
+  //     deleteCart(id: ${cartId}){
+  //       message
+  //     }
+  //   }` }).expect(200);
+  //   console.log(res.body.data);
+  //   expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
+  // });
+
   // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
@@ -202,10 +339,10 @@ describe("Cart REST API", () => {
     // Remove the sample data created in before()
     console.log("Removing sample data");
     for (let user of sample_users) {
-      await cart.repository.knex('users').where({uid: user.uid}).del();
+      await cart.repository.knex('users').where({ uid: user.uid }).del();
     }
     for (let prod of sample_products) {
-      await cart.repository.knex('products').where({pid: prod.pid}).del();
+      await cart.repository.knex('products').where({ pid: prod.pid }).del();
     }
 
     // Close the knex connection
