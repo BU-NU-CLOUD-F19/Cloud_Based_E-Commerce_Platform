@@ -39,6 +39,7 @@ const typeDefs = gql`
   type Mutation {
     addProduct(input: ProductDetails): Product
     updateProduct(id: Int!, input: ProductDetails): Product
+    deleteProduct(id: Int!): String
   }
 `;
 
@@ -61,6 +62,11 @@ const resolvers = {
         },
         updateProduct: (root, { id, input }, { dataSources }) => {
             return dataSources.inventoryAPI.updateProduct(input, id).then(result => {
+                return result;
+            });
+        },
+        deleteProduct: (root, { id }, { dataSources }) => {
+            return dataSources.inventoryAPI.deleteProduct(id).then(result => {
                 return result;
             });
         }

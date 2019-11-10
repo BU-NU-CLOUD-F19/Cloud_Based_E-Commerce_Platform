@@ -73,4 +73,14 @@ module.exports = class InventoryAPI extends RESTDataSource {
         );
         return result.data[0];
     }
+
+    /** 
+    Deletes the product with the given ID
+    @param {String} pid - ID of the product to be updated
+    @returns {Object} with a string message of confirmation
+    */
+    async deleteProduct(pid) {
+        const result = await this.delete(`inventory/${pid}`);
+        return result.message;
+    }
 };

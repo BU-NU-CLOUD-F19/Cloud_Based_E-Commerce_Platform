@@ -96,12 +96,14 @@ services:
       - ./graphql-api-gateway-poc/log:/usr/app/log
     links:
       - inventory-management-graphql-service
+      - cart-graphql-service
     expose:
       - 3050
     ports:
       - 3050:3050
     environment:
-      GRAPHQL_SERVICE: inventory-management-graphql-service
+      INVENTORY_GRAPHQL_SERVICE: inventory-management-graphql-service
+      CART_GRAPHQL_SERVICE: cart-graphql-service
   inventory-management-graphql-service:
     build: ./inventory-management/graphql-service
     container_name: "inventory-management-graphql-service"
@@ -117,18 +119,33 @@ services:
       - 6000:6000
     environment:
       INVENTORY_SERVICE: inventory-management
-  members-graphql-service:
-    build: ./members-graphql-service
-    container_name: "members-graphql-service"
+  cart-graphql-service:
+    build: ./cart/graphql-service
+    container_name: "cart-graphql-service"
     volumes:
-      - ./members-graphql-service/index.js:/usr/app/index.js
-      - ./members-graphql-service/datasource.js:/usr/app/datasource.js
-      - ./members-graphql-service/process.json:/usr/app/process.json
-      - ./members-graphql-service/src:/usr/app/src
-      - ./members-graphql-service/log:/usr/app/log
+      - ./cart/graphql-service/index.js:/usr/app/index.js
+      - ./cart/graphql-service/datasource.js:/usr/app/datasource.js
+      - ./cart/graphql-service/process.json:/usr/app/process.json
+      - ./cart/graphql-service/src:/usr/app/src
+      - ./cart/graphql-service/log:/usr/app/log
     expose:
-      - 5000
+      - 6050
     ports:
-      - 5000:5000
+      - 6050:6050
     environment:
-      BOILERPLATE_SERVICE: boilerplate
+      CART_SERVICE: cart
+  # members-graphql-service:
+  #   build: ./members-graphql-service
+  #   container_name: "members-graphql-service"
+  #   volumes:
+  #     - ./members-graphql-service/index.js:/usr/app/index.js
+  #     - ./members-graphql-service/datasource.js:/usr/app/datasource.js
+  #     - ./members-graphql-service/process.json:/usr/app/process.json
+  #     - ./members-graphql-service/src:/usr/app/src
+  #     - ./members-graphql-service/log:/usr/app/log
+  #   expose:
+  #     - 5000
+  #   ports:
+  #     - 5000:5000
+  #   environment:
+  #     BOILERPLATE_SERVICE: boilerplate
