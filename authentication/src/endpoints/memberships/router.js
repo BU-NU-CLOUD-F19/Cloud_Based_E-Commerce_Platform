@@ -31,23 +31,24 @@ class Router {
       path: `/memberships`,
       handler: this.handlers.addMembership.bind(this.handlers),
       config: {
-        description: `Add a product to the cart.`,
+        description: `Add a memberships.`,
         tags: ['api', 'memberships'],
         auth: 'firebase',
         plugins: {
           'hapi-swagger': {
-            201: { description: 'Product added' },
+            201: { description: 'Memberships added' },
             400: { description: 'Bad request (e.g. body empty)' }
           }
         },
         validate: {
           payload: Joi.object().keys({
-              userId : Joi.string()
+              userId: Joi.string()
                       .required()
                       .description('The user id whose membership is to be created'),
-              storeId : Joi.string()
+              storeId: Joi.string()
                         .required()
                         .description('The store id for which the membership is to be created'),
+              subscriptionStatus: Joi.boolean().description('Email subscription'),
           }),
         }
       },
@@ -131,8 +132,8 @@ class Router {
       path: `/memberships/{userId}/{storeId}`,
       handler: this.handlers.getMembership.bind(this.handlers),
       config: {
-        description: 'Get all products in a cart.',
-        tags: ['api', 'authentication'],
+        description: 'Get a membership.',
+        tags: ['api', 'memberships'],
         auth: 'firebase',
         plugins: {
           'hapi-swagger': {

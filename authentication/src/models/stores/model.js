@@ -60,6 +60,16 @@ class StoreModel {
   async getStoreByEmail(storeEmail) {
     return this.repository.getStoreByEmail(storeEmail);
   }
+
+  /**
+   * Update the store
+   * @async
+   * @param {number} storeId
+   * @param {object} storeData
+   */
+  async updateStore(storeId, storeData) {
+    return this.repository.updateStore(storeId, storeData);
+  }
 }
 
 // binds base model to the kernel

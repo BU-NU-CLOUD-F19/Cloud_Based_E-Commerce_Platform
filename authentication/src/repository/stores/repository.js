@@ -123,6 +123,23 @@ class StoresRepository {
     this.logger.debug(`\tResult: ${removed}`);
     return removed;
   }
+
+  /**
+   * Update a store
+   * @async
+   * @param {string} id
+   * @param {object} patchData
+   */
+  async updateUser(id, patchData) {
+    const query = this.knex(this.resource)
+                  .where({id})
+                  .update(patchData);
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const updated = await query;
+    this.logger.debug(`\tResult: ${updated}`);
+    return updated;
+  }
 }
 
 module.exports = StoresRepository;

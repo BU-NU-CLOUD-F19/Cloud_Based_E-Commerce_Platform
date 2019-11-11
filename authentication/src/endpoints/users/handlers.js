@@ -65,7 +65,6 @@ class Handlers {
       return rep.response({message: "User created.", data: res}).code(201);
     }
 
-    // Catch any database errors (e.g. product not found) and return the appropriate response
     catch (err) {
       this.logger.error(JSON.stringify(err));
       throw err;
@@ -93,7 +92,7 @@ class Handlers {
         return rep.response({message: `User ${id} not found.`}).code(400);
       }
       else {
-        // Otherwise, return  how many rows were removed
+        // Otherwise, return how many rows were removed
         return rep.response({message: `User ${id} deleted.`, data: res}).code(200);
       }
     }
@@ -124,11 +123,10 @@ class Handlers {
       // Update the user
       const res = await this.users.updateUser(id, payload);
 
-      // Return the new product record
+      // Return the new user record
       if (res.length > 0) {
         return rep.response({message: "User updated.", data: res});
       }
-      // If nothing was updated, the product wasn't in the users.
       else {
         return rep.response({message: `No such user ${id} found.`}).code(400);
       }

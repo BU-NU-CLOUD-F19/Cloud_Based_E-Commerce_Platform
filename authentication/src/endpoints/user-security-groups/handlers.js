@@ -65,7 +65,6 @@ class Handlers {
       return rep.response({message: "User security group created", data: res}).code(201);
     }
 
-    // Catch any database errors (e.g. product not found) and return the appropriate response
     catch (err) {
       this.logger.error(JSON.stringify(err));
       throw err;
@@ -88,7 +87,6 @@ class Handlers {
       const res = await this.userSecurityGroups.deleteUSGroupByUserId(userId);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in user-security-groups), respond with a 400.
       if (res === 0) {
         return rep.response({message: `User Security Group does not exist for user ${userId}`})
         .code(400);
@@ -149,7 +147,6 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Get user security Group for user ${userId} in store ${storeId}`);
 
-      // Get the products in the user-security-groups and return them
       const result = await this.userSecurityGroups.getUSGroupByUserIdStoreId(userId, storeId);
       return rep.response({message: "User Security Group retrieved.", data: result}).code(200);
     }

@@ -6,6 +6,7 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
+const Joi = require('@hapi/joi');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -31,6 +32,16 @@ class Router {
       config: {
         description: `Generate a token.`,
         tags: ['auth-token']
+      },
+      validate: {
+        params: Joi.object().keys({
+            userId : Joi.string()
+                    .required()
+                    .description('The user id whose membership is to be retrieved'),
+            storeId : Joi.string()
+                      .required()
+                      .description('The store id for which the membership is to be retrieved'),
+        }),
       }
     });
   }

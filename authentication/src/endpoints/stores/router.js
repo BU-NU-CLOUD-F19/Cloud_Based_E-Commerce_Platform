@@ -46,7 +46,8 @@ class Router {
             phone: Joi.string().required()
                   .description('Phone of the store'),
             email: Joi.string().required()
-                  .description('Email of the store')
+                  .description('Email of the store'),
+            address: Joi.string().description('Physical address of the store'),
           })
         }
       }

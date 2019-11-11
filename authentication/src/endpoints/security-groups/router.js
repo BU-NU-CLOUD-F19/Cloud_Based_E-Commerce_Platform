@@ -7,6 +7,7 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
+const Joi = require('@hapi/joi');
 
 /**
  * The Hapi router, creates HTTP routes
@@ -30,8 +31,14 @@ class Router {
       path: `/security-groups`,
       handler: this.handlers.getSecurityGroups.bind(this.handlers),
       config: {
-        description: 'Get all products in a security-groups.',
+        description: 'Get all security-groups.',
         tags: ['api', 'security-groups']
+      },
+      validate: {
+        params: Joi.object().keys({
+          scope: Joi.string().required()
+                .description('Scope of the security group.')
+        })
       }
     });
   }

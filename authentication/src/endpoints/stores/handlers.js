@@ -87,7 +87,6 @@ class Handlers {
       const res = await this.stores.deleteStore(id);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-      // If no rows were removed (i.e. the products wasn't in stores), respond with a 400.
       if (res === 0) {
         return rep.response({message: `Store ${id} not found`}).code(400);
       }
@@ -116,7 +115,6 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Get a store with id: ${id}`);
 
-      // Get the products in the stores and return them
       const result = await this.stores.getStoreById(id);
       return rep.response({message: "Stores retrieved.", data: result}).code(200);
     }

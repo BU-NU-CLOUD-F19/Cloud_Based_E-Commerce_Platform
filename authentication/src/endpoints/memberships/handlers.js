@@ -172,7 +172,6 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Getting membership for ${storeId}`);
 
-      // Get the products in the cart and return them
       const result = await this.memberships.getMembership(userId, storeId);
       return rep.response({message: "Membership retrieved.", data: result}).code(200);
     }

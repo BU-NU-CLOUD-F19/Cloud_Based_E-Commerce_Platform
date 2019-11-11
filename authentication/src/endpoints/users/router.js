@@ -113,7 +113,7 @@ class Router {
   }
 
    /**
-   * GET list the products in the users
+   * GET a user by its email
    * @param {Hapi.server} server - the Hapi server to which to add the route
    */
   routeGetUserByEmail(server) {
