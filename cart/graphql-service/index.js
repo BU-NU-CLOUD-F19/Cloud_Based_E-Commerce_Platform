@@ -16,33 +16,33 @@ const typeDefs = gql`
     pid: Int!
     amount_in_cart: Int
   }
-  input ProductId{
+  input ProductID {
     pid: Int!
   }
   type ProductInfo {
     pid: Int
     amount_in_cart: Int
   }
-  type RemoveProduct{
+  type RemoveProductSuccess{
     message: String
     data: Int
   }
-  type PostProduct {
+  type GetProductSuccess {
     message: String
     data: [ProductInfo]
   }
-  type DeleteCart {
+  type DeleteCartSuccess {
     message: String
   }
   type Query {
-    getProducts(id: Int!): PostProduct
+    getProducts(id: Int!): GetProductSuccess
   }
   type Mutation {
-    addProductToCart(id: Int!, input: ProductInCart): PostProduct
-    removeProduct(id: Int!, input: ProductId): RemoveProduct
-    emptyCart(id: Int!): RemoveProduct
-    changeAmount(id: Int!, input: ProductInCart): PostProduct
-    deleteCart(id: Int!): DeleteCart
+    addProductToCart(id: Int!, input: ProductInCart): GetProductSuccess
+    removeProduct(id: Int!, input: ProductID): RemoveProductSuccess
+    emptyCart(id: Int!): RemoveProductSuccess
+    changeAmount(id: Int!, input: ProductInCart): GetProductSuccess
+    deleteCart(id: Int!): DeleteCartSuccess
   }
 `;
 

@@ -197,19 +197,22 @@ describe("Cart REST API", () => {
     await requestCart.put(`/${cartId}`).expect(400)
   });
 
-  it("gateway lists all products in cart", async () => {
+  // Tests for API Gateway
+
+  it("Gateway lists products in cart", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
-    // console.log(inventory.getProducts());
+
     const res = await requestGateway.post('').send({ query: `{ getProducts(id: ${cartId}){ message, data{ pid, amount_in_cart } }}` }).expect(200);
+
     expect(res.body.data.getProducts).to.have.property("message");
-    expect(res.body.data.getProducts).to.have.property("data");
     expect(res.body.data.getProducts.data[0]).to.have.property("pid");
     expect(res.body.data.getProducts.data[0].pid).to.equal(1);
     expect(res.body.data.getProducts.data[0]).to.have.property("amount_in_cart");
   });
 
-  it("gateway adds a product to the cart", async () => {
+  it("Gateway adds a product to the cart", async () => {
+    // Add a product with pid = 1 and amount = 1
     const res = await requestGateway.post('').send({
       query: `mutation {
       addProductToCart(id: ${cartId}, input: {
@@ -223,15 +226,17 @@ describe("Cart REST API", () => {
         }
       }
     }` }).expect(200);
+
     expect(res.body.data.addProductToCart).to.have.property("message");
     expect(res.body.data.addProductToCart).to.have.property("data");
     expect(res.body.data.addProductToCart.data[0].pid).to.equal(1);
     expect(res.body.data.addProductToCart.data[0].amount_in_cart).to.equal(1);
   });
 
-  it("gateway removes a product from the cart", async () => {
-    // Add a product
+  it("Gateway removes a product from the cart", async () => {
+    // Add a product to then remove from cart
     await requestCart.post(`/${cartId}`).send(product).expect(201);
+
     const res = await requestGateway.post('').send({
       query: `mutation {
       removeProduct(id: ${cartId}, input: {
@@ -241,13 +246,16 @@ describe("Cart REST API", () => {
         data 
       }
     }` }).expect(200);
+
     expect(res.body.data.removeProduct.message).to.equal("Product removed from cart.");
     expect(res.body.data.removeProduct.data).to.equal(1);
   });
 
-  it("gateway responds to an empty-cart request", async () => {
-    // Add a product
+  it("Gateway responds to an empty-cart request", async () => {
+    // Add a product 
     await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Empty the cart
     const res = await requestGateway.post('').send({
       query: `mutation {
       emptyCart(id: ${cartId}){
@@ -255,13 +263,16 @@ describe("Cart REST API", () => {
         data 
       }
     }` }).expect(200);
+
     expect(res.body.data.emptyCart.message).to.equal("Cart emptied.");
     expect(res.body.data.emptyCart.data).to.equal(1);
   });
 
-  it("gateway responds to a change request", async () => {
+  it("Gateway responds to a change request", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Change the amount of the product in cart
     const res = await requestGateway.post('').send({
       query: `mutation {
       changeAmount(id: ${cartId}, input: {
@@ -275,12 +286,15 @@ describe("Cart REST API", () => {
         }
       }
     }` }).expect(200);
+
     expect(res.body.data.changeAmount.message).to.equal("Amount updated.");
     expect(res.body.data.changeAmount.data[0].amount_in_cart).to.equal(3);
   });
 
   it("Gateway rejects a malformed remove request", async () => {
     await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Send a remove request with the id of the product
     const res = await requestGateway.post('').send({
       query: `mutation {
       removeProduct(id: ${cartId}){
@@ -292,6 +306,7 @@ describe("Cart REST API", () => {
   });
 
   it("Gateway rejects a malformed add request", async () => {
+    // Send an add request with the information of the product
     const res = await requestGateway.post('').send({
       query: `mutation {
       addProductToCart(id: ${cartId}){
@@ -306,6 +321,7 @@ describe("Cart REST API", () => {
   });
 
   it("Gateway rejects a malformed change request", async () => {
+    // Send a change request with the information of the product
     const res = await requestGateway.post('').send({
       query: `mutation {
       changeAmount(id: ${cartId}){
@@ -319,16 +335,20 @@ describe("Cart REST API", () => {
     expect(res.body).to.have.property("errors");
   });
 
-  // it("gateway responds to a delete request", async () => {
-  //   const res = await requestGateway.post('').send({
-  //     query: `mutation {
-  //     deleteCart(id: ${cartId}){
-  //       message
-  //     }
-  //   }` }).expect(200);
-  //   console.log(res.body.data);
-  //   expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
-  // });
+  it("gateway responds to a delete request", async () => {
+    // Add a product to the cart
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Delete the cart
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      deleteCart(id: ${cartId}){
+        message
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
+  });
 
   // Clean up after all tests are done
   after(async function after() {

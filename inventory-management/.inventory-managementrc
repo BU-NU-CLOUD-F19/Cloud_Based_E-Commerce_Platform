@@ -2,7 +2,7 @@
   "persistence": {
     "postgres": {
       "connection": {
-        "host": "localhost",
+        "host": "postgres",
         "user": "postgres",
         "password": "northeastern",
         "database": "cloud_ecommerce"

@@ -225,78 +225,140 @@ describe("Inventory management REST API", () => {
         await requestInventory.get(`/2`).expect(400);
     });
 
-    it("gateway lists all products", async () => {
-        // Check if product listing is possible
+    // Tests for API Gateway
+
+    it("Gateway lists all products", async () => {
+        // Add sample products
         await requestInventory.post('').send(sample_products[0]).expect(201);
         await requestInventory.post('').send(sample_products[1]).expect(201);
-        // console.log(inventory.getProducts());
+
+        // Make request to Gateway
         const res = await requestGateway.post('').send({ query: "{ products{ pid, pname }}" }).expect(200);
-        console.log(res.body);
+
         expect(res.body.data.products[0]).to.have.property("pname");
         expect(res.body.data.products[0].pname).to.equal("Something");
         expect(res.body.data.products[1]).to.have.property("pid");
         expect(res.body.data.products[1].pid).to.equal(2);
     });
 
-    it("gateway lists product with given ID", async () => {
-        // Check if product listing is possible
+    it("Gateway lists product with given ID", async () => {
+        // Add sample product
         await requestInventory.post('').send(sample_products[0]).expect(201);
-        // console.log(inventory.getProducts());
+
+        // Make request to Gateway
         const res = await requestGateway.post('').send({ query: "{ product(id: 1){ pid, pname }}" }).expect(200);
-        console.log(res.body);
+
         expect(res.body.data.product).to.have.property("pname");
         expect(res.body.data.product.pname).to.equal("Something");
     });
 
-    it("gateway doesn't retrieve product that doesn't exist", async () => {
+    it("Gateway doesn't retrieve product that doesn't exist", async () => {
+        // Send request for product with ID 1 when no products exist
         const res = await requestGateway.post('').send({ query: "{ product(id: 1){ pid, pname }}" }).expect(200);
+
+        // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");
         expect(res.body.errors[0].extensions.response.body).to.have.property("message");
         expect(res.body.errors[0].extensions.response.body.message).to.equal("Product with id 1 not in inventory.");
     });
 
-    it("gateway adds a product", async () => {
-        const res = await requestGateway.post('').send({ query: "mutation { addProduct(input: {pid: 5 pcode: \"XYZ999\" price: 500 sku: \"PQR\" amount_in_stock: 500 pname: \"Da Vinci Code\" description: \"This is a book by Dan Brown\" lang: \"en_US\"}) {pid pname description}}" }).expect(200);
+    it("Gateway adds a product", async () => {
+        const newProduct = `{
+            pid: 5 
+            pcode: \"XYZ999\" 
+            price: 500 
+            sku: \"PQR\" 
+            amount_in_stock: 500 
+            pname: \"Da Vinci Code\" 
+            description: \"This is a book by Dan Brown\" 
+            lang: \"en_US\"}`;
+
+        // Add a product with ID 5
+        const res = await requestGateway.post('').send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` })
+            .expect(200);
+
         expect(res.body.data.addProduct).to.have.property("pname");
         expect(res.body.data.addProduct).to.have.property("pid");
         expect(res.body.data.addProduct).to.have.property("description");
         expect(res.body.data.addProduct.pname).to.equal("Da Vinci Code");
     });
 
-    it("gateway doesn't allow to add a product if ID already exists", async () => {
+    it("Gateway doesn't allow to add a product if ID already exists", async () => {
+        // Add a product with ID 1
         await requestInventory.post('').send(sample_products[0]).expect(201);
-        console.log(inventory.getProducts());
-        const res = await requestGateway.post('').send({ query: "mutation { addProduct(input: {pid: 1 pcode: \"XYZ999\" price: 500 sku: \"PQR\" amount_in_stock: 500 pname: \"Da Vinci Code\" description: \"This is a book by Dan Brown\" lang: \"en_US\"}) {pid pname description}}" });
+
+        const newProduct = `{
+            pid: 1
+            pcode: \"XYZ999\" 
+            price: 500 
+            sku: \"PQR\" 
+            amount_in_stock: 500 
+            pname: \"Da Vinci Code\" 
+            description: \"This is a book by Dan Brown\" 
+            lang: \"en_US\"}`;
+
+        const res = await requestGateway.post('').send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` });
+
+        // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");
         expect(res.body.errors[0].extensions.response.body).to.have.property("message");
         expect(res.body.errors[0].extensions.response.body.message).to.equal("Product already present in inventory.");
     });
 
-    it("gateway updates a product", async () => {
+    it("Gateway updates a product", async () => {
+        // Add a product with ID 1
         await requestInventory.post('').send(sample_products[0]).expect(201);
-        const res = await requestGateway.post('').send({ query: "mutation { updateProduct(id: 1 input: {pid: 1 pcode: \"XYZ999\" price: 500 sku: \"PQR\" amount_in_stock: 500 pname: \"Da Vinci Code\" description: \"This is a book by Dan Brown\" lang: \"en_US\"}) {pid pname description}}" }).expect(200);
+
+        const updateProduct = `{
+            pid: 1
+            pcode: \"XYZ999\" 
+            price: 500 
+            sku: \"PQR\" 
+            amount_in_stock: 500 
+            pname: \"Da Vinci Code\" 
+            description: \"This is a book by Dan Brown\" 
+            lang: \"en_US\"}`;
+
+        const res = await requestGateway.post('').send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` })
+            .expect(200);
+
         expect(res.body.data.updateProduct).to.have.property("pname");
         expect(res.body.data.updateProduct).to.have.property("pid");
         expect(res.body.data.updateProduct).to.have.property("description");
         expect(res.body.data.updateProduct.pname).to.equal("Da Vinci Code");
     });
 
-    it("gateway doesn't allow to update a product that doesn't exist", async () => {
-        console.log(inventory.getProducts());
-        const res = await requestGateway.post('').send({ query: "mutation { updateProduct(id: 1 input: {pid: 1 pcode: \"XYZ999\" price: 500 sku: \"PQR\" amount_in_stock: 500 pname: \"Da Vinci Code\" description: \"This is a book by Dan Brown\" lang: \"en_US\"}) {pid pname description}}" });
+    it("Gateway doesn't allow to update a product that doesn't exist", async () => {
+        const updateProduct = `{
+            pid: 1
+            pcode: \"XYZ999\" 
+            price: 500 
+            sku: \"PQR\" 
+            amount_in_stock: 500 
+            pname: \"Da Vinci Code\" 
+            description: \"This is a book by Dan Brown\" 
+            lang: \"en_US\"}`;
+        const res = await requestGateway.post('').send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` });
+
+        // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");
         expect(res.body.errors[0].extensions.response.body).to.have.property("message");
         expect(res.body.errors[0].extensions.response.body.message).to.equal("No such product in inventory.");
     });
 
-    it("gateway deletes a product", async () => {
+    it("Gateway deletes a product", async () => {
+        // Add a product with ID 1
         await requestInventory.post('').send(sample_products[0]).expect(201);
+
         const res = await requestGateway.post('').send({ query: ` mutation { deleteProduct(id: 1)}` }).expect(200);
+
         expect(res.body.data).to.have.property("deleteProduct");
     });
 
-    it("gateway doesn't delete a product that doesn't exist", async () => {
+    it("Gateway doesn't delete a product that doesn't exist", async () => {
         const res = await requestGateway.post('').send({ query: ` mutation { deleteProduct(id: 1)}` }).expect(200);
+
+        // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");
         expect(res.body.errors[0].extensions.response.body).to.have.property("message");
         expect(res.body.errors[0].extensions.response.body.message).to.equal("No such product in inventory.");
