@@ -3,16 +3,16 @@ const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
 const port = 3000;
-const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
-const requestCart = require("supertest")(cartURL);
+const baseURL = `http://${host}:${port}/`; // URL for GraphQL API Gateway
+const requestBaseURL = require("supertest")(baseURL);
 
 describe("Cart REST API", () => {
-  let product, cartId, cart, productsInCart, sample_products, sample_users;
+  let users, stores, memberships, sampleStores, sampleUsers, sampleSecurityGroups;
 
   // Utility function to initialize data
   async function loadSampleData() {
     // Set up test data
-    sample_users = [
+    sampleUsers = [
       {
         "uid": "user1",
         "fname": "John",
@@ -23,37 +23,24 @@ describe("Cart REST API", () => {
       }
     ]
 
-    sample_products = [
+    sampleStores = [
       {
-        "pid": 1,
-        "pcode": "ABC123",
-        "price": 42.5,
-        "sku": "XYZ",
-        "amount_in_stock": 10,
-        "pname": "Something",
-        "description": "This is something very interesting that you want to buy.",
-        "lang": "en_US"
-      },
-      {
-        "pid": 2,
-        "pcode": "FD2",
-        "price": 99.99,
-        "sku": "QWOP",
-        "amount_in_stock": 100,
-        "pname": "Speedos",
-        "description": "I'm too lazy to write a description",
-        "lang": "en_US"
+        "name": "Dummy store",
+        "address": "dummy street 11",
+        "phone": 999999998,
+        "email": "support@dummystore.com"
       }
     ]
 
     // Create the records in the database
     console.log(`Inserting sample records`);
-    await cart.deleteAll(); // Clear out the existing data
-    await productsInCart.deleteAll(); // Clear out the existing data
+    await users.deleteAll(); // Clear out the existing data
+    await stores.deleteAll(); // Clear out the existing data
+    await memberships.deleteAll(); // Clear out the existing data
 
     // Kind of a hack to access the other tables, replace this with models eventually
-    await cart.repository.knex('products').insert(sample_products);
-    await cart.repository.knex('users').insert(sample_users);
+    await users.createUser(sampleUsers[0]);
+    await stores.createStore(sampleStores[0]);
   }
 
   async function initModels() {
@@ -61,9 +48,9 @@ describe("Cart REST API", () => {
       await require('../src/configs/config');
 
       // Set up all the required constants
-      const { ProductsInCart, Cart } = require('../src/models/');
+      const { Users, Stores, Memberships } = require('../src/models');
 
-      return { cart: new Cart(), productsInCart: new ProductsInCart() }
+      return { users: new Users(), stores: new Stores(), memberships: new Memberships() }
     }
     catch(err)  {
       console.log(err.message);
@@ -77,35 +64,29 @@ describe("Cart REST API", () => {
     // Load the config and wait for it to load
     initModels().then(objs => {
 
-      cart = objs.cart;
-      productsInCart = objs.productsInCart
+      users = objs.users;
+      stores = objs.stores;
+      memberships = objs.memberships;
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
 
       // Load the sample data into the database
       loadSampleData();
-
-      // Define a sample reference to a product for later use
-      product = {
-        pid: 1,
-        amount_in_cart: 3
-      }
-      // Choose a sample cart id
-      cartId = 1;
     })
   })
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
-    await cart.deleteAll();
-    await productsInCart.deleteAll();
+    await stores.deleteAll();
+    await users.deleteAll();
+    await memberships.deleteAll();
   })
 
   // Test API functionality
-  it("lists products", async () => {
+  it("get memberships", async () => {
     // Check if product listing is possible
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await memberships.get(`/${cartId}`).expect(200)
     expect(res.body.data).to.eql([]);
   });
 
@@ -201,7 +182,7 @@ describe("Cart REST API", () => {
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
-    for (let user of sample_users) {
+    for (let user of sampleUsers) {
       await cart.repository.knex('users').where({uid: user.uid}).del();
     }
     for (let prod of sample_products) {
