@@ -23,7 +23,7 @@ services:
     # Mount local directories on the container filesystem
     volumes:
       # A place to store postgres data
-      - ./db/db-data:/var/lib/postgresql/data
+      - ./db/db-data:/var/lib/postgresql
       # Script to initialize a test database
       - ./db/test-db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
@@ -70,6 +70,7 @@ services:
       #   handled differently in production.
 
     restart: unless-stopped
+
   api-gateway:
     build: ./graphql-api-gateway-poc
     container_name: "api-gateway"
@@ -100,3 +101,19 @@ services:
       - 5000:5000
     environment:
       BOILERPLATE_SERVICE: boilerplate
+
+  authentication:
+    build: ./authentication
+    container_name: "auth-service"
+    volumes:
+      - ./authentication/src:/usr/app/src
+      - ./authentication/app.js:/usr/app/app.js
+      - ./authentication/process.json:/usr/app/process.json
+      - ./authentication/registrations.js:/usr/app/registrations.js
+      - ./authentication/.authenticationrc:/usr/app/.authenticationrc
+      - ./authentication/log:/usr/app/log
+    expose:
+      - 4050
+    ports:
+      - 4050:4050
+    restart: unless-stopped
