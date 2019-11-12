@@ -4,10 +4,15 @@ const { expect } = chai;
 const host = "localhost";
 const port = 3000;
 const baseURL = `http://${host}:${port}/`; // URL for GraphQL API Gateway
-const requestBaseURL = require("supertest")(baseURL);
+const usersAPI = require("supertest")(baseURL+'users');
+const storesAPI = require("supertest")(baseURL+'stores');
+const securityGroupsAPI = require("supertest")(baseURL+'security-groups');
+const userSecurityGroupsAPI = require("supertest")(baseURL+'user-security-groups');
 
 describe("Cart REST API", () => {
-  let sampleStores, sampleUsers, sampleSecurityGroups;
+  let users, stores, securityGroups, sampleStores, sampleUsers, sampleSecurityGroups;
+  let userSecurityGroups;
+  let userId, storeId, securityGroupId;
 
   // Utility function to initialize data
   async function loadSampleData() {
@@ -21,46 +26,52 @@ describe("Cart REST API", () => {
         "phone": 1111111111,
         "email": "john@doe.com"
       }
-    ]
+    ];
 
     sampleStores = [
       {
-        "id": 1,
-        "name": "ABC123",
-        "phone": 42.5,
-        "email": "XYZ",
-        "number": 10,
-        "address": "Something"
+        "id": "store1",
+        "name": "Dummy store",
+        "address": "dummy street 11",
+        "phone": 999999998,
+        "email": "support@dummystore.com"
       }
-    ]
+    ];
 
     sampleSecurityGroups = [
       {
-        "id": 1,
+        "id": "1",
         "scope": "SUPER_ADMIN"
       },
       {
-        "id": 2,
+        "id": "2",
         "scope": "STORE_ADMIN"
       },
       {
-        "id": 3,
+        "id": "3",
         "scope": "CUSTOMER"
       },
       {
-        "id": 4,
+        "id": "4",
         "scope": "GUEST"
       }
-    ]
+    ];
+
+    userId = sampleUsers[0].uid;
+    storeId = sampleStores[0].id;
+    securityGroupId = sampleSecurityGroups[0].id;
 
     // Create the records in the database
     console.log(`Inserting sample records`);
-    await cart.deleteAll(); // Clear out the existing data
-    await productsInCart.deleteAll(); // Clear out the existing data
+    await users.deleteAll(); // Clear out the existing data
+    await stores.deleteAll(); // Clear out the existing data
+    await securityGroups.deleteAll();
+    await userSecurityGroups.deleteAll();
 
     // Kind of a hack to access the other tables, replace this with models eventually
-    await cart.repository.knex('products').insert(sample_products);
-    await cart.repository.knex('users').insert(sampleUsers);
+    await users.repository.knex('users').insert(sampleUsers);
+    await stores.repository.knex('stores').insert(sampleUsers);
+    await securityGroups.repository.knex('security_groups').insert(sampleUsers);
   }
 
   async function initModels() {
@@ -68,9 +79,13 @@ describe("Cart REST API", () => {
       await require('../src/configs/config');
 
       // Set up all the required constants
-      const { ProductsInCart, Cart } = require('../src/models');
+      const { Users, Stores, SecurityGroups, UserSecurityGroups } = require('../src/models');
 
-      return { cart: new Cart(), productsInCart: new ProductsInCart() }
+      return {
+         users: new Users(),
+         stores: new Stores(),
+         securityGroups: new SecurityGroups(),
+         userSecurityGroups: new UserSecurityGroups() };
     }
     catch(err)  {
       console.log(err.message);
@@ -84,142 +99,89 @@ describe("Cart REST API", () => {
     // Load the config and wait for it to load
     initModels().then(objs => {
 
-      cart = objs.cart;
-      productsInCart = objs.productsInCart
+      users = objs.users;
+      stores = objs.stores;
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
 
       // Load the sample data into the database
       loadSampleData();
+    });
+  });
 
-      // Define a sample reference to a product for later use
-      product = {
-        pid: 1,
-        amount_in_cart: 3
-      }
-      // Choose a sample cart id
-      cartId = 1;
-    })
-  })
-
-  // Before each test, clear out the cart data
-  beforeEach(async function beforeEach() {
-    await cart.deleteAll();
-    await productsInCart.deleteAll();
-  })
+  beforeEach(async () => {
+    userSecurityGroups.deleteAll();
+  });
 
   // Test API functionality
-  it("lists products", async () => {
-    // Check if product listing is possible
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+  it("create user security group", async () => {
+    const payload = {
+      userId,
+      storeId,
+      securityGroupId
+    };
+    
+    const res = await userSecurityGroupsAPI.post().send(payload).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
-  it("adds a product to a cart", async () => {
-    // Add it to the cart, and check response
-    let res = await requestCart.post(`/${cartId}`).send(product).expect(201)
-    expect(res.body.data).to.eql([product])
+  it("Get User security group", async () => {
+    
+    const payload = {
+      userId,
+      storeId,
+      securityGroupId
+    };
+    
+    await userSecurityGroupsAPI.post().send(payload).expect(200);
 
-    res = await requestCart.get(`/${cartId}`).expect(200)
-    expect(res.body.data).to.eql([product]);
+    const res = await userSecurityGroupsAPI.get(`/${userId}/${storeId}`).expect(200);
+    expect(res.body.data).to.eql();
   });
 
-  it("removes a product from a cart", async () => {
-    // Add it to the cart
-    await requestCart.post(`/${cartId}`).send(product).expect(201)
+  it("removes a user security group", async () => {
+    const payload = {
+      userId,
+      storeId,
+      securityGroupId
+    };
+    
+    await userSecurityGroupsAPI.post().send(payload).expect(200);
 
-    // Remove it from the cart
-    await requestCart.put(`/${cartId}/remove`).send({ pid: product.pid }).expect(200)
-
-
-    // List the products, expecting none to be present
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await userSecurityGroups.delete(`/${userId}/${storeId}`).send(product).expect(201);
     expect(res.body.data).to.eql([]);
   });
 
-  it("responds to an empty-cart request", async () => {
-    // Insert a few products into the cart
-    for (let i = 1; i <= 2; i++) {
-      await requestCart.post(`/${cartId}`).send({ pid: i, amount_in_cart: i }).expect(201);
-    }
+  
+  // // Check API error handling
+  // it("Rejects a malformed remove request", async () => {
+  //   await requestCart.put(`/${cartId}/remove`).expect(400);
+  // });
 
-    // Check that the cart contains 3 products
-    let res = await requestCart.get(`/${cartId}`).expect(200);
-    expect(res.body.data.length).to.eql(2)
+  // it("Rejects a malformed add request", async () => {
+  //   await requestCart.post(`/${cartId}`).expect(400);
+  // });
 
-    // Empty the cart
-    res = await requestCart.put(`/${cartId}/empty`).expect(200);
-    expect(res.body.data).to.eql(2);  // rows deleted
-
-    // Check that the cart is empty
-    res = await requestCart.get(`/${cartId}`).expect(200);
-    expect(res.body.data).to.eql([])
-  })
-
-  it("responds to a change request", async () => {
-    // Define a new product
-    let new_product = {
-      pid: product.pid,
-      amount_in_cart: product.amount_in_cart+5
-    }
-
-    // Add a product
-    await requestCart.post(`/${cartId}`).send(product).expect(201);
-
-    // Change the product
-    await requestCart.put(`/${cartId}`).send(new_product).expect(200);
-
-    // Check that the amount has been updated
-    const res = await requestCart.get(`/${cartId}`).expect(200)
-    expect(res.body.data[0].amount_in_cart).to.eql(new_product.amount_in_cart)
-  });
-
-  it("responds to a delete request", async () => {
-    // Add a product
-    await requestCart.post(`/${cartId}`).send(product).expect(201);
-
-    // Delete the cart
-    await requestCart.delete(`/${cartId}`).expect(200);
-
-    // Check that the product is gone
-    const res = await requestCart.get(`/${cartId}`).expect(200);
-    expect(res.body.data).to.eql([]);
-  })
-
-  // Check API error handling
-  it("Rejects a malformed remove request", async () => {
-    await requestCart.put(`/${cartId}/remove`).expect(400)
-  });
-
-  it("Rejects a malformed add request", async () => {
-    await requestCart.post(`/${cartId}`).expect(400)
-  });
-
-  it("Rejects a malformed change request", async () => {
-    await requestCart.put(`/${cartId}`).expect(400)
-  });
+  // it("Rejects a malformed change request", async () => {
+  //   await requestCart.put(`/${cartId}`).expect(400);
+  // });
 
   // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
-    await cart.deleteAll();
-    await productsInCart.deleteAll();
-
-    // Remove the sample data created in before()
-    console.log("Removing sample data");
-    for (let user of sampleUsers) {
-      await cart.repository.knex('users').where({uid: user.uid}).del();
-    }
-    for (let prod of sample_products) {
-      await cart.repository.knex('products').where({pid: prod.pid}).del();
-    }
+    await users.deleteAll();
+    await stores.deleteAll();
+    await securityGroups.deleteAll();
+    await userSecurityGroups.deleteAll();
 
     // Close the knex connection
-    cart.repository.knex.destroy();
-    productsInCart.repository.knex.destroy();
+    users.repository.knex.destroy();
+    stores.repository.knex.destroy();
+    securityGroups.repository.knex.destroy();
+    userSecurityGroups.repository.knex.destroy();
 
     console.log("Test finished.");
-  })
+  });
 
-})
+});

@@ -37,7 +37,7 @@ describe("Users REST API", () => {
       // Set up all the required constants
       const { Users } = require('../src/models');
 
-      return { users: new Users() }
+      return { users: new Users() };
     }
     catch(err)  {
       console.log(err.message);
@@ -59,13 +59,13 @@ describe("Users REST API", () => {
       // Load the sample data into the database
       loadSampleData();
 
-    })
-  })
+    });
+  });
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
     await users.deleteAll();    
-  })
+  });
 
   // Test API functionality
   it("lists users by id and email", async () => {
@@ -97,7 +97,7 @@ describe("Users REST API", () => {
 
 
     // List the products, expecting none to be present
-    const res = await usersAPI.get(`/${id}`).expect(200)
+    const res = await usersAPI.get(`/${id}`).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
@@ -134,6 +134,6 @@ describe("Users REST API", () => {
     
 
     console.log("Test finished.");
-  })
+  });
 
-})
+});

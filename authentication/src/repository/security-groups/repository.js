@@ -65,7 +65,7 @@ class SecurityGroupRepository {
    * Get all security-groups
    * @async
    */
-  async getSecurityGroup() {
+  async getSecurityGroups() {
     const securityGroups = this.knex(this.resource);
     const query = securityGroups.select('*');
     this.logger.debug(`\tQuery: ${query}`);
@@ -106,7 +106,7 @@ class SecurityGroupRepository {
       id: shortid.generate(),
       scope,
       date_created: this.postgresDateStr()
-    }
+    };
 
     const query = securityGroups.insert(securityGroupData).returning('*');
     this.logger.debug(`\tQuery: ${query}`);

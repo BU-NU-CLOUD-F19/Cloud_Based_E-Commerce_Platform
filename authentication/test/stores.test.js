@@ -6,7 +6,7 @@ const port = 3000;
 const storesURL = `http://${host}:${port}/stores`; // URL for GraphQL API Gateway
 const storesAPI = require("supertest")(storesURL);
 
-describe("Cart REST API", () => {
+describe("Stores REST API", () => {
   let store, sampleStores;
 
   // Utility function to initialize data
@@ -19,7 +19,7 @@ describe("Cart REST API", () => {
         "phone": 999999998,
         "email": "support@dummystore.com"
       }
-    ]
+    ];
 
     // Create the records in the database
     console.log(`Inserting sample records`);
@@ -35,7 +35,7 @@ describe("Cart REST API", () => {
       // Set up all the required constants
       const { Stores } = require('../src/models');
 
-      return { store: new Stores() }
+      return { store: new Stores() };
     }
     catch(err)  {
       console.log(err.message);
@@ -55,24 +55,24 @@ describe("Cart REST API", () => {
 
       // Load the sample data into the database
       loadSampleData();
-    })
-  })
+    });
+  });
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
     await store.deleteAll();
-  })
+  });
 
   // Test API functionality
   it("get store by id", async () => {
     // Check if product listing is possible
-    const res = await storesAPI.get(`/${storeId}`).expect(200)
+    const res = await storesAPI.get(`/${storeId}`).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
   it("creates a store", async () => {
     // Add it to the cart, and check response
-    let res = await storesAPI.post('').send(sampleStores[0]).expect(201)
+    let res = await storesAPI.post('').send(sampleStores[0]).expect(201);
     const { id } = res.body.data[0];
     delete res.body.data[0].id;
     expect(res.body.data).to.eql(sampleStores[0]);
@@ -92,7 +92,7 @@ describe("Cart REST API", () => {
 
 
     // List the products, expecting none to be present
-    const res = await storeRes.get(`/${id}`).expect(200)
+    const res = await storeRes.get(`/${id}`).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
@@ -108,8 +108,8 @@ describe("Cart REST API", () => {
     await storesAPI.patch(`/${id}`).send({ phone: 222222222 }).expect(200);
 
     // Check that the amount has been updated
-    const res = await storesAPI.get(`/${id}`).expect(200)
-    expect(res.body.data[0].phone).to.eql(222222222)
+    const res = await storesAPI.get(`/${id}`).expect(200);
+    expect(res.body.data[0].phone).to.eql(222222222);
   });
 
   // // Check API error handling
@@ -134,6 +134,6 @@ describe("Cart REST API", () => {
     store.repository.knex.destroy();
 
     console.log("Test finished.");
-  })
+  });
 
-})
+});

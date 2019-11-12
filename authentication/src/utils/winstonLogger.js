@@ -33,7 +33,7 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
 });
 
 // set the level based on env
-const level = process.env.loglevel || ((env === 'production' || env === 'test') ? 'error' : 'debug')
+const level = process.env.loglevel || ((env === 'production' || env === 'test') ? 'error' : 'debug');
 
 // Create the Winston logger
 const winstonLogger = createLogger({

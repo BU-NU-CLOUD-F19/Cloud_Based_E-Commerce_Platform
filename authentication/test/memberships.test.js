@@ -8,7 +8,7 @@ const membershipsAPI = require("supertest")(baseURL+'memberships');
 const usersAPI = require("supertest")(baseURL+'users');
 const storesAPI = require("supertest")(baseURL+'stores');
 
-describe("Cart REST API", () => {
+describe("Memberships REST API", () => {
   let users, stores, memberships, sampleStores, sampleUsers, sampleMemberships;
 
   // Utility function to initialize data
@@ -23,7 +23,7 @@ describe("Cart REST API", () => {
         "phone": 1111111111,
         "email": "john@doe.com"
       }
-    ]
+    ];
 
     sampleStores = [
       {
@@ -32,7 +32,7 @@ describe("Cart REST API", () => {
         "phone": 999999998,
         "email": "support@dummystore.com"
       }
-    ]
+    ];
 
     sampleMemberships = [
       {
@@ -58,7 +58,7 @@ describe("Cart REST API", () => {
       // Set up all the required constants
       const { Users, Stores, Memberships } = require('../src/models');
 
-      return { users: new Users(), stores: new Stores(), memberships: new Memberships() }
+      return { users: new Users(), stores: new Stores(), memberships: new Memberships() };
     }
     catch(err)  {
       console.log(err.message);
@@ -81,15 +81,15 @@ describe("Cart REST API", () => {
 
       // Load the sample data into the database
       loadSampleData();
-    })
-  })
+    });
+  });
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
     await stores.deleteAll();
     await users.deleteAll();
     await memberships.deleteAll();
-  })
+  });
 
   it("create and get a membership", async () => {
     // create store
@@ -104,10 +104,10 @@ describe("Cart REST API", () => {
     sampleMemberships[0].userId = userId;
     sampleMemberships[0].storeId = storeId;
     // create a membership for the user in the store
-    let res = await memberships.post('').send(sampleMemberships).expect(201)
-    expect(res.body.data).to.eql(sampleMemberships)
+    let res = await memberships.post('').send(sampleMemberships).expect(201);
+    expect(res.body.data).to.eql(sampleMemberships);
 
-    res = await memberships.get(`/${userId}/${storeId}`).expect(200)
+    res = await memberships.get(`/${userId}/${storeId}`).expect(200);
     expect(res.body.data).to.eql(sampleMemberships);
   });
 
@@ -123,8 +123,8 @@ describe("Cart REST API", () => {
     sampleMemberships[0].userId = userId;
     sampleMemberships[0].storeId = storeId;
     // create a membership for the user in the store
-    let res = await memberships.post('').send(sampleMemberships).expect(201)
-    expect(res.body.data).to.eql(sampleMemberships)
+    let res = await memberships.post('').send(sampleMemberships).expect(201);
+    expect(res.body.data).to.eql(sampleMemberships);
 
     res = await memberships.delete(`/${userId}/${storeId}`).expect(201);
   });
@@ -177,6 +177,6 @@ describe("Cart REST API", () => {
     memberships.repository.knex.destroy();
 
     console.log("Test finished.");
-  })
+  });
 
-})
+});

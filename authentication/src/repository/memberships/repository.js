@@ -10,7 +10,7 @@ const Names = require('../../constants/modelNames');
 const resource = Names.memberships;
 const Kernel = require('../kernel');
 const knex = require('../knex');
-const shortid = require('shortid')
+const shortid = require('shortid');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
@@ -92,7 +92,7 @@ class MembershipRepository {
       store_id: storeId,
       subscription_status: subscriptionStatus,
       date_created: this.postgresDateStr()
-    }
+    };
 
     const createMembership = memberships.insert(membershipData).returning('*');
     this.logger.debug(`\tQuery: ${createMembership}`);

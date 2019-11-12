@@ -10,7 +10,7 @@ const Names = require('../../constants/modelNames');
 const resource = Names.userSecurityGroups;
 const Kernel = require('../kernel');
 const knex = require('../knex');
-const shortid = require('shortid')
+const shortid = require('shortid');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
@@ -94,7 +94,7 @@ class UserSecurityGroupRepository {
       store_id: storeId,
       security_group_id: securityGroupId,
       date_created: this.postgresDateStr()
-    }
+    };
 
     const query = uSGroup.insert(uSGroupData).returning('*');
     this.logger.debug(`\tQuery: ${query}`);

@@ -2,4 +2,4 @@
 
 const Repository = require('./repository');
 
-module.exports = Repository
+module.exports = Repository;

@@ -10,7 +10,7 @@ const Names = require('../../constants/modelNames');
 const resource = Names.users;
 const Kernel = require('../kernel');
 const knex = require('../knex');
-const shortid = require('shortid')
+const shortid = require('shortid');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
