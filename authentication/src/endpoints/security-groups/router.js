@@ -34,15 +34,8 @@ class Router {
         description: 'Get all security-groups.',
         tags: ['api', 'security-groups']
       },
-      validate: {
-        params: Joi.object().keys({
-          scope: Joi.string().required()
-                .description('Scope of the security group.')
-        })
-      }
     });
   }
-
    
   /**
    * Actually adds the routes to the server

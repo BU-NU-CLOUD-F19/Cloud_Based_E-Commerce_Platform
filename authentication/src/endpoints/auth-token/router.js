@@ -31,18 +31,18 @@ class Router {
       handler: this.handlers.generateToken.bind(this.handlers),
       config: {
         description: `Generate a token.`,
-        tags: ['auth-token']
-      },
-      validate: {
-        params: Joi.object().keys({
+        tags: ['auth-token'],
+        validate: {
+          payload: Joi.object().keys({
             userId : Joi.string()
                     .required()
                     .description('The user id whose membership is to be retrieved'),
             storeId : Joi.string()
-                      .required()
-                      .description('The store id for which the membership is to be retrieved'),
-        }),
-      }
+              .required()
+              .description('The store id for which the membership is to be retrieved'),
+            }),
+        }
+     },
     });
   }
 
