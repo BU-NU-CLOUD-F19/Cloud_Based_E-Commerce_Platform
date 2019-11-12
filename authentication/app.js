@@ -21,7 +21,7 @@ const logger = require('./src/utils/logger');
 module.exports = new Promise(resolve => config.then(async (conf) => {
   const registrations = registrationsFactory(conf);
 
-  const port = process.env.PORT || 4050
+  const port = process.env.PORT || 4050;
 
   const manifest = {
     server: {
