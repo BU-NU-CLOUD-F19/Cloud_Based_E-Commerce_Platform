@@ -6,7 +6,7 @@ const port = 3000;
 const baseURL = `http://${host}:${port}/`;
 const userSecurityGroupsAPI = require("supertest")(baseURL+'user-security-groups');
 
-describe("Cart REST API", () => {
+describe("User Security groups REST API", () => {
   let users, stores, securityGroups, sampleStores, sampleUsers, sampleSecurityGroups;
   let userSecurityGroups;
   let userId, storeId, securityGroupId;

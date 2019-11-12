@@ -3,16 +3,14 @@ const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
 const port = 4050;
-const usersURL = `http://${host}:${port}/users`; // URL for GraphQL API Gateway
+const usersURL = `http://${host}:${port}/users`;
 const usersAPI = require("supertest")(usersURL);
 
 describe("Users REST API", () => {
-  let users, userId, sampleUsers;
+  let users;
 
-  // Utility function to initialize data
-  async function loadSampleData() {
     // Set up test data
-    sampleUsers = [
+  const sampleUsers = [
       {
         "fname": "John",
         "lname": "Doe",
@@ -21,14 +19,6 @@ describe("Users REST API", () => {
         "email": "john@doe.com"
       }
     ];
-
-    // Create the records in the database
-    console.log(`Inserting sample Users`);
-    await users.deleteAll(); // Clear out the existing data
-
-    // Kind of a hack to access the other tables, replace this with models eventually
-    await users.createUser(sampleUsers[0]);
-  }
 
   async function initModels() {
     try {
@@ -56,9 +46,6 @@ describe("Users REST API", () => {
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
 
-      // Load the sample data into the database
-      loadSampleData();
-
     });
   });
 
@@ -69,6 +56,8 @@ describe("Users REST API", () => {
 
   // Test API functionality
   it("lists users by id and email", async () => {
+    const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
+    const { id: userId } = userRes.body.data[0];
     // get users
     let res = await usersAPI.get(`/${userId}`).expect(200);
     delete res.body.data[0].id;
@@ -102,6 +91,10 @@ describe("Users REST API", () => {
   });
 
   it("update a user", async () => {
+    const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
+
+    const { id: userId } = userRes.body.data[0];
+
     const patchData = {
       fname: "Jonathan"
     };
