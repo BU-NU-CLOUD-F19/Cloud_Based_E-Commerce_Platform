@@ -119,7 +119,7 @@ describe("Inventory management REST API", () => {
             sku: "QWOP",
             amount_in_stock: 100,
             pname: "Speedos",
-            description: "I\'m too lazy to write a description",
+            description: "I'm too lazy to write a description",
             lang: "en_US"
         }]);
     });
@@ -265,16 +265,17 @@ describe("Inventory management REST API", () => {
     it("Gateway adds a product", async () => {
         const newProduct = `{
             pid: 5 
-            pcode: \"XYZ999\" 
+            pcode: "XYZ999" 
             price: 500 
-            sku: \"PQR\" 
+            sku: "PQR" 
             amount_in_stock: 500 
-            pname: \"Da Vinci Code\" 
-            description: \"This is a book by Dan Brown\" 
-            lang: \"en_US\"}`;
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
 
         // Add a product with ID 5
-        const res = await requestGateway.post('').send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` })
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` })
             .expect(200);
 
         expect(res.body.data.addProduct).to.have.property("pname");
@@ -289,15 +290,16 @@ describe("Inventory management REST API", () => {
 
         const newProduct = `{
             pid: 1
-            pcode: \"XYZ999\" 
+            pcode: "XYZ999" 
             price: 500 
-            sku: \"PQR\" 
+            sku: "PQR" 
             amount_in_stock: 500 
-            pname: \"Da Vinci Code\" 
-            description: \"This is a book by Dan Brown\" 
-            lang: \"en_US\"}`;
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
 
-        const res = await requestGateway.post('').send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` });
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` });
 
         // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");
@@ -311,15 +313,16 @@ describe("Inventory management REST API", () => {
 
         const updateProduct = `{
             pid: 1
-            pcode: \"XYZ999\" 
+            pcode: "XYZ999" 
             price: 500 
-            sku: \"PQR\" 
+            sku: "PQR" 
             amount_in_stock: 500 
-            pname: \"Da Vinci Code\" 
-            description: \"This is a book by Dan Brown\" 
-            lang: \"en_US\"}`;
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
 
-        const res = await requestGateway.post('').send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` })
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` })
             .expect(200);
 
         expect(res.body.data.updateProduct).to.have.property("pname");
@@ -331,14 +334,15 @@ describe("Inventory management REST API", () => {
     it("Gateway doesn't allow to update a product that doesn't exist", async () => {
         const updateProduct = `{
             pid: 1
-            pcode: \"XYZ999\" 
+            pcode: "XYZ999" 
             price: 500 
-            sku: \"PQR\" 
+            sku: "PQR" 
             amount_in_stock: 500 
-            pname: \"Da Vinci Code\" 
-            description: \"This is a book by Dan Brown\" 
-            lang: \"en_US\"}`;
-        const res = await requestGateway.post('').send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` });
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` });
 
         // Check that the response contains errors with a specific error message
         expect(res.body).to.have.property("errors");

@@ -134,18 +134,3 @@ services:
       - 6050:6050
     environment:
       CART_SERVICE: cart
-  # members-graphql-service:
-  #   build: ./members-graphql-service
-  #   container_name: "members-graphql-service"
-  #   volumes:
-  #     - ./members-graphql-service/index.js:/usr/app/index.js
-  #     - ./members-graphql-service/datasource.js:/usr/app/datasource.js
-  #     - ./members-graphql-service/process.json:/usr/app/process.json
-  #     - ./members-graphql-service/src:/usr/app/src
-  #     - ./members-graphql-service/log:/usr/app/log
-  #   expose:
-  #     - 5000
-  #   ports:
-  #     - 5000:5000
-  #   environment:
-  #     BOILERPLATE_SERVICE: boilerplate

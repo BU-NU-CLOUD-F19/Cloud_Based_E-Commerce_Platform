@@ -105,5 +105,6 @@ try {
         console.log(`Server ready at ${url}`);
     });
 } catch (err) {
-    logger.error(`Error occurred while starting the Apollo Server for the cart-management microservice - ${err.message}`);
+    logger.error(`Error occurred while starting the Apollo Server for 
+    the cart-management microservice - ${err.message}`);
 }

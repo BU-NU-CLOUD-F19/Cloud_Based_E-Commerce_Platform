@@ -28,6 +28,7 @@ module.exports = class InventoryAPI extends RESTDataSource {
 
     /** 
     Returns the added product
+    @param {String} id - ID of the cart
     @param {Object} product - Product to be added
     @returns {Object} with the id, name and description of the product
     */
@@ -46,10 +47,10 @@ module.exports = class InventoryAPI extends RESTDataSource {
     }
 
     /** 
-    Returns the updated product
-    @param {Object} product - Product to be updated
-    @param {String} pid - ID of the product to be updated
-    @returns {Object} with the id, name and description of the product
+    Returns an object containing the message and data
+    @param {String} id - ID of the cart
+    @param {Object} product - Product to be removed
+    @returns {Object} with message and data
     */
     async removeProductFromCart(id, product) {
         product = JSON.stringify(product);
@@ -66,10 +67,9 @@ module.exports = class InventoryAPI extends RESTDataSource {
     }
 
     /** 
-    Returns the updated product
-    @param {Object} product - Product to be updated
-    @param {String} pid - ID of the product to be updated
-    @returns {Object} with the id, name and description of the product
+    Returns an object containing the message and data
+    @param {String} id - ID of the cart
+    @returns {Object} with message and data
     */
     async emptyCart(id) {
         const result = await this.put(
@@ -79,10 +79,10 @@ module.exports = class InventoryAPI extends RESTDataSource {
     }
 
     /** 
-    Returns the updated product
+    Returns an object containing the message and updated product information
+    @param {String} id - ID of the cart
     @param {Object} product - Product to be updated
-    @param {String} pid - ID of the product to be updated
-    @returns {Object} with the id, name and description of the product
+    @returns {Object} with message and updated product information
     */
     async changeAmountOfProduct(id, product) {
         product = JSON.stringify(product);
@@ -99,8 +99,8 @@ module.exports = class InventoryAPI extends RESTDataSource {
     }
 
     /** 
-    Deletes the product with the given ID
-    @param {String} pid - ID of the product to be updated
+    Deletes the cart with the given ID
+    @param {String} id - ID of the cart
     @returns {Object} with a string message of confirmation
     */
     async deleteCart(id) {

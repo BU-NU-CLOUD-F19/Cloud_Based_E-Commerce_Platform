@@ -203,7 +203,8 @@ describe("Cart REST API", () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
 
-    const res = await requestGateway.post('').send({ query: `{ getProducts(id: ${cartId}){ message, data{ pid, amount_in_cart } }}` }).expect(200);
+    const res = await requestGateway.post('')
+      .send({ query: `{ getProducts(id: ${cartId}){ message, data{ pid, amount_in_cart } }}` }).expect(200);
 
     expect(res.body.data.getProducts).to.have.property("message");
     expect(res.body.data.getProducts.data[0]).to.have.property("pid");
