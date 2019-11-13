@@ -121,15 +121,9 @@ class Handlers {
 
     try {
       // Update the user
-      const res = await this.users.updateUser(id, payload);
-
-      // Return the new user record
-      if (res.length > 0) {
-        return rep.response({message: "User updated.", data: res});
-      }
-      else {
-        return rep.response({message: `No such user ${id} found.`}).code(400);
-      }
+      const updateCount = await this.users.updateUser(id, payload);
+      
+      return rep.response({message: `Number of users updated: ${updateCount}`, data: updateCount});
     }
     // Catch database errors
     catch(err) {

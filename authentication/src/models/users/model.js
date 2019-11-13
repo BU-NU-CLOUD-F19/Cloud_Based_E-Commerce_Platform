@@ -77,7 +77,8 @@ class UsersModel {
    * @param {object} userData
    */
   async updateUser(userId, userData) {
-    return this.repository.updateUser(userId, userData);
+    const result = await this.repository.updateUser(userId, userData);
+    return result;
   }
 }
 

@@ -15,7 +15,7 @@ describe("Users REST API", () => {
         "fname": "John",
         "lname": "Doe",
         "address": "Some Street 22",
-        "phone": 1111111111,
+        "phone": "1111111111",
         "email": "john@doe.com"
       }
     ];
@@ -57,22 +57,25 @@ describe("Users REST API", () => {
   // Test API functionality
   it("lists users by id and email", async () => {
     const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
-    const { id: userId } = userRes.body.data[0];
+    const { uid: userId } = userRes.body.data[0];
     // get users
     let res = await usersAPI.get(`/${userId}`).expect(200);
-    delete res.body.data[0].id;
+    delete res.body.data[0].uid;
+    delete res.body.data[0].date_created;
     expect(res.body.data).to.eql(sampleUsers);
-  
+
     // get users by email
     res = await usersAPI.get(`/byEmail/${sampleUsers[0].email}`).expect(200);
-    delete res.body.data[0].id;
+    delete res.body.data[0].uid;
+    delete res.body.data[0].date_created;
     expect(res.body.data).to.eql(sampleUsers);
   });
 
   it("create a user", async () => {
     // creates a user
     let res = await usersAPI.post('').send(sampleUsers[0]).expect(201);
-    delete res.body.data[0].id;
+    delete res.body.data[0].uid;
+    delete res.body.data[0].date_created;
     expect(res.body.data).to.eql(sampleUsers);
   });
   
@@ -80,28 +83,28 @@ describe("Users REST API", () => {
     // Add a user
     const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
 
-    const { id } = userRes.body.data[0];
+    const { uid } = userRes.body.data[0];
     // Remove that user
-    await usersAPI.delete(`/${id}`).expect(200);
+    await usersAPI.delete(`/${uid}`).expect(200);
 
 
     // List the products, expecting none to be present
-    const res = await usersAPI.get(`/${id}`).expect(200);
+    const res = await usersAPI.get(`/${uid}`).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
   it("update a user", async () => {
     const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
 
-    const { id: userId } = userRes.body.data[0];
+    const { uid: userId } = userRes.body.data[0];
 
     const patchData = {
       fname: "Jonathan"
     };
+
     // Update a user
     const res = await usersAPI.patch(`/${userId}`).send(patchData).expect(200);
-
-    expect(res.body.data[0].fname).to.eql(patchData.fname);
+    expect(res.body.data).to.eql(1);
   });
 
   // Check API error handling
@@ -123,7 +126,7 @@ describe("Users REST API", () => {
     await users.deleteAll();
     
     // Close the knex connection
-    users.repository.knex.destroy();
+    await users.repository.knex.destroy();
     
 
     console.log("Test finished.");
