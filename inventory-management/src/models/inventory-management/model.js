@@ -46,11 +46,11 @@ class InventoryManagementModel {
     }
 
     /**
-    * Update the product in the inventory
-    * @async
-    * @param {number} productId - the id of the product
-    * @param {object} product - an object with product details
-    */
+     * Update the product in the inventory
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {object} product - an object with product details
+     */
     async updateProduct(productId, product) {
         return this.repository.updateProduct(productId, product);
     }
@@ -65,11 +65,32 @@ class InventoryManagementModel {
     }
 
     /**
-    * Delete all records that are related to this model.
-    * @async
-    */
+     * Delete all records that are related to this model.
+     * @async
+     */
     async deleteAll() {
         return this.repository.deleteAll();
+    }
+
+
+    /**
+     * Add amount of a product to the inventory
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {number} amount - the amount to add to the inventory
+     */
+    async addAmount(productId, amount) {
+        return this.repository.addAmount(productId, amount);
+    }
+
+    /**
+     * Subtract amount of a product from the inventory
+     * @async
+     * @param {number} productId - the id of the product
+     * @param {number} amount - the amount to subtract from the inventory
+     */
+    async subtractAmount(productId, amount) {
+        return this.repository.subtractAmount(productId, amount);
     }
 }
 
