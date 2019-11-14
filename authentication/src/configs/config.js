@@ -39,7 +39,7 @@ if (!process.env.NODE_ENV) {
 }
 
 // Get the app name, which is used by convention to load the rc file
-const configName = pkg.config.appName;
+const configName = process.env.NODE_ENV == 'test' ? pkg.config.appName + 'test': pkg.config.appName;
 logger.info(`App name: ${configName}`);
 
 
