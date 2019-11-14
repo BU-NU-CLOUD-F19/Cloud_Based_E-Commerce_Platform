@@ -1,224 +1,58 @@
-# Shopping Cart Microservice
-This microservice provides REST API endpoints for a shopping cart, and integrates with the PostgreSQL database.
+Authentication Microservice
+===========================
 
-## Class Documentation
-[Here is the online documentation.](/docs/cart)
+(Requires modification for future use)
 
-## REST API
-### POST /cart/{id}
-#### Purpose
-Add a new product to a cart (automatically creates a new cart if it doesn't exist).
+## Overview
 
-#### Request body
-A JSON object containing
+This package plays role of user-authenticator to be built for the `Cloud based E-commerce Platform` project.
 
-* `pid` (a number referring to the id of a product)
-* `amount_in_cart` (the amount of this product in the cart)
+Prerequisites:
 
-Example:
+1. Create an project on Google Firebase.
+2. Download credentials for that project. (should be a json file)
+3. Replace the appropriate firebase database url.
+4. Use a token generator to get a firebase token. Use this as Bearer Token when making requests
+5. Edit `schema.sql` if required in future. Have Postgres docker container up and running ( run `docker-compose up -d`)
 
-```json
-{
-  "pid": 1,
-  "amount_in_cart": 1
-}
-```
+To start this service, use the docker-compose file in the root of the repository:
 
-#### Response
-**Status code:** 201.
+For API documentation, go to browser and hit: `http://localhost:4050/documentation`
 
-**Body:** a JSON object containing
+You should be able to see a swagger json documentation page.
 
-* `message`: a message regarding the status of the request
-* `data`: on a successful request, an array containing elements with:
-  * `pid`: id of the added product
-  * `amount_in_cart`: the amount added to the cart
+The main purpose of this service is to provide you with a authenticator for user requests.
 
-Example:
+These are the models in this service:
 
-```json
-{
-  "message": "Product added to cart.",
-  "data": [
-    {
-      "amount_in_cart": 1,
-      "pid": 1
-    }
-  ]
-}
-```
+1. `users` - contains all the user related information
 
-Errors:
+2. `stores` - contains all the store related information
 
-* 400: bad request (e.g. empty request body, or required data not present)
+3. `security-groups` - contains different access level
 
-### PUT /cart/{id}/remove
-#### Purpose
-Remove a product from a cart.
+4. `memberships` - contains membership of users in the stores
 
-#### Request body
-A JSON object containing
+5. `user-security-groups` - contains user access level in thestore
 
-* `pid` (a number referring to the id of a product)
+6. `src/repository` - contains the wrapper classes to talk to the database.
+7. `src/utils` - contains the utility scripts required in the application (generally contains logger).
 
-Example:
+8. `app.js` -  the server configuration file for the application (changes should be as minimal to this as possible).
 
-```json
-{
-  "pid": 1,
-}
-```
+9. `Dockerfile` - contains the configuration required to generate docker image for this application.
 
-#### Response
-**Status code:** 200.
+10. `registrations` - contains a list of the routes to be plugged into the server (should contain all the subfolders of `src/endpoints` folder).
 
-**Body:** a JSON object containing
+11. `process.json` - defines pm2 process to be executed. (don't change this file unless required)
 
-* `message`: a message regarding the status of the request
-* `data`: on a successful request, contains a number denoting the number of products removed
+12. `.authenticationrc` - contains system-wide configuration to be used throughout the service. Should be copied to root folder when running locally. `.authenticationtestrc` is used for test environment.
 
-Example:
+13. `auth.js` - contains setup for firbase admin
 
-```json
-{
-  "message": "Product added to cart.",
-  "data": 1
-}
-```
+## Packages
 
-Errors:
-
-* 400: bad request (e.g. empty request body, or required data not preset)
-
-### PUT '/cart/{id}/empty'
-#### Purpose
-Empty the cart, removing all products.
-
-#### Request body
-Empty.
-
-#### Response
-**Status code:** 200.
-
-**Body:** a JSON object containing
-
-* `message`: a message regarding the status of the request
-* `data`: on a successful request, a number denoting the number of products removed.
-
-Example:
-
-```json
-{
-  "message": "Cart emptied.",
-  "data": 1
-}
-```
-
-Errors:
-
-* 400: bad request (e.g. cart does not exist)
-
-### PUT '/cart/{id}'
-#### Purpose
-Change the amount of a product in the cart.
-
-#### Request body
-A JSON object containing
-
-* `pid` (a number referring to the id of a product)
-* `amount_in_cart` (the new amount of this product in the cart)
-
-Example:
-
-```json
-{
-  "pid": 1,
-  "amount_in_cart": 3
-}
-```
-
-#### Response
-**Status code:** 200.
-
-**Body:** a JSON object containing
-
-* `message`: a message regarding the status of the request
-* `data`: on a successful request, an array containing elements with:
-  * `pid`: id of the changed product
-  * `amount_in_cart`: the new amount
-
-Example:
-
-```json
-{
-  "message": "Amount updated.",
-  "data": [
-    {
-      "amount_in_cart": 3,
-      "pid": 1
-    }
-  ]
-}
-```
-
-Errors:
-
-* 400: bad request (e.g. product not present in cart)
-
-### GET /cart/{id}
-#### Purpose
-List the products in the cart.
-
-#### Request body
-Empty.
-
-#### Response
-**Status code:** 200.
-
-**Body:** a JSON object containing
-
-* `message`: a message regarding the status of the request
-* `data`: on a successful request, an array containing elements with:
-  * `pid`: id of each product
-  * `amount_in_cart`: amount of each product that is in the cart
-
-Example:
-
-```json
-{
-  "message": "Products retrieved.",
-  "data": [
-    {
-      "amount_in_cart": 3,
-      "pid": 1
-    }
-  ]
-}
-```
-
-### DELETE '/cart/{id}'
-#### Purpose
-Delete a cart and all products in it.
-
-#### Request body
-None.
-
-#### Response
-**Status code:** 200.
-
-**Body:** a JSON object containing
-
-* `message`: a message regarding the status of the request
-
-Example:
-
-```json
-{
-  "message": "Cart deleted."
-}
-```
-
-Errors:
-
-* 400: bad request (e.g. cart does not exist)
-
+* `elv` - we use this package for `elv.coalesce` to pick the first non-null value out of the list of values
+* `hapi-firebase` - to integrate Firebase with Hapi
+  
+For more details refer the relevant file in the folders.
