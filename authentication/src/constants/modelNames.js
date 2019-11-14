@@ -10,10 +10,10 @@ const names = {
   */
 
   memberships: 'memberships',
-  securityGroups: 'security-groups',
+  securityGroups: 'security_groups',
   stores: 'stores',
   users: 'users',
-  userSecurityGroups: 'user-security-groups',
+  userSecurityGroups: 'user_security_groups',
   
   /*
      Repository

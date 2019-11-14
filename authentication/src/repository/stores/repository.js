@@ -130,7 +130,7 @@ class StoresRepository {
    * @param {string} id
    * @param {object} patchData
    */
-  async updateUser(id, patchData) {
+  async updateStore(id, patchData) {
     const query = this.knex(this.resource)
                   .where({id})
                   .update(patchData);

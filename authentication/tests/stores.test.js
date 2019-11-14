@@ -2,22 +2,25 @@
 const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
-const port = 3000;
+const port = 4050;
 const storesURL = `http://${host}:${port}/stores`; // URL for GraphQL API Gateway
 const storesAPI = require("supertest")(storesURL);
 
 describe("Stores REST API", () => {
   let store, sampleStores;
 
+  const storeId = "store1";
   // Utility function to initialize data
   async function loadSampleData() {
     // Set up test data
     sampleStores = [
       {
+        "id": storeId,
         "name": "Dummy store",
         "address": "dummy street 11",
-        "phone": 999999998,
-        "email": "support@dummystore.com"
+        "phone": "9999999988",
+        "email": "support@dummystore.com",
+        "date_created": null
       }
     ];
 
@@ -25,7 +28,7 @@ describe("Stores REST API", () => {
     console.log(`Inserting sample records`);
     await store.deleteAll(); // Clear out the existing data
 
-    await store.createStore(sampleStores);
+    await store.repository.knex('stores').insert(sampleStores);
   }
 
   async function initModels() {
@@ -52,64 +55,53 @@ describe("Stores REST API", () => {
       store = objs.store;
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
-
-      // Load the sample data into the database
-      loadSampleData();
     });
   });
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
-    await store.deleteAll();
+    // Load the sample data into the database
+    await loadSampleData();
   });
 
   // Test API functionality
   it("get store by id", async () => {
     // Check if product listing is possible
     const res = await storesAPI.get(`/${storeId}`).expect(200);
-    expect(res.body.data).to.eql([]);
+    expect(res.body.data).to.eql(sampleStores);
   });
 
   it("creates a store", async () => {
-    // Add it to the cart, and check response
-    let res = await storesAPI.post('').send(sampleStores[0]).expect(201);
-    const { id } = res.body.data[0];
-    delete res.body.data[0].id;
-    expect(res.body.data).to.eql(sampleStores[0]);
+    const newStoreData = {
+      "name": "New Store",
+      "address": "new street 11",
+      "phone": "2222222222",
+      "email": "support@dummystore.com"
+    };
 
-    res = await storesAPI.get(`/${id}`).expect(200);
+    // Add it to the cart, and check response
+    let res = await storesAPI.post('').send(newStoreData).expect(201);
     delete res.body.data[0].id;
-    expect(res.body.data).to.eql(sampleStores[0]);
+    delete res.body.data[0].date_created;
+    expect(res.body.data[0]).to.eql(newStoreData);
   });
 
   it("removes a store", async () => {
-    // Add it to the cart
-    const storeRes = await storesAPI.post('').send(sampleStores[0]).expect(201);
-
-    const { id } = storeRes.body.data[0];
     // Remove it from the cart
-    await storeRes.delete(`/${id}`).expect(200);
-
+    await storesAPI.delete(`/${storeId}`).expect(200);
 
     // List the products, expecting none to be present
-    const res = await storeRes.get(`/${id}`).expect(200);
+    const res = await storesAPI.get(`/${storeId}`).expect(200);
     expect(res.body.data).to.eql([]);
   });
 
   it("update a store", async () => {
-    // Define a new product
-
-    // Add a product
-    const storeRes = await storesAPI.post('').send(sampleStores[0]).expect(201);
-
-    const { id } = storeRes.body.data[0];
-
     // Change the product
-    await storesAPI.patch(`/${id}`).send({ phone: 222222222 }).expect(200);
+    await storesAPI.patch(`/${storeId}`).send({ phone: "2222222222" }).expect(200);
 
     // Check that the amount has been updated
-    const res = await storesAPI.get(`/${id}`).expect(200);
-    expect(res.body.data[0].phone).to.eql(222222222);
+    const res = await storesAPI.get(`/${storeId}`).expect(200);
+    expect(res.body.data[0].phone).to.eql("2222222222");
   });
 
   // // Check API error handling
@@ -131,7 +123,7 @@ describe("Stores REST API", () => {
     await store.deleteAll();
 
     // Close the knex connection
-    store.repository.knex.destroy();
+    await store.repository.knex.destroy();
 
     console.log("Test finished.");
   });

@@ -2,9 +2,9 @@
 const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
-const port = 3000;
-const baseURL = `http://${host}:${port}/`;
-const userSecurityGroupsAPI = require("supertest")(baseURL+'user-security-groups');
+const port = 4050;
+const usgURL = `http://${host}:${port}/user-security-groups`;
+const userSecurityGroupsAPI = require("supertest")(usgURL);
 
 describe("User Security groups REST API", () => {
   let users, stores, securityGroups, sampleStores, sampleUsers, sampleSecurityGroups;
@@ -20,7 +20,7 @@ describe("User Security groups REST API", () => {
         "fname": "John",
         "lname": "Doe",
         "address": "Some Street 22",
-        "phone": 1111111111,
+        "phone": "1111111111",
         "email": "john@doe.com"
       }
     ];
@@ -30,8 +30,9 @@ describe("User Security groups REST API", () => {
         "id": "store1",
         "name": "Dummy store",
         "address": "dummy street 11",
-        "phone": 999999998,
-        "email": "support@dummystore.com"
+        "phone": "9999999998",
+        "email": "support@dummystore.com",
+        "date_created": null
       }
     ];
 
@@ -67,8 +68,8 @@ describe("User Security groups REST API", () => {
 
     // Kind of a hack to access the other tables, replace this with models eventually
     await users.repository.knex('users').insert(sampleUsers);
-    await stores.repository.knex('stores').insert(sampleUsers);
-    await securityGroups.repository.knex('security_groups').insert(sampleUsers);
+    await stores.repository.knex('stores').insert(sampleStores);
+    await securityGroups.repository.knex('security_groups').insert(sampleSecurityGroups);
   }
 
   async function initModels() {
@@ -98,17 +99,17 @@ describe("User Security groups REST API", () => {
 
       users = objs.users;
       stores = objs.stores;
+      securityGroups = objs.securityGroups;
+      userSecurityGroups = objs.userSecurityGroups;
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
-
-      // Load the sample data into the database
-      loadSampleData();
     });
   });
 
   beforeEach(async () => {
-    userSecurityGroups.deleteAll();
+    // Load the sample data into the database
+    await loadSampleData();
   });
 
   // Test API functionality
@@ -118,23 +119,38 @@ describe("User Security groups REST API", () => {
       storeId,
       securityGroupId
     };
+
+    const expectedOutput = {
+      user_id: userId,
+      store_id: storeId,
+      security_group_id: securityGroupId
+    };
     
-    const res = await userSecurityGroupsAPI.post().send(payload).expect(200);
-    expect(res.body.data).to.eql([]);
+    const res = await userSecurityGroupsAPI.post('').send(payload).expect(201);
+    delete res.body.data[0].id;
+    delete res.body.data[0].date_created;
+    expect(res.body.data).to.eql([expectedOutput]);
   });
 
   it("Get User security group", async () => {
-    
     const payload = {
       userId,
       storeId,
       securityGroupId
     };
     
-    await userSecurityGroupsAPI.post().send(payload).expect(200);
+    const expectedOutput = {
+      user_id: userId,
+      store_id: storeId,
+      security_group_id: securityGroupId
+    };
+
+    await userSecurityGroupsAPI.post('').send(payload).expect(201);
 
     const res = await userSecurityGroupsAPI.get(`/${userId}/${storeId}`).expect(200);
-    expect(res.body.data).to.eql();
+    delete res.body.data[0].id;
+    delete res.body.data[0].date_created;
+    expect(res.body.data).to.eql([expectedOutput]);
   });
 
   it("removes a user security group", async () => {
@@ -144,10 +160,10 @@ describe("User Security groups REST API", () => {
       securityGroupId
     };
     
-    await userSecurityGroupsAPI.post().send(payload).expect(201);
+    await userSecurityGroupsAPI.post('').send(payload).expect(201);
 
-    const res = await userSecurityGroups.delete(`/${userId}/${storeId}`).expect(200);
-    expect(res.body.data).to.eql([]);
+    const res = await userSecurityGroupsAPI.delete(`/${userId}/${storeId}`).expect(200);
+    expect(res.body.data).to.eql(1);
   });
 
   
@@ -173,10 +189,10 @@ describe("User Security groups REST API", () => {
     await userSecurityGroups.deleteAll();
 
     // Close the knex connection
-    users.repository.knex.destroy();
-    stores.repository.knex.destroy();
-    securityGroups.repository.knex.destroy();
-    userSecurityGroups.repository.knex.destroy();
+    await users.repository.knex.destroy();
+    await stores.repository.knex.destroy();
+    await securityGroups.repository.knex.destroy();
+    await userSecurityGroups.repository.knex.destroy();
 
     console.log("Test finished.");
   });

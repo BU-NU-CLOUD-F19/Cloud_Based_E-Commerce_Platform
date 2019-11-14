@@ -81,12 +81,11 @@ class MembershipsModel {
   /**
    * Update the subscription status of a membership
    * @async
-   * @param {number} storeId
-   * @param {number} userId
-   * @param {number} isSubscribed - status of email notifications
+   * @param {number} id
+   * @param {boolean} isSubscribed - status of email notifications
    */
-  async updateMembershipSubscription(storeId, userId, isSubscribed) {
-    return this.repository.updateSubscription(storeId, userId, isSubscribed);
+  async updateMembershipSubscription(id, isSubscribed) {
+    return this.repository.updateSubscription(id, isSubscribed);
   }
 
 }

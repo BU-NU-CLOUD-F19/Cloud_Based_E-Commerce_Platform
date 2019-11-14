@@ -10,7 +10,6 @@ const Names = require('../../constants/modelNames');
 const resource = Names.memberships;
 const Kernel = require('../kernel');
 const knex = require('../knex');
-const shortid = require('shortid');
 
 /**
  * Defines primitive functions for interacting with the PostgreSQL database.
@@ -155,12 +154,10 @@ class MembershipRepository {
   /**
    * Update subscription
    * @async
-   * @param {String} userId
-   * @param {String} storeId
+   * @param {String} id
    * @param {Boolean} subscriptionStatus
    */
-  async updateSubscription(storeId, userId, subscriptionStatus) {
-    const id = `${userId}:${storeId}`;
+  async updateSubscription(id, subscriptionStatus) {
     const query = this.knex(this.resource)
                   .where({id})
                   .update({ subscription_status: subscriptionStatus});

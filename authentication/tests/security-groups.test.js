@@ -2,11 +2,11 @@
 const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
-const port = 3000;
+const port = 4050;
 const sgURL = `http://${host}:${port}/security-groups`; // URL for GraphQL API Gateway
 const securityGroupsAPI = require("supertest")(sgURL);
 
-describe("Cart REST API", () => {
+describe("Security-groups REST API", () => {
   let securityGroups, sampleSecurityGroups;
 
   // Utility function to initialize data
@@ -64,15 +64,17 @@ describe("Cart REST API", () => {
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
-
-      // Load the sample data into the database
-      loadSampleData();
     });
+  });
+
+  beforeEach(async () => {
+    // Load the sample data into the database
+    await loadSampleData();
   });
 
   // Test API functionality
   it("list security groups", async () => {
-    const res = await securityGroupsAPI.get().expect(200);
+    const res = await securityGroupsAPI.get('').expect(200);
     expect(res.body.data).to.eql(sampleSecurityGroups);
   });
 
@@ -81,7 +83,7 @@ describe("Cart REST API", () => {
     await securityGroups.deleteAll();
 
     // Close the knex connection
-    securityGroups.repository.knex.destroy();
+    await securityGroups.repository.knex.destroy();
 
     console.log("Test finished.");
   });

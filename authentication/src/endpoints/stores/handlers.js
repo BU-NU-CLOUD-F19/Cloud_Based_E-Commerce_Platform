@@ -144,12 +144,8 @@ class Handlers {
       // Update store information
       const res = await this.stores.updateStore(id, payload);
 
-      if (res.length > 0) {
-        return rep.response({message: "Store updated.", data: res});
-      }
-      else {
-        return rep.response({message: `No such store ${id} found.`}).code(400);
-      }
+      return rep.response({message: `Number of stores updated: ${res}`, data: res});
+      
     }
     // Catch database errors
     catch(err) {

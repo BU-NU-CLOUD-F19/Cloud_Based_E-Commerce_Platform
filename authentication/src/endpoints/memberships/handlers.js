@@ -42,11 +42,11 @@ class Handlers {
   async addMembership(req, rep) {
     this.logger.logRequest(req);
     const { payload } = req;
-    const { userId, storeId, subscriptionStatus = true } = payload;
     // Check if request contains a body
     if (!payload) {
       return rep.response({message: "Body cannot be empty."}).code(400);
     }
+    const { userId, storeId, subscriptionStatus = true } = payload;
 
     // Check if request body contains the required values
     const isValid = Handlers.propsPresent(['userId', 'storeId'], payload);
@@ -105,7 +105,7 @@ class Handlers {
       }
       else {
         // Otherwise, return  how many rows were removed
-        return rep.response({message: "Memberships removed: ", data: res}).code(200);
+        return rep.response({message: `Memberships removed: ${res}`, data: res}).code(200);
       }
     }
     catch (err) {
@@ -122,7 +122,7 @@ class Handlers {
    */
   async updateSubscription(req, rep) {
     this.logger.logRequest(req);
-    const { params: { userId, storeId }, payload } = req;
+    const { params: { id }, payload } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -137,19 +137,13 @@ class Handlers {
 
     const { subscriptionStatus } = payload;
     this.logger.debug(`\tHandler: Updating sbscription status for
-     user ${userId} in store ${storeId} to ${subscriptionStatus}`);
+     membership ${id} to ${subscriptionStatus}`);
 
     try {
       // Update subscription status
-      const res = await this.memberships.updateMembershipSubscription(storeId, userId, subscriptionStatus);
-
-      // Return the new product record
-      if (res.length > 0) {
-        return rep.response({message: "Subscription updated.", data: res});
-      }
-      else {
-        return rep.response({message: "No such membership present."}).code(400);
-      }
+      const res = await this.memberships.updateMembershipSubscription(id, subscriptionStatus);
+      
+      return rep.response({message: `Subscription updated for records: ${res}`, data: res});
     }
     // Catch database errors
     catch(err) {
@@ -172,7 +166,7 @@ class Handlers {
     try {
       this.logger.debug(`\tHandler: Getting membership for ${storeId}`);
 
-      const result = await this.memberships.getMembership(userId, storeId);
+      const result = await this.memberships.getMembership(storeId, userId);
       return rep.response({message: "Membership retrieved.", data: result}).code(200);
     }
     catch(err)  {

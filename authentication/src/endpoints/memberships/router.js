@@ -9,6 +9,10 @@
 const Handlers = require('./handlers');
 const Joi = require('@hapi/joi');
 
+
+// Authentication strategy
+
+const auth = (process.env.NODE_ENV == 'test') ? null : 'firebase';
 /**
  * The Hapi router, creates HTTP routes
  */
@@ -33,7 +37,7 @@ class Router {
       config: {
         description: `Add a memberships.`,
         tags: ['api', 'memberships'],
-        auth: 'firebase',
+        auth,
         plugins: {
           'hapi-swagger': {
             201: { description: 'Memberships added' },
@@ -67,7 +71,7 @@ class Router {
       config: {
         description: 'Remove a membership.',
         tags: ['api', 'memberships'],
-        auth: 'firebase',
+        auth,
         plugins: {
           'hapi-swagger': {
             200: { description: 'Membership removed'},
@@ -100,7 +104,7 @@ class Router {
       config: {
         description: 'Change the subscription of membership.',
         tags: ['api', 'memberships'],
-        auth: 'firebase',
+        auth,
         plugins: {
           'hapi-swagger': {
             200: { description: 'Subscription updated' },
@@ -111,7 +115,7 @@ class Router {
           params: Joi.object().keys({
               id : Joi.string()
                       .required()
-                      .description('The user id whose membership is to be created'),
+                      .description('The id whose membership is to be created'),
           }),
           payload: Joi.object().keys({
             subscriptionStatus : Joi.boolean().required()
@@ -134,7 +138,7 @@ class Router {
       config: {
         description: 'Get a membership.',
         tags: ['api', 'memberships'],
-        auth: 'firebase',
+        auth,
         plugins: {
           'hapi-swagger': {
             200: { description: 'Membership returned' },

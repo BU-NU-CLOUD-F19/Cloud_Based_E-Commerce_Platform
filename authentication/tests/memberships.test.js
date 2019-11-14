@@ -2,40 +2,43 @@
 const chai = require("chai");
 const { expect } = chai;
 const host = "localhost";
-const port = 3000;
-const baseURL = `http://${host}:${port}/`; // URL for GraphQL API Gateway
-const membershipsAPI = require("supertest")(baseURL+'memberships');
-const usersAPI = require("supertest")(baseURL+'users');
-const storesAPI = require("supertest")(baseURL+'stores');
+const port = 4050;
+const baseURL = `http://${host}:${port}/memberships`; // URL for GraphQL API Gateway
+const membershipsAPI = require("supertest")(baseURL);
 
 describe("Memberships REST API", () => {
   let users, stores, memberships, sampleStores, sampleUsers, sampleMemberships;
+  const userId = "user1", storeId = "store1";
 
   // Utility function to initialize data
   async function loadSampleData() {
     // Set up test data
     sampleUsers = [
       {
-        "uid": "user1",
+        "uid": userId,
         "fname": "John",
         "lname": "Doe",
         "address": "Some Street 22",
-        "phone": 1111111111,
+        "phone": "1111111111",
         "email": "john@doe.com"
       }
     ];
 
     sampleStores = [
       {
+        "id": storeId,
         "name": "Dummy store",
         "address": "dummy street 11",
-        "phone": 999999998,
-        "email": "support@dummystore.com"
+        "phone": "9999999998",
+        "email": "support@dummystore.com",
+        "date_created": null
       }
     ];
 
     sampleMemberships = [
       {
+        userId,
+        storeId,
         subscriptionStatus: true,
       }
     ];
@@ -47,8 +50,8 @@ describe("Memberships REST API", () => {
     await memberships.deleteAll(); // Clear out the existing data
 
     // Kind of a hack to access the other tables, replace this with models eventually
-    await users.createUser(sampleUsers[0]);
-    await stores.createStore(sampleStores[0]);
+    await users.repository.knex('users').insert(sampleUsers);
+    await stores.repository.knex('stores').insert(sampleStores);
   }
 
   async function initModels() {
@@ -78,77 +81,52 @@ describe("Memberships REST API", () => {
 
       // Log the start of the test
       console.log(`Starting test at ${new Date().toLocaleString()}`);
-
-      // Load the sample data into the database
-      loadSampleData();
     });
   });
 
   // Before each test, clear out the cart data
   beforeEach(async function beforeEach() {
-    await stores.deleteAll();
-    await users.deleteAll();
-    await memberships.deleteAll();
+    // Load the sample data into the database
+    await loadSampleData();
   });
 
   it("create and get a membership", async () => {
-    // create store
-    const storeRes = await storesAPI.post('').send(sampleStores[0]).expect(201);
-    const { id: storeId } = storeRes.body.data[0];
 
-    // create store
-    const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
-    const { id: userId } = userRes.body.data[0];
+    const expectedOutput = [
+      {
+        user_id: userId,
+        store_id: storeId,
+        subscription_status: true
+      }
+    ];
 
-
-    sampleMemberships[0].userId = userId;
-    sampleMemberships[0].storeId = storeId;
     // create a membership for the user in the store
-    let res = await memberships.post('').send(sampleMemberships).expect(201);
-    expect(res.body.data).to.eql(sampleMemberships);
-
-    res = await memberships.get(`/${userId}/${storeId}`).expect(200);
-    expect(res.body.data).to.eql(sampleMemberships);
+    await membershipsAPI.post('').send(sampleMemberships[0]).expect(201);
+    
+    const res = await membershipsAPI.get(`/${userId}/${storeId}`).expect(200);
+    delete res.body.data[0].id;
+    delete res.body.data[0].date_created;
+    expect(res.body.data).to.eql(expectedOutput);
   });
 
   it("delete a membership", async () => {
-    const storeRes = await storesAPI.post('').send(sampleStores[0]).expect(201);
-    const { id: storeId } = storeRes.body.data[0];
-
-    // create store
-    const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
-    const { id: userId } = userRes.body.data[0];
-
-
-    sampleMemberships[0].userId = userId;
-    sampleMemberships[0].storeId = storeId;
     // create a membership for the user in the store
-    let res = await memberships.post('').send(sampleMemberships).expect(201);
-    expect(res.body.data).to.eql(sampleMemberships);
-
-    res = await memberships.delete(`/${userId}/${storeId}`).expect(201);
+    await membershipsAPI.post('').send(sampleMemberships[0]).expect(201);
+    
+    const res = await membershipsAPI.delete(`/${userId}/${storeId}`).expect(200);
+    expect(res.body.data).to.eql(1);
   });
 
 
   it("update subscription", async () => {
-    const storeRes = await storesAPI.post('').send(sampleStores[0]).expect(201);
-    const { id: storeId } = storeRes.body.data[0];
-
-    // create store
-    const userRes = await usersAPI.post('').send(sampleUsers[0]).expect(201);
-    const { id: userId } = userRes.body.data[0];
-
-
-    sampleMemberships[0].userId = userId;
-    sampleMemberships[0].storeId = storeId;
     // create a membership for the user in the store
-    const membershipRes = await memberships.post('').send(sampleMemberships).expect(201);
+    const membershipRes = await membershipsAPI.post('').send(sampleMemberships[0]).expect(201);
 
     const { id } = membershipRes.body.data[0];
 
     // Update the subscription
     const res = await membershipsAPI.patch(`/${id}`).send({ subscriptionStatus: false}).expect(200);
-    expect(res.body.data[0].subscriptionStatus).to.eql(false);
+    expect(res.body.data).to.eql(1);
   });
 
   // // Check API error handling
