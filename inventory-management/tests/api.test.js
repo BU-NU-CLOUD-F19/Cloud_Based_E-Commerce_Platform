@@ -378,7 +378,14 @@ describe("Inventory management REST API", () => {
         // Check that the database was updated
         const res = await requestInventory.get(`/${product.pid}`).expect(200);
         expect(res.body.data).to.eql([{
-            "products": `(3,PQR123,100,LMN,${product.amount_in_stock - toSubtract},Watch,\"This is a Tissot classic watch.\",en_US)`
+            "amount_in_stock": 15,
+            "description": "This is a Tissot classic watch.",
+            "lang": "en_US",
+            "pcode": "PQR123",
+            "pid": 3,
+            "pname": "Watch",
+            "price": 100,
+            "sku": "LMN"
         }]);
     })
 
@@ -393,7 +400,14 @@ describe("Inventory management REST API", () => {
         // Check that the database was updated
         const res = await requestInventory.get(`/${product.pid}`).expect(200);
         expect(res.body.data).to.eql([{
-            "products": `(3,PQR123,100,LMN,${product.amount_in_stock + toAdd},Watch,\"This is a Tissot classic watch.\",en_US)`
+            "amount_in_stock": 25,
+            "description": "This is a Tissot classic watch.",
+            "lang": "en_US",
+            "pcode": "PQR123",
+            "pid": 3,
+            "pname": "Watch",
+            "price": 100,
+            "sku": "LMN"
         }]);
     })
 
@@ -408,7 +422,14 @@ describe("Inventory management REST API", () => {
         // Check that the database didn't change
         const res = await requestInventory.get(`/${product.pid}`).expect(200);
         expect(res.body.data).to.eql([{
-            "products": `(3,PQR123,100,LMN,${product.amount_in_stock},Watch,\"This is a Tissot classic watch.\",en_US)`
+            "amount_in_stock": 20,
+            "description": "This is a Tissot classic watch.",
+            "lang": "en_US",
+            "pcode": "PQR123",
+            "pid": 3,
+            "pname": "Watch",
+            "price": 100,
+            "sku": "LMN"
         }]);
     })
 
@@ -428,7 +449,14 @@ describe("Inventory management REST API", () => {
         // Check that the database didn't change
         const res = await requestInventory.get(`/${product.pid}`).expect(200);
         expect(res.body.data).to.eql([{
-            "products": `(3,PQR123,100,LMN,0,Watch,\"This is a Tissot classic watch.\",en_US)`
+            "amount_in_stock": 0,
+            "description": "This is a Tissot classic watch.",
+            "lang": "en_US",
+            "pcode": "PQR123",
+            "pid": 3,
+            "pname": "Watch",
+            "price": 100,
+            "sku": "LMN"
         }]);
     })
 
