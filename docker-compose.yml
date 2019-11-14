@@ -129,6 +129,9 @@ services:
       - ./authentication/registrations.js:/usr/app/registrations.js
       - ./authentication/.authenticationrc:/usr/app/.authenticationrc
       - ./authentication/log:/usr/app/log
+      - ./authentication/auth.js:/usr/app/auth.js
+      - ./authentication/serviceAccountKey.json:/usr/app/serviceAccountKey.json
+      - ./authentication/firebase-client.js:/usr/app/firebase-client.js
     expose:
       - 4050
     ports:
