@@ -47,6 +47,23 @@ services:
       # port 5050 for the web interface (port 80 in the container).
       - "${PGADMIN_PORT:-5050}:80"
     restart: unless-stopped
+  inventory-management:
+    build: ./inventory-management
+    container_name: "inventory-management"
+    # Forward ports, format 'container:host'
+    ports:
+      - 3020:3020
+    # Mount local directories on the container filesystem.
+    # Should not happen in production.
+    volumes:
+      - ./inventory-management/src:/usr/app/src
+      - ./inventory-management/app.js:/usr/app/app.js
+      - ./inventory-management/process.json:/usr/app/process.json
+      - ./inventory-management/registrations.js:/usr/app/registrations.js
+      - ./inventory-management/.inventory-managementrc:/usr/app/.inventory-managementrc
+      - ./inventory-management/log:/usr/app/log
+      - ./inventory-management/tests:/usr/app/tests
+    restart: unless-stopped
 
   cart:
     build: ./cart
