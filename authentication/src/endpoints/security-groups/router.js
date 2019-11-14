@@ -7,7 +7,6 @@
 
 // Handlers for the routes, triggered on request
 const Handlers = require('./handlers');
-const Joi = require('@hapi/joi');
 
 /**
  * The Hapi router, creates HTTP routes

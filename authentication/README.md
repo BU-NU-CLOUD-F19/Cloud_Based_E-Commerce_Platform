@@ -53,6 +53,6 @@ These are the models in this service:
 ## Packages
 
 * `elv` - we use this package for `elv.coalesce` to pick the first non-null value out of the list of values
-* `hapi-firebase` - to integrate Firebase with Hapi
+* `hapi-firebase-auth` - to integrate Firebase with Hapi
   
 For more details refer the relevant file in the folders.
