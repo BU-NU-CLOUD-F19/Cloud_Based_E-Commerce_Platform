@@ -37,7 +37,7 @@ class StoreModel {
   /**
    * Create a store
    * @async
-   * @param {number} storeData - data of the store
+   * @param {String} storeData - data of the store
    */
   async createStore(storeData) {
     return this.repository.createStore(storeData);
@@ -46,7 +46,7 @@ class StoreModel {
   /**
    * Retrieve the store by storeId
    * @async
-   * @param {number} storeId - the id of the store
+   * @param {String} storeId - the id of the store
    */
   async getStoreById(storeId) {
     return this.repository.getStoreById(storeId);
@@ -55,7 +55,7 @@ class StoreModel {
   /**
    * Retrieve the store by its email
    * @async
-   * @param {number} storeEmail - the email of the store
+   * @param {String} storeEmail - the email of the store
    */
   async getStoreByEmail(storeEmail) {
     return this.repository.getStoreByEmail(storeEmail);
@@ -64,7 +64,7 @@ class StoreModel {
   /**
    * Update the store
    * @async
-   * @param {number} storeId
+   * @param {String} storeId
    * @param {object} storeData
    */
   async updateStore(storeId, storeData) {

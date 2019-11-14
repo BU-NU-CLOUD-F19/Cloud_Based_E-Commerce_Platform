@@ -28,7 +28,7 @@ class SecurityGroupModel {
   /**
    * Delete a securitygroup
    * @async
-   * @param {number} securityGroupId - the id of the securityGroup
+   * @param {String} securityGroupId - the id of the securityGroup
    */
   async deleteSecurityGroup(securityGroupId) {
     return this.repository.deleteSecurityGroup(securityGroupId);
@@ -37,7 +37,7 @@ class SecurityGroupModel {
   /**
    * Create a securitygroup
    * @async
-   * @param {number} scope - the scope of this securityGroup
+   * @param {String} scope - the scope of this securityGroup
    */
   async createSecurityGroup(scope) {
     return this.repository.createSecurityGroup(scope);

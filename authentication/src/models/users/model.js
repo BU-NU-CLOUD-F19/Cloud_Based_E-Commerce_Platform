@@ -27,7 +27,7 @@ class UsersModel {
   /**
    * Delete a user
    * @async
-   * @param {number} userId - the id of the associated user
+   * @param {String} userId - the id of the associated user
    */
   async deleteUser(userId) {
     return this.repository.deleteUser(userId);
@@ -55,7 +55,7 @@ class UsersModel {
   /**
    * Retrieve the user
    * @async
-   * @param {number} userId
+   * @param {String} userId
    */
   async getUser(userId) {
     return this.repository.getUser(userId);
@@ -73,7 +73,7 @@ class UsersModel {
   /**
    * Update the user
    * @async
-   * @param {number} userId
+   * @param {String} userId
    * @param {object} userData
    */
   async updateUser(userId, userData) {

@@ -119,7 +119,7 @@ class SecurityGroupRepository {
   /**
    * Delete a security group
    * @async
-   * @param {number} id - the id associated with a security group
+   * @param {String} id - the id associated with a security group
    */
   async deleteSecurityGroup(id) {
     const securityGroups = this.knex(this.resource);

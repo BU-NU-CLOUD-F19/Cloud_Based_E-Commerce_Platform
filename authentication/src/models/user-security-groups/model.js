@@ -27,7 +27,7 @@ class UserSecurityGroupModel {
   /**
    * Delete all user security groups for a store
    * @async
-   * @param {number} storeId - the id of the associated store
+   * @param {String} storeId - the id of the associated store
    */
   async deleteUSGroup(userId, storeId) {
     return this.repository.deleteUSGroup(userId, storeId);
@@ -37,7 +37,7 @@ class UserSecurityGroupModel {
   /**
    * Delete all user security groups for a user
    * @async
-   * @param {number} userId - the id of the associated user
+   * @param {String} userId - the id of the associated user
    */
   async deleteUSGroupByUserId(userId) {
     return this.repository.deleteUSGroupByUserId(userId);
@@ -46,7 +46,7 @@ class UserSecurityGroupModel {
   /**
    * Delete all user security groups for a store
    * @async
-   * @param {number} storeId - the id of the associated store
+   * @param {String} storeId - the id of the associated store
    */
   async deleteUSGroupByStoreId(storeId) {
     return this.repository.deleteUSGroupByStoreId(storeId);
@@ -55,9 +55,9 @@ class UserSecurityGroupModel {
   /**
    * Create a user security group record
    * @async
-   * @param {number} userId
-   * @param {number} storeId
-   * @param {number} securityGroupId
+   * @param {String} userId
+   * @param {String} storeId
+   * @param {String} securityGroupId
    */
   async createUserSecurityGroup(userId, storeId, securityGroupId) {
     // TODO: add logic to fetch scope somewhere along this flow
@@ -67,8 +67,8 @@ class UserSecurityGroupModel {
   /**
    * Retrieve the user security group
    * @async
-   * @param {number} userId
-   * @param {number} storeId
+   * @param {String} userId
+   * @param {String} storeId
    */
   async getUSGroupByUserIdStoreId(userId, storeId) {
     return this.repository.getUserSecurityGroup(userId, storeId);

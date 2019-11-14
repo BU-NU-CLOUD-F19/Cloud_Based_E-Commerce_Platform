@@ -104,8 +104,8 @@ class MembershipRepository {
   /**
    * Delete a Membership
    * @async
-   * @param {number} storeId
-   * @param {number} userId
+   * @param {String} storeId
+   * @param {String} userId
    */
   async deleteMembership(storeId, userId) {
     const memberships = this.knex(this.resource);
@@ -122,7 +122,7 @@ class MembershipRepository {
   /**
    * Delete a Membership by User
    * @async
-   * @param {number} userId
+   * @param {String} userId
    */
   async deleteMembershipByUserId(userId) {
     const memberships = this.knex(this.resource);
@@ -138,7 +138,7 @@ class MembershipRepository {
   /**
    * Delete a Membership by Store
    * @async
-   * @param {number} storeId
+   * @param {String} storeId
    */
   async deleteMembershipByStoreId(storeId) {
     const memberships = this.knex(this.resource);

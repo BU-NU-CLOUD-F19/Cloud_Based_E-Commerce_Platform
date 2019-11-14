@@ -64,8 +64,8 @@ class UserSecurityGroupRepository {
   /**
    * Get the user security group
    * @async
-   * @param {number} userId
-   * @param {number} storeId
+   * @param {String} userId
+   * @param {String} storeId
    */
   async getUserSecurityGroup(userId, storeId) {
     const query = this.knex(this.resource)
@@ -124,7 +124,7 @@ class UserSecurityGroupRepository {
   /**
    * Delete a user-security-group
    * @async
-   * @param {number} userId
+   * @param {String} userId
    */
   async deleteUSGroupByUserId(userId) {
     const query = this.knex(this.resource)

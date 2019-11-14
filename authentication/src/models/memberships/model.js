@@ -28,8 +28,8 @@ class MembershipsModel {
   /**
    * Delete a Membership of a user in a store
    * @async
-   * @param {number} storeId - the id of the store of which user is a member
-   * @param {number} userId - the id of the user whose membership is to be deleted
+   * @param {String} storeId - the id of the store of which user is a member
+   * @param {String} userId - the id of the user whose membership is to be deleted
    */
   async deleteMembership(storeId, userId) {
     return this.repository.deleteMembership(storeId, userId);
@@ -38,7 +38,7 @@ class MembershipsModel {
   /**
    * Delete all Memberships of a user
    * @async
-   * @param {number} userId - the id of the user whose memberships are to be deleted
+   * @param {String} userId - the id of the user whose memberships are to be deleted
    */
   async deleteMembershipsByUserId(userId) {
     return this.repository.deleteMembershipsByUserId(userId);
@@ -47,7 +47,7 @@ class MembershipsModel {
   /**
    * Delete all Memberships of a store
    * @async
-   * @param {number} storeId - the id of the store whose membership is to be deleted
+   * @param {String} storeId - the id of the store whose membership is to be deleted
    */
   async deleteMembershipsByStoreId(storeId) {
     return this.repository.deleteMembershipsByStoreId(storeId);
@@ -56,9 +56,9 @@ class MembershipsModel {
   /**
    * Create a membership
    * @async
-   * @param {number} userId
-   * @param {number} storeId
-   * @param {number} subscriptionStatus - status for email notifications
+   * @param {String} userId
+   * @param {String} storeId
+   * @param {String} subscriptionStatus - status for email notifications
    */
   async createMembership(userId, storeId, subscriptionStatus) {
     const res = await this.getMembership(storeId, userId);
@@ -71,8 +71,8 @@ class MembershipsModel {
   /**
    * Retrieve the row containing the userId and storeId
    * @async
-   * @param {number} storeId
-   * @param {number} userId
+   * @param {String} storeId
+   * @param {String} userId
    */
   async getMembership(storeId, userId) {
     return this.repository.getMembership(storeId, userId);
@@ -81,7 +81,7 @@ class MembershipsModel {
   /**
    * Update the subscription status of a membership
    * @async
-   * @param {number} id
+   * @param {String} id
    * @param {boolean} isSubscribed - status of email notifications
    */
   async updateMembershipSubscription(id, isSubscribed) {
