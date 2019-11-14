@@ -31,6 +31,7 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-unused-vars": ["error", { "args": "none" }],
     "no-shadow": "error",
+    "semi": "error",
     "strict": "off",
     "valid-typeof": "error",
     "linebreak-style": ["error", "unix"],
