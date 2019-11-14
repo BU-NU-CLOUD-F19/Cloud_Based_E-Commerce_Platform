@@ -105,8 +105,8 @@ services:
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
       - ./graphql-api-gateway-poc/log:/usr/app/log
     depends_on:
-      - inventory-management-graphql-service
-      - cart-graphql-service
+      - ${INVENTORY_GQL_HOST}
+      - ${CART_GQL_HOST}
     expose:
       - ${API_GW_PORT}
     ports:
