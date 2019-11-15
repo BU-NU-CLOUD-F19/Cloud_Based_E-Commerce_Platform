@@ -29,7 +29,9 @@ create table carts (
   date_modified timestamptz, -- could be null if not modified
   date_checkout timestamptz,
   locked boolean not null,
-  uid varchar(20) references users(uid) not null
+  uid varchar(20) references users(uid), -- can be null if user not logged in
+  sid varchar(20),
+  constraint is_associated check (uid is not null or sid is not null)
 );
 
 create table products_in_cart (

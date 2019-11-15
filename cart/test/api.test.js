@@ -103,7 +103,7 @@ describe("Cart REST API", () => {
   // Test API functionality
   it("lists products", async () => {
     // Check if product listing is possible
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).send({uid: 'hello'}).expect(200)
     expect(res.body.data).to.eql([]);
   });
 

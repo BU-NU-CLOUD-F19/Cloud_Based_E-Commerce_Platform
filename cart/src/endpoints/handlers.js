@@ -8,6 +8,7 @@
 const logger = require('../utils/logger');
 const ProductsInCart = require('../models/').ProductsInCart;
 const Carts = require('../models/').Cart;
+const shortid = require('shortid');
 
 /**
  * The handler functions for all endpoints defined for the cart
@@ -35,6 +36,40 @@ class Handlers {
     return {valid: true};
   }
 
+  async isAuthorized({ uid, sid, password }, cartId) {
+    let as;
+    if (uid) {
+      if (!password) {
+        return { authorized: false, why: "Password not provided" }
+      }
+      else {
+        // TODO: verify uid-pass paid with auth
+        uid = uid;
+        as = 'reguser';
+      }
+    }
+    else if (sid) {
+      uid = sid; // already existing guest
+      as = 'guest';
+    }
+    else {
+      // TODO: contact auth for new guest id
+      uid = shortid.generate(); // new guest session
+      as = 'guest';
+    }
+
+    const cart = (await this.carts.getCart(cartId))[0];
+    if (!cart) {
+      return { authorized: true, uid, as }
+    }
+    else if (uid != cart.uid || uid != cart.sid) {
+      return { authorized: false, why: `Cannot modify cart ${id} as user ${uid}.` }
+    }
+    else {
+      return { authorized: true, uid, as }
+    }
+  }
+
   /**
    * Add a product to a cart.
    * @async
@@ -47,7 +82,9 @@ class Handlers {
 
     // Check if request contains a body
     if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
     }
 
     // Check if request body contains the required values
@@ -56,12 +93,24 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
+
     this.logger.debug(`\tHandler: Adding product ${JSON.stringify(payload)} to cart ${id}`);
 
     try {
       // Add the product to the cart
       if (await this.carts.getCart(id) == 0) {
-        await this.carts.createCart(id);
+        if (auth.as === 'guest') {
+          await this.carts.createCart(id, { sid: auth.uid });
+        }
+        else if (auth.as == 'reguser') {
+          await this.carts.createCart(id, { uid: auth.uid });
+        }
       }
 
       // Abort if the cart is locked
@@ -71,6 +120,7 @@ class Handlers {
 
       const res = await this.productsInCart.addProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
+
 
       await this.carts.modified(id);
 
@@ -119,13 +169,22 @@ class Handlers {
 
     // Check if request contains a body
     if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
     }
 
     // Check if request body contains the required values
     const isValid = Handlers.propsPresent(['pid'], payload);
     if (!isValid.valid) {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
+    }
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
     }
 
     this.logger.debug(`\tHandler: Removing product ${JSON.stringify(payload)} from cart ${id}`);
@@ -146,6 +205,7 @@ class Handlers {
       else {
         // Otherwise, return  how many rows were removed
         await this.carts.modified(id);
+
         return rep.response({message: "Product removed from cart.", data: res}).code(200);
       }
     }
@@ -173,7 +233,9 @@ class Handlers {
 
     // Check if request contains a body
     if (!payload) {
-      return rep.response({message: "Body cannot be empty."}).code(400);
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
     }
 
     // Check if request body contains the required values
@@ -185,6 +247,13 @@ class Handlers {
     // Check if the new amount is valid
     if (payload.amount_in_cart <= 0) {
       return rep.response({message: "Amount must be greater than 0."}).code(400);
+    }
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
     }
 
     this.logger.debug(`\tHandler: Changing amount of product in cart ${id}`);
@@ -230,7 +299,21 @@ class Handlers {
    */
   async emptyCart(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }} = req;
+    const { params: { id }, payload } = req;
+
+    // Check if request contains a body
+    if (!payload) {
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     // If cart does not exist, error
     this.logger.debug(`\tHandler: Emptying cart ${id}`);
@@ -268,8 +351,22 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async deleteCart(req, rep) {
-    const { params: { id }} = req;
+    const { params: { id }, payload } = req;
     this.logger.logRequest(req);
+
+    // Check if request contains a body
+    if (!payload) {
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     this.logger.debug(`\tHandler: Removing cart ${id}`);
 
@@ -314,8 +411,22 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async getProducts(req, rep) {
-    const { params: { id }} = req;
+    const { params: { id }, payload } = req;
     this.logger.logRequest(req);
+
+    // Check if request contains a body
+    if (!payload) {
+      let message = "Body cannot be empty.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     try {
       this.logger.debug(`\tHandler: Listing all products in ${id}`);
@@ -332,6 +443,13 @@ class Handlers {
   async lockCart(req, rep) {
     const { id } = req.params;
     this.logger.logRequest(req);
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     try {
       this.logger.debug(`\tHandler: Locking cart ${id}`);
@@ -350,6 +468,13 @@ class Handlers {
     const { id } = req.params;
     this.logger.logRequest(req);
 
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
+
     try {
       this.logger.debug(`\tHandler: Unlocking cart ${id}`);
 
@@ -366,6 +491,13 @@ class Handlers {
   async isLocked(req, rep) {
     const { id } = req.params;
     this.logger.logRequest(req);
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     try {
       this.logger.debug(`\tHandler: getting locked status of ${id}`);
@@ -393,6 +525,13 @@ class Handlers {
    */
   async startCheckout(req, rep) {
     const { id } = req.params;
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
 
     try {
       // If the cart is locked, do nothing
@@ -423,6 +562,15 @@ class Handlers {
    */
   async endCheckout(req, rep) {
     const { id } = req.params;
+
+    this.logger.debug(`\tChecking authorization...`);
+    const auth = await this.isAuthorized(payload, id);
+    if (!auth.authorized) {
+      this.logger.debug(`\t${auth.why}`);
+      return rep.response({ message: auth.why }).code(403);
+    }
+
+
     try {
       if (!(await this.carts.isLocked(id))) {
         return rep.response({message: "No checkout in progress."}).code(400);
