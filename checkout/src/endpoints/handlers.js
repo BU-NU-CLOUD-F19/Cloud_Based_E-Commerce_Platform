@@ -133,9 +133,9 @@ class Handlers {
       })
 
       if (!response.ok) {
-        let message = `Could not subtract ${product.amount_in_cart} of ${product.pid} from inventory.`;
+        let message = `Could not subtract ${product.amount_in_cart} of product id ${product.pid} from inventory.`;
         this.logger.debug(`\t${message}`);
-        return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
+        return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
       }
     }
 
@@ -169,11 +169,7 @@ class Handlers {
   }
   async abortCheckout(req, rep, why) {
     const { id: cartId } = req.params;
-    const { reason, code } = why;
     this.logger.debug(`Handler: abort checkout on cart ${cartId}.`);
-    if (reason) {
-      this.logger.debug(`\tReason: ${reason} (code ${code})`);
-    }
 
     // If cart not locked, don't do anything
     let response = await fetch(`${cartUrl}/${cartId}/lock`);
@@ -185,7 +181,7 @@ class Handlers {
     const { data: { locked: cartLocked } } = await response.json();
 
     if (!cartLocked) {
-      let message = "Cart is not locked, no checkout to abort.";
+      let message = "Cart is not locked, no checkout in progress.";
       this.logger.debug(`\t${message}`);
       return rep.response({ message }).code(400);
     }
@@ -197,11 +193,14 @@ class Handlers {
       return rep.response({ message }).code(500);
     }
 
-    if (reason) {
-      let message = `Checkout aborted: ${reason}` ;
-      this.logger.debug(`\t${message}`);
-      return rep.response({ message }).code(code);
+    if (why) {
+      const { reason, code } = why;
+      if (reason) {
+        this.logger.debug(`\tAborting because: ${reason} (code ${code})`);
+        return rep.response({ message: `Checkout aborted: ${reason}` }).code(code);
+      }
     }
+
     else {
       let message = "Checkout aborted.";
       this.logger.debug(`\t${message}`);
