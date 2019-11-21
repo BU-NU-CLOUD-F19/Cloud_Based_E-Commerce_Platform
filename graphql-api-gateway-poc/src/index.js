@@ -7,19 +7,15 @@ const { ApolloGateway } = require("@apollo/gateway");
 
 const logger = require('./utils/logger');
 
-const PORT = process.env.PORT || 3050;
-const inventory_host = process.env.INVENTORY_GRAPHQL_SERVICE;
-const cart_host = process.env.CART_GRAPHQL_SERVICE;
-const INVENTORY_GRAPHQL_SERVICE_PORT = process.env.INVENTORY_GRAPHQL_SERVICE_PORT || 6000;
-const CART_GRAPHQL_SERVICE_PORT = process.env.CART_GRAPHQL_SERVICE_PORT || 6050;
+const PORT = process.env.API_GW_PORT || 3050;
+const inventory_host = process.env.INVENTORY_GQL_HOST;
+const cart_host = process.env.CART_GQL_HOST;
+const INVENTORY_GRAPHQL_SERVICE_PORT = process.env.INVENTORY_GQL_PORT || 6000;
+const CART_GRAPHQL_SERVICE_PORT = process.env.CART_GQL_PORT || 6050;
 
 const gateway = new ApolloGateway({
   // Add different microservices here with thier server (with schema, resolvers, data sources) url
   serviceList: [
-    // {
-    //   name: "members",
-    //   url: `http://${host}:${INVENTORY_GRAPHQL_SERVICE_PORT}/members`
-    // }
     {
       name: "inventory-management",
       url: `http://${inventory_host}:${INVENTORY_GRAPHQL_SERVICE_PORT}/inventory-management`

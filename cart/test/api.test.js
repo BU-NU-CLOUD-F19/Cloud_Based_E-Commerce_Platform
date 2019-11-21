@@ -1,13 +1,16 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-const host = "localhost";
-const port = 3000;
-const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
-const requestCart = require("supertest")(cartURL);
 
-const gatewayHost = process.env.API_GATEWAY || "localhost";
-const urlGateway = `http://${gatewayHost}:3050/`; // URL for GraphQL API Gateway
+const cartHost = `${process.env.CART_HOST}` || "localhost";
+const cartPort = `${process.env.CART_PORT}` || "3000";
+const cartUrl = `http://${cartHost}:${cartPort}/cart`; // URL for cart service
+const requestCart = require("supertest")(cartUrl);
+
+
+const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
+const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
+const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
 const requestGateway = require("supertest")(urlGateway);
 
 describe("Cart REST API", () => {
@@ -354,14 +357,14 @@ describe("Cart REST API", () => {
   // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
-    await cart.deleteAll();
+    // await cart.deleteAll();
     await productsInCart.deleteAll();
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
-    for (let user of sample_users) {
-      await cart.repository.knex('users').where({ uid: user.uid }).del();
-    }
+    // for (let user of sample_users) {
+    //   await cart.repository.knex('users').where({ uid: user.uid }).del();
+    // }
     for (let prod of sample_products) {
       await cart.repository.knex('products').where({ pid: prod.pid }).del();
     }

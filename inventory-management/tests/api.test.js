@@ -1,14 +1,15 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-const host = "localhost";
-const port = 3020;
-const inventoryUrl = `http://${host}:${port}/inventory`; // URL for inventory management service
+const inventoryHost = `${process.env.INVENTORY_HOST}` || "localhost";
+const inventoryPort = `${process.env.INVENTORY_PORT}` || "3020";
+const inventoryUrl = `http://${inventoryHost}:${inventoryPort}/inventory`; // URL for inventory management service
 const requestInventory = require("supertest")(inventoryUrl);
 
 
-const gatewayHost = process.env.API_GATEWAY || "localhost";
-const urlGateway = `http://${gatewayHost}:3050/`; // URL for GraphQL API Gateway
+const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
+const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
+const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
 const requestGateway = require("supertest")(urlGateway);
 
 describe("Inventory management REST API", () => {
