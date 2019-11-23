@@ -52,7 +52,6 @@ class ShoppingCartRepository {
       const query = this.knex.raw(`TRUNCATE TABLE ${this.resource} CASCADE`);
       const result = await query;
 
-      this.logger.debug("Successfully truncated the table.");
       return result;
     }
     catch (err) {
@@ -80,14 +79,19 @@ class ShoppingCartRepository {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartId) {
+  async createCart(cartId, as) {
     const carts = this.knex(this.resource);
-
     const cartData = {
       cart_id: cartId,
       date_created: this.postgresDateStr(),
       locked: false,
-      uid: 'user1' // TODO: this shouldn't be hardcoded
+    }
+
+    if (as.uid) {
+      cartData.uid = as.uid;
+    }
+    else {
+      cartData.sid = as.sid;
     }
 
     const createCart = carts.insert(cartData).returning('*');

@@ -52,7 +52,6 @@ class ProductsInCartRepository {
       const query = this.knex.raw(`TRUNCATE TABLE ${this.resource} CASCADE`);
       const result = await query;
 
-      this.logger.debug("Successfully truncated the table.");
       return result;
     }
     catch (err) {

@@ -43,8 +43,8 @@ class CartModel {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartId) {
-    return this.repository.createCart(cartId);
+  async createCart(cartId, as) {
+    return this.repository.createCart(cartId, as);
   }
 
   /**

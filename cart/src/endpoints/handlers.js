@@ -36,6 +36,24 @@ class Handlers {
     return {valid: true};
   }
 
+  /**
+   * This is the single function that determines what makes a request authorized.
+   * It gets passed the URL query object, and the cart ID.
+   * Returns an object with properties:
+   *  - If the user is authorized:
+   *    - 'authorized' (true, denoting that the user is authorized)
+   *    - 'uid' (the id of the user, is either the id of a registered user, or a guest session id)
+   *    - 'as' (a string with either "guest" or "reguser")
+   *  - Else:
+   *    - 'authorized' (false, denoting that the user is not authorized)
+   *    - 'why' (a string, containing a message giving the reason why the user is not authorized)
+   *
+   * @async
+   * @param {string} uid - a user id, if the user is registered
+   * @param {string} sid - a session id, if it's a guest
+   * @param {string} password - the password for the user. placeholder for actual auth.
+   * @param {number} cartId - the number identifying the cart
+   */
   async isAuthorized({ uid, sid, password }, cartId) {
     let as;
     if (uid) {
@@ -43,17 +61,18 @@ class Handlers {
         return { authorized: false, why: "Password not provided" }
       }
       else {
-        // TODO: verify uid-pass paid with auth
+        // TODO: verify uid-pass paid with auth, or verify in some other way
         uid = uid;
         as = 'reguser';
       }
     }
     else if (sid) {
+      // TODO: maybe verify guest user with auth?
       uid = sid; // already existing guest
       as = 'guest';
     }
     else {
-      // TODO: contact auth for new guest id
+      // TODO: contact auth for new guest id, not generate here
       uid = shortid.generate(); // new guest session
       as = 'guest';
     }
@@ -62,8 +81,8 @@ class Handlers {
     if (!cart) {
       return { authorized: true, uid, as }
     }
-    else if (uid != cart.uid || uid != cart.sid) {
-      return { authorized: false, why: `Cannot modify cart ${id} as user ${uid}.` }
+    else if (uid != cart.uid && uid != cart.sid) {
+      return { authorized: false, why: `Cannot modify cart ${cartId} as user ${uid}.` }
     }
     else {
       return { authorized: true, uid, as }
@@ -78,7 +97,7 @@ class Handlers {
    */
   async addProduct(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
+    const { params: { id }, payload, query } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -94,9 +113,9 @@ class Handlers {
     }
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -125,7 +144,7 @@ class Handlers {
       await this.carts.modified(id);
 
       // Return what was added
-      return rep.response({message: "Product added to cart.", data: res}).code(201);
+      return rep.response({message: "Product added to cart.", data: res, auth }).code(201);
     }
 
     // Catch any database errors (e.g. product not found) and return the appropriate response
@@ -165,7 +184,7 @@ class Handlers {
    */
   async removeProduct(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
+    const { params: { id }, payload, query } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -181,9 +200,9 @@ class Handlers {
     }
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -206,7 +225,7 @@ class Handlers {
         // Otherwise, return  how many rows were removed
         await this.carts.modified(id);
 
-        return rep.response({message: "Product removed from cart.", data: res}).code(200);
+        return rep.response({message: "Product removed from cart.", data: res, auth }).code(200);
       }
     }
     catch (err) {
@@ -227,9 +246,7 @@ class Handlers {
    */
   async changeAmount(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
-
-    // TODO: Should we deal with product not in stock?
+    const { params: { id }, payload, query } = req;
 
     // Check if request contains a body
     if (!payload) {
@@ -250,9 +267,9 @@ class Handlers {
     }
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -270,7 +287,7 @@ class Handlers {
       // Return the new product record
       if (res.length > 0) {
         await this.carts.modified(id);
-        return rep.response({message: "Amount updated.", data: res});
+        return rep.response({message: "Amount updated.", data: res, auth });
       }
       // If nothing was updated, the product wasn't in the cart.
       else {
@@ -299,19 +316,12 @@ class Handlers {
    */
   async emptyCart(req, rep) {
     this.logger.logRequest(req);
-    const { params: { id }, payload } = req;
-
-    // Check if request contains a body
-    if (!payload) {
-      let message = "Body cannot be empty.";
-      this.logger.debug(`\t${message}`);
-      return rep.response({ message }).code(400);
-    }
+    const { params: { id }, query } = req;
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -333,7 +343,7 @@ class Handlers {
 
       // Return the number of products removed
       await this.carts.modified(id);
-      return rep.response({message: "Cart emptied.", data: res}).code(200);
+      return rep.response({message: "Cart emptied.", data: res, auth }).code(200);
     }
     catch(err) {
       if (err.what == "cart_does_not_exist") {
@@ -351,20 +361,13 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async deleteCart(req, rep) {
-    const { params: { id }, payload } = req;
+    const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
-    // Check if request contains a body
-    if (!payload) {
-      let message = "Body cannot be empty.";
-      this.logger.debug(`\t${message}`);
-      return rep.response({ message }).code(400);
-    }
-
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -384,7 +387,7 @@ class Handlers {
 
       // If something has been deleted, return the number of carts deleted (should always be 1)
       if (res === 1) {
-        return rep.response({message: "Cart deleted.", data: res})
+        return rep.response({message: "Cart deleted.", data: res, auth })
       }
       // If nothing was deleted, cart doesn't exist
       else if (res === 0) {
@@ -411,20 +414,13 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async getProducts(req, rep) {
-    const { params: { id }, payload } = req;
+    const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
-    // Check if request contains a body
-    if (!payload) {
-      let message = "Body cannot be empty.";
-      this.logger.debug(`\t${message}`);
-      return rep.response({ message }).code(400);
-    }
-
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -433,7 +429,7 @@ class Handlers {
 
       // Get the products in the cart and return them
       const result = await this.productsInCart.getProducts(id);
-      return rep.response({message: "Products retrieved.", data: result}).code(200);
+      return rep.response({message: "Products retrieved.", data: result, auth }).code(200);
     }
     catch(err)  {
       this.logger.error(err.message);
@@ -441,13 +437,13 @@ class Handlers {
   }
 
   async lockCart(req, rep) {
-    const { id } = req.params;
+    const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -457,7 +453,7 @@ class Handlers {
       await this.carts.lockCart(id);
 
       await this.carts.modified(id);
-      return rep.response({message: "Cart locked."}).code(200);
+      return rep.response({message: "Cart locked.", auth }).code(200);
     }
     catch(err) {
       this.logger.error(err.message);
@@ -465,13 +461,13 @@ class Handlers {
   }
 
   async unlockCart(req, rep) {
-    const { id } = req.params;
+    const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -480,7 +476,7 @@ class Handlers {
 
       await this.carts.unlockCart(id);
       await this.carts.modified(id);
-      return rep.response({message: "Cart unlocked."}).code(200);
+      return rep.response({message: "Cart unlocked.", auth }).code(200);
     }
     catch(err) {
       this.logger.error(err.message);
@@ -489,13 +485,13 @@ class Handlers {
   }
 
   async isLocked(req, rep) {
-    const { id } = req.params;
+    const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -504,7 +500,7 @@ class Handlers {
 
       const result = await this.carts.isLocked(id);
 
-      return rep.response({message: "Cart status retrieved.", data: { locked: result }}).code(200);
+      return rep.response({message: "Cart status retrieved.", data: { locked: result }, auth }).code(200);
 
     }
     catch(err) {
@@ -524,12 +520,12 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async startCheckout(req, rep) {
-    const { id } = req.params;
+    const { params: { id }, query } = req;
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -541,7 +537,7 @@ class Handlers {
 
       await this.carts.beginCheckout(id);
 
-      return rep.response({message: "Checkout started."}).code(200);
+      return rep.response({message: "Checkout started.", auth }).code(200);
     }
 
     catch (err) {
@@ -561,12 +557,12 @@ class Handlers {
    * @param {object} rep - the response toolkit (Hapi.h)
    */
   async endCheckout(req, rep) {
-    const { id } = req.params;
+    const { params: { id }, query } = req;
 
     this.logger.debug(`\tChecking authorization...`);
-    const auth = await this.isAuthorized(payload, id);
+    const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
-      this.logger.debug(`\t${auth.why}`);
+      this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
 
@@ -578,7 +574,7 @@ class Handlers {
 
       await this.carts.endCheckout(id);
 
-      return rep.response({message: "Checkout finished."}).code(200);
+      return rep.response({message: "Checkout finished.", auth }).code(200);
     }
 
     catch (err) {
