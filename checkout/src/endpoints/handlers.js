@@ -72,9 +72,27 @@ class Handlers {
     this.logger.debug("\tPayment sucessful");
     return Promise.resolve(true);
   }
-  calculatePrice(cart) {
+
+  calculateShippingPrice(shippingAddress, productCost, shippingProvider, daysToDeliver) {
+    return 42;
+  }
+
+  async calculatePrice(cart, rep) {
     this.logger.debug("\tCalculating price");
-    return { total: 42, shipping: 3.50 };
+    let price = 0;
+    for (let product of cart.data) {
+      let response = await fetch(`${invUrl}/${product.pid}`);
+      if (!response.ok) {
+        let message = `Cannot fetch information for ${product.pid}`;
+        this.logger.debug(`\t${message}`);
+        return this.abortCheckout({params: {id: cart.id}}, rep, { reason: message, code: 500 });
+      }
+
+      let unitPrice = await response.json();
+      price += Number(unitPrice)*Number(product.amount_in_cart);
+    }
+
+    return { total: price, shipping: calculateShippingPrice() };
   }
 
   async buy(req, rep) {
@@ -121,7 +139,7 @@ class Handlers {
       }
     }
 
-    const price = this.calculatePrice(cart);
+    const price = await this.calculatePrice(cart, rep);
     const paymentSuccessful = await this.doPayment(price.total+price.shipping);
     this.logger.debug(JSON.stringify(paymentSuccessful));
 
