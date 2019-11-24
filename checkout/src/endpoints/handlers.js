@@ -7,6 +7,7 @@
 
 const logger = require('../utils/logger');
 const fetch = require('node-fetch');
+const { URL } = require('url');
 
 const cartUrl = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`
 const invUrl = `http://${process.env.INVENTORY_HOST}:${process.env.INVENTORY_PORT}/inventory`
@@ -37,30 +38,38 @@ class Handlers {
     return {valid: true};
   }
 
+  static addParams(url, params) {
+    url = new URL(url);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    return url;
+  }
+
   async beginCheckout(req, rep) {
     const { id: cartId } = req.params;
+    const authDetails = req.payload;
+
     this.logger.debug(`Handler: begin checkout on cart ${cartId}`);
 
     // If cart is already locked, don't do anything
-    let response = await fetch(`${cartUrl}/${cartId}/lock`);
+    let response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/lock`, authDetails));
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500});
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500});
     }
     const { data: { locked: cartLocked } } = await response.json();
     if (cartLocked) {
       let message = "Cart is locked, perhaps a checkout is in progress.";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
     }
 
     // Add checkout time to cart and lock it
-    response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'PUT' });
+    response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/checkout`, authDetails), { method: 'PUT' });
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
     }
 
     let message ="Checkout initiated successfully.";
@@ -85,40 +94,41 @@ class Handlers {
       if (!response.ok) {
         let message = `Cannot fetch information for ${product.pid}`;
         this.logger.debug(`\t${message}`);
-        return this.abortCheckout({params: {id: cart.id}}, rep, { reason: message, code: 500 });
+        return this.abortCheckout({params: {id: cart.id}, body: authDetails}, rep, { reason: message, code: 500 });
       }
 
       let unitPrice = await response.json();
       price += Number(unitPrice)*Number(product.amount_in_cart);
     }
 
-    return { total: price, shipping: calculateShippingPrice() };
+    return { total: price, shipping: this.calculateShippingPrice() };
   }
 
   async buy(req, rep) {
     const { id: cartId } = req.params;
+    const authDetails = req.payload;
     this.logger.debug(`Handler: buy on cart ${cartId}`);
 
     // If cart is not locked, don't do anything
-    let response = await fetch(`${cartUrl}/${cartId}/lock`);
+    let response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/lock`, authDetails));
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
     }
     const { data: { locked: cartLocked } } = await response.json();
     if (!cartLocked) {
       let message = "Cart is not locked, maybe a checkout wasn't started.";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
     }
 
     // Get cart data
-    response = await fetch(`${cartUrl}/${cartId}`)
+    response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}`, authDetails))
     if (!response.ok) {
       let message = `Could not get contents of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
     }
     const cart = await response.json();
     this.logger.debug(`\tGot cart: ${JSON.stringify(cart)}`);
@@ -135,7 +145,7 @@ class Handlers {
       if (!response.ok) {
         let message = `Could not subtract ${product.amount_in_cart} of product id ${product.pid} from inventory.`;
         this.logger.debug(`\t${message}`);
-        return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 400 });
+        return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
       }
     }
 
@@ -154,25 +164,26 @@ class Handlers {
         if (!response.ok) {
           let message = `Could not add ${product.amount_in_cart} of ${product.pid} to inventory.`;
           this.logger.debug(`\t${message}`);
-          return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 500 });
+          return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
         }
       }
 
       let message = "Payment unsuccessful";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}}, rep, { reason: message, code: 402 });
+      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 402 });
     }
     else {
       this.logger.debug(`\tFinishing checkout...`);
-      return this.finishCheckout(rep, cart, price);
+      return this.finishCheckout(rep, cart, price, authDetails);
     }
   }
   async abortCheckout(req, rep, why) {
     const { id: cartId } = req.params;
+    const { authDetails } = req.payload;
     this.logger.debug(`Handler: abort checkout on cart ${cartId}.`);
 
     // If cart not locked, don't do anything
-    let response = await fetch(`${cartUrl}/${cartId}/lock`);
+    let response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/lock`, authDetails));
     if (!response.ok) {
       let message =`Cannot get locked status of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
@@ -186,7 +197,7 @@ class Handlers {
       return rep.response({ message }).code(400);
     }
 
-    response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'DELETE' });
+    response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/checkout`, authDetails), { method: 'DELETE' });
     if (!response.ok) {
       let message =`Could not abort checkout for cart ${cartId}`;
       this.logger.debug(`\t${message}`);
@@ -208,10 +219,10 @@ class Handlers {
     }
   }
 
-  async finishCheckout(rep, cart, price) {
+  async finishCheckout(rep, cart, price, authDetails) {
     // If cart not locked, don't do anything
     const { cartId } = cart;
-    let response = await fetch(`${cartUrl}/${cartId}/lock`);
+    let response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/lock`, authDetails));
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`
       this.logger.debug(`\t${message}`);
@@ -225,14 +236,14 @@ class Handlers {
       return rep.response({ message }).code(400);
     }
 
-    response = await fetch(`${cartUrl}/${cartId}/checkout`, { method: 'DELETE' });
+    response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}/checkout`, authDetails), { method: 'DELETE' });
     if (!response.ok) {
       let message = `Cannot finish checkout on cart ${cartId}`;
       this.logger.debug(`\t${message}`);
       return rep.response({ message }).code(500);
     }
 
-    response = await fetch(`${cartUrl}/${cartId}`, { method: 'DELETE' });
+    response = await fetch(Handlers.addParams(`${cartUrl}/${cartId}`, authDetails), { method: 'DELETE' });
     if (!response.ok) {
       let message = `Cannot delete cart ${cartId}`;
       this.logger.debug(`\t${message}`);

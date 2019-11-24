@@ -12,6 +12,7 @@ const requestCheckout = require("supertest")(checkoutUrl);
 
 describe("Checkout REST API", () => {
   let orders, sample_users, sample_products, sample_cart;
+  let guestId;
 
   // Utility function to initialize data
   async function loadSampleData() {
@@ -108,9 +109,8 @@ describe("Checkout REST API", () => {
   beforeEach(async function beforeEach() {
     console.log(`Setting up test data`)
     console.log(`\tClearing previous inventory and cart...`);
-    await requestCart.delete(`/${sample_cart.cartId}/lock`);
-    await requestCart.delete(`/${sample_cart.cartId}`);
-
+    await requestCart.delete(`/${sample_cart.cartId}/lock`).query({ sid: guestId });
+    await requestCart.delete(`/${sample_cart.cartId}`).query({ sid: guestId });
 
     console.log(`\tClearing orders...`);
     await orders.repository.knex.raw("truncate table orders cascade");
@@ -118,38 +118,47 @@ describe("Checkout REST API", () => {
     for (let prod of sample_products) {
       await requestInv.delete(`/${prod.pid}`);
     }
+
     console.log(`\tCreating products...`);
     for (let prod of sample_products) {
       await requestInv.post('').send(prod).expect(201);
     }
 
     console.log(`\tAdding products to cart...`);
-    for (let prod of sample_cart.products) {
-      await requestCart.post(`/${sample_cart.cartId}`).send(prod).expect(201);
+    for (let i in sample_cart.products) {
+      if (i == 0) {
+        guestId = (await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).expect(201)).body.auth.uid;
+      }
+      else {
+        await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).query({ sid: guestId }).expect(201);
+      }
     }
 
     console.log(`\tChecking consistency...`);
-    const { body } = await requestCart.get(`/${sample_cart.cartId}`).expect(200);
+    const { body } = await requestCart.get(`/${sample_cart.cartId}`).query({ sid: guestId }).expect(200);
     expect(body.data.length).to.equal(2);
 
   })
 
-  it("initiates a checkout", async () => {
-    await requestCheckout.post(`/${sample_cart.cartId}`).send().expect(200);
+  it("guest initiates a checkout", async () => {
+    const authDetails = { sid: guestId }
+    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
   })
 
-  it("completes the checkout flow", async () => {
-    await requestCheckout.post(`/${sample_cart.cartId}`).expect(200);
+  it("guest completes the checkout flow", async () => {
+    const authDetails = { sid: guestId }
+    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
 
-    const { body: { data: order} } = await requestCheckout.put(`/${sample_cart.cartId}`).expect(201);
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_cart.cartId}`).send(authDetails).expect(201);
 
     expect(order.uid).to.equal(sample_users[0].uid);
     expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
   })
 
-  it("aborts a checkout", async () => {
-    await requestCheckout.post(`/${sample_cart.cartId}`).expect(200);
-    requestCheckout.delete(`/${sample_cart.cartId}`).expect(200);
+  it("guest aborts a checkout", async () => {
+    const authDetails = { sid: guestId };
+    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
+    requestCheckout.delete(`/${sample_cart.cartId}`).send(authDetails).expect(200);
   })
 
   // Clean up after all tests are done
@@ -157,8 +166,8 @@ describe("Checkout REST API", () => {
     // Remove carts and products in cart
     console.log(`Clearing test data...`);
     console.log(`\tDeleting products and cart...`);
-    await requestCart.delete(`/${sample_cart.cartId}/lock`).expect(200);
-    await requestCart.delete(`/${sample_cart.cartId}`).expect(200);
+    await requestCart.delete(`/${sample_cart.cartId}/lock`).query({ sid: guestId }).expect(200);
+    await requestCart.delete(`/${sample_cart.cartId}`).query({ sid: guestId }).expect(200);
 
     for (let prod of sample_products) {
       await requestInv.delete(`/${prod.pid}`).expect(200);
