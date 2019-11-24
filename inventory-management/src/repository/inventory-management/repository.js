@@ -39,7 +39,7 @@ class InventoryManagementRepository {
     async getProducts() {
 
         const knexBuilder = this.knex(this.resource);
-        const query = knexBuilder.select('products');
+        const query = knexBuilder.select('*');
         this.logger.debug(`\tQuery: ${query}`);
 
         const result = await query;
@@ -54,7 +54,7 @@ class InventoryManagementRepository {
      */
     async getProduct(productid) {
         const knexBuilder = this.knex(this.resource);
-        const query = knexBuilder.select('products').where({ pid: productid });
+        const query = knexBuilder.select('*').where({ pid: productid });
         this.logger.debug(`\tQuery: ${query}`);
 
         const result = await query;
