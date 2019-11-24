@@ -61,13 +61,13 @@ class Handlers {
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500});
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 500});
     }
     const { data: { locked: cartLocked } } = await response.json();
     if (cartLocked) {
       let message = "Cart is locked, perhaps a checkout is in progress.";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 400 });
     }
 
     // Add checkout time to cart and lock it
@@ -75,7 +75,7 @@ class Handlers {
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 500 });
     }
 
     let message ="Checkout initiated successfully.";
@@ -100,12 +100,14 @@ class Handlers {
       if (!response.ok) {
         let message = `Cannot fetch information for ${product.pid}`;
         this.logger.debug(`\t${message}`);
-        return this.abortCheckout({params: {id: cart.id}, body: authDetails}, rep, { reason: message, code: 500 });
+        return this.abortCheckout({params: {id: cart.id}, payload: authDetails}, rep, { reason: message, code: 500 });
       }
 
-      let unitPrice = await response.json();
+      response = await response.json();
+      let unitPrice = response.data[0].price // TODO: why does inv return an arr here...
       price += Number(unitPrice)*Number(product.amount_in_cart);
     }
+    this.logger.debug(`\tCart price: ${price}`);
 
     return { total: price, shipping: Handlers.calculateShippingPrice() };
   }
@@ -127,13 +129,13 @@ class Handlers {
     if (!response.ok) {
       let message = `Cannot get locked status of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 500 });
     }
     const { data: { locked: cartLocked } } = await response.json();
     if (!cartLocked) {
       let message = "Cart is not locked, maybe a checkout wasn't started.";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 400 });
     }
 
     // Get cart data
@@ -141,7 +143,7 @@ class Handlers {
     if (!response.ok) {
       let message = `Could not get contents of cart ${cartId}`;
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 500 });
     }
     const cart = await response.json();
     this.logger.debug(`\tGot cart: ${JSON.stringify(cart)}`);
@@ -158,13 +160,12 @@ class Handlers {
       if (!response.ok) {
         let message = `Could not subtract ${product.amount_in_cart} of product id ${product.pid} from inventory.`;
         this.logger.debug(`\t${message}`);
-        return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 400 });
+        return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 400 });
       }
     }
 
     const price = await this.calculatePrice(cart, rep, authDetails);
     const paymentSuccessful = await this.doPayment(price.total+price.shipping);
-    this.logger.debug(JSON.stringify(paymentSuccessful));
 
     if (!paymentSuccessful) {
       // Re-add the products to the inventory
@@ -177,13 +178,13 @@ class Handlers {
         if (!response.ok) {
           let message = `Could not add ${product.amount_in_cart} of ${product.pid} to inventory.`;
           this.logger.debug(`\t${message}`);
-          return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 500 });
+          return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 500 });
         }
       }
 
       let message = "Payment unsuccessful";
       this.logger.debug(`\t${message}`);
-      return this.abortCheckout({params: {id: cartId}, body: authDetails}, rep, { reason: message, code: 402 });
+      return this.abortCheckout({params: {id: cartId}, payload: authDetails}, rep, { reason: message, code: 402 });
     }
     else {
       this.logger.debug(`\tFinishing checkout...`);
@@ -192,7 +193,7 @@ class Handlers {
   }
   async abortCheckout(req, rep, why) {
     const { id: cartId } = req.params;
-    const { authDetails } = req.payload;
+    const authDetails = req.payload;
 
     if (!authDetails) {
       let message = "Body cannot be empty, auth details required.";
@@ -270,12 +271,19 @@ class Handlers {
       return rep.response({ message }).code(500);
     }
 
-    const order = await this.orders.createOrder({
+    const orderDetails = {
       total_price: price.total,
       destination: "Easter Island",
       shipping: price.shipping,
-      uid: 'user1' // TODO: shouldn't be hardcoded
-    });
+    }
+    if (authDetails.uid) {
+      orderDetails.uid = authDetails.uid;
+    }
+    else {
+      orderDetails.uid = authDetails.sid;
+    }
+
+    const order = await this.orders.createOrder(orderDetails);
 
     this.logger.debug(`\tOrder created: ${JSON.stringify(order)}`);
     this.logger.debug(`Checkout complete`);

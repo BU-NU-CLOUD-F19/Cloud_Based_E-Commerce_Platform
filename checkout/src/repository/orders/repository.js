@@ -53,7 +53,9 @@ class OrdersRepository {
     }
 
     const query = orders.insert(order).returning('*');
+    this.logger.debug(`\tQuery: ${query}`);
     const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
 
     return result[0];
 

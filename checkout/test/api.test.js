@@ -154,7 +154,7 @@ describe("Checkout REST API", () => {
 
     const { body: { data: order} } = await requestCheckout.put(`/${sample_cart.cartId}`).send(authDetails).expect(201);
 
-    expect(order.uid).to.equal(sample_users[0].uid);
+    expect(order.uid).to.equal(guestId);
     expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
   })
 
