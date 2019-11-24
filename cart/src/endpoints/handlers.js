@@ -62,7 +62,7 @@ class Handlers {
       }
       else {
         // TODO: verify uid-pass paid with auth, or verify in some other way
-        uid = uid;
+        //  uid = uid;
         as = 'reguser';
       }
     }

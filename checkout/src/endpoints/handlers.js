@@ -82,11 +82,11 @@ class Handlers {
     return Promise.resolve(true);
   }
 
-  calculateShippingPrice(shippingAddress, productCost, shippingProvider, daysToDeliver) {
+  static calculateShippingPrice(shippingAddress, productCost, shippingProvider, daysToDeliver) {
     return 42;
   }
 
-  async calculatePrice(cart, rep) {
+  async calculatePrice(cart, rep, authDetails) {
     this.logger.debug("\tCalculating price");
     let price = 0;
     for (let product of cart.data) {
@@ -101,7 +101,7 @@ class Handlers {
       price += Number(unitPrice)*Number(product.amount_in_cart);
     }
 
-    return { total: price, shipping: this.calculateShippingPrice() };
+    return { total: price, shipping: Handlers.calculateShippingPrice() };
   }
 
   async buy(req, rep) {
@@ -149,7 +149,7 @@ class Handlers {
       }
     }
 
-    const price = await this.calculatePrice(cart, rep);
+    const price = await this.calculatePrice(cart, rep, authDetails);
     const paymentSuccessful = await this.doPayment(price.total+price.shipping);
     this.logger.debug(JSON.stringify(paymentSuccessful));
 

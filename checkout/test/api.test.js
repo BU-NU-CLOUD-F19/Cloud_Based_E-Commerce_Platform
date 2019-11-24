@@ -127,10 +127,13 @@ describe("Checkout REST API", () => {
     console.log(`\tAdding products to cart...`);
     for (let i in sample_cart.products) {
       if (i == 0) {
-        guestId = (await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).expect(201)).body.auth.uid;
+        let resp = await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).expect(201);
+        guestId = resp.body.auth.uid;
       }
       else {
-        await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).query({ sid: guestId }).expect(201);
+        await requestCart.post(`/${sample_cart.cartId}`)
+          .send(sample_cart.products[i]).query({ sid: guestId })
+          .expect(201);
       }
     }
 

@@ -360,7 +360,7 @@ describe("Cart REST API", () => {
 
   it("does not allow users to modify each other's carts", async () => {
     const user = { uid: sample_users[0].uid, password: sample_users[0].password };
-    let res = await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
 
     // Create a guest cart
     await requestCart.post(`/${cartId}`).send(product).expect(403);
