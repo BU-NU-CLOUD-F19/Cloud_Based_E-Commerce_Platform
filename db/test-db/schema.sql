@@ -48,7 +48,7 @@ create table orders (
   date timestamptz not null,
   destination varchar(50) not null,
   shipping float(2) not null check (shipping >= 0), -- shipping price
-  uid varchar(20) references users(uid)
+  uid varchar(20)  -- would be nice to add 'references users(uid)', but have to handle guest user orders
 );
 
 create table products_in_order (
