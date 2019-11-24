@@ -48,6 +48,12 @@ class Handlers {
     const { id: cartId } = req.params;
     const authDetails = req.payload;
 
+    if (!authDetails) {
+      let message = "Body cannot be empty, auth details required.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
     this.logger.debug(`Handler: begin checkout on cart ${cartId}`);
 
     // If cart is already locked, don't do anything
@@ -107,6 +113,13 @@ class Handlers {
   async buy(req, rep) {
     const { id: cartId } = req.params;
     const authDetails = req.payload;
+
+    if (!authDetails) {
+      let message = "Body cannot be empty, auth details required.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
     this.logger.debug(`Handler: buy on cart ${cartId}`);
 
     // If cart is not locked, don't do anything
@@ -180,6 +193,13 @@ class Handlers {
   async abortCheckout(req, rep, why) {
     const { id: cartId } = req.params;
     const { authDetails } = req.payload;
+
+    if (!authDetails) {
+      let message = "Body cannot be empty, auth details required.";
+      this.logger.debug(`\t${message}`);
+      return rep.response({ message }).code(400);
+    }
+
     this.logger.debug(`Handler: abort checkout on cart ${cartId}.`);
 
     // If cart not locked, don't do anything
