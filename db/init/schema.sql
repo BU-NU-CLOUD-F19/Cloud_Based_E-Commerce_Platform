@@ -57,3 +57,10 @@ create table products_in_order (
   amount_in_order int not null check (amount_in_order > 0),
   primary key (oid, pid)
 );
+
+\connect postgres
+create extension pg_cron;
+\set current_port `echo $POSTGRES_PORT`
+\set sweep_command 'UPDATE carts SET locked = false, date_checkout = NULL WHERE locked = true AND DATE_PART(\'minutes\', AGE(NOW(), date_checkout)) > 10;'
+insert into cron.job (schedule, command, database, nodeport)
+    values ('* * * * *', :'sweep_command', 'cloud_ecommerce', :'current_port');
