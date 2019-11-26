@@ -1,10 +1,17 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-const host = "localhost";
-const port = 3000;
-const cartURL = `http://${host}:${port}/cart`; // URL for GraphQL API Gateway
-const requestCart = require("supertest")(cartURL);
+
+const cartHost = `${process.env.CART_HOST}` || "localhost";
+const cartPort = `${process.env.CART_PORT}` || "3000";
+const cartUrl = `http://${cartHost}:${cartPort}/cart`; // URL for cart service
+const requestCart = require("supertest")(cartUrl);
+
+
+const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
+const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
+const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
+const requestGateway = require("supertest")(urlGateway);
 
 describe("Cart REST API", () => {
   let product, cartId, cart, productsInCart, sample_products, sample_users;
@@ -65,7 +72,7 @@ describe("Cart REST API", () => {
 
       return { cart: new Cart(), productsInCart: new ProductsInCart() }
     }
-    catch(err)  {
+    catch (err) {
       console.log(err.message);
       throw err;
     }
@@ -154,7 +161,7 @@ describe("Cart REST API", () => {
     // Define a new product
     let new_product = {
       pid: product.pid,
-      amount_in_cart: product.amount_in_cart+5
+      amount_in_cart: product.amount_in_cart + 5
     }
 
     // Add a product
@@ -193,19 +200,173 @@ describe("Cart REST API", () => {
     await requestCart.put(`/${cartId}`).expect(400)
   });
 
+  // Tests for API Gateway
+
+  it("Gateway lists products in cart", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    const res = await requestGateway.post('')
+      .send({ query: `{ getProducts(id: ${cartId}){ message, data{ pid, amount_in_cart } }}` }).expect(200);
+
+    expect(res.body.data.getProducts).to.have.property("message");
+    expect(res.body.data.getProducts.data[0]).to.have.property("pid");
+    expect(res.body.data.getProducts.data[0].pid).to.equal(1);
+    expect(res.body.data.getProducts.data[0]).to.have.property("amount_in_cart");
+  });
+
+  it("Gateway adds a product to the cart", async () => {
+    // Add a product with pid = 1 and amount = 1
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      addProductToCart(id: ${cartId}, input: {
+        pid: 1,
+        amount_in_cart: 1
+      }){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.addProductToCart).to.have.property("message");
+    expect(res.body.data.addProductToCart).to.have.property("data");
+    expect(res.body.data.addProductToCart.data[0].pid).to.equal(1);
+    expect(res.body.data.addProductToCart.data[0].amount_in_cart).to.equal(1);
+  });
+
+  it("Gateway removes a product from the cart", async () => {
+    // Add a product to then remove from cart
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      removeProduct(id: ${cartId}, input: {
+        pid: 1
+      }){
+        message,
+        data 
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.removeProduct.message).to.equal("Product removed from cart.");
+    expect(res.body.data.removeProduct.data).to.equal(1);
+  });
+
+  it("Gateway responds to an empty-cart request", async () => {
+    // Add a product 
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Empty the cart
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      emptyCart(id: ${cartId}){
+        message,
+        data 
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.emptyCart.message).to.equal("Cart emptied.");
+    expect(res.body.data.emptyCart.data).to.equal(1);
+  });
+
+  it("Gateway responds to a change request", async () => {
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Change the amount of the product in cart
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      changeAmount(id: ${cartId}, input: {
+        pid: 1,
+        amount_in_cart: 3
+      }){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.changeAmount.message).to.equal("Amount updated.");
+    expect(res.body.data.changeAmount.data[0].amount_in_cart).to.equal(3);
+  });
+
+  it("Gateway rejects a malformed remove request", async () => {
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Send a remove request with the id of the product
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      removeProduct(id: ${cartId}){
+        message,
+        data 
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  it("Gateway rejects a malformed add request", async () => {
+    // Send an add request with the information of the product
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      addProductToCart(id: ${cartId}){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  it("Gateway rejects a malformed change request", async () => {
+    // Send a change request with the information of the product
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      changeAmount(id: ${cartId}){
+        message,
+        data {
+          pid,
+          amount_in_cart
+        }
+      }
+    }` });
+    expect(res.body).to.have.property("errors");
+  });
+
+  it("gateway responds to a delete request", async () => {
+    // Add a product to the cart
+    await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Delete the cart
+    const res = await requestGateway.post('').send({
+      query: `mutation {
+      deleteCart(id: ${cartId}){
+        message
+      }
+    }` }).expect(200);
+
+    expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
+  });
+
   // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
-    await cart.deleteAll();
+    // await cart.deleteAll();
     await productsInCart.deleteAll();
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
-    for (let user of sample_users) {
-      await cart.repository.knex('users').where({uid: user.uid}).del();
-    }
+    // for (let user of sample_users) {
+    //   await cart.repository.knex('users').where({ uid: user.uid }).del();
+    // }
     for (let prod of sample_products) {
-      await cart.repository.knex('products').where({pid: prod.pid}).del();
+      await cart.repository.knex('products').where({ pid: prod.pid }).del();
     }
 
     // Close the knex connection

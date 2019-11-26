@@ -39,8 +39,8 @@ Example:
 **Body:** a JSON object containing
 
 * `data`: on a successful request, an array containing elements with:
-  * `pid`: id of the added product
-  * `pname`: name of the added product
+  * `pid`: id of the updated product
+  * `pname`: name of the updated product
   * `description`: description of the product
 
 Example:
