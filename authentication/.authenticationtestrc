@@ -1,0 +1,16 @@
+{
+  "persistence": {
+    "postgres": {
+      "connection": {
+        "host": "localhost",
+        "user": "postgres",
+        "password": "northeastern",
+        "database": "cloud_ecommerce"
+      },
+      "pool": {
+        "min": "0",
+        "max": "20"
+      }
+    },
+  }
+}
