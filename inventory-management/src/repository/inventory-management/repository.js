@@ -39,7 +39,7 @@ class InventoryManagementRepository {
     async getProducts() {
 
         const knexBuilder = this.knex(this.resource);
-        const query = knexBuilder.select('products');
+        const query = knexBuilder.select('*');
         this.logger.debug(`\tQuery: ${query}`);
 
         const result = await query;
@@ -54,7 +54,7 @@ class InventoryManagementRepository {
      */
     async getProduct(productid) {
         const knexBuilder = this.knex(this.resource);
-        const query = knexBuilder.select('products').where({ pid: productid });
+        const query = knexBuilder.select('*').where({ pid: productid });
         this.logger.debug(`\tQuery: ${query}`);
 
         const result = await query;
@@ -138,17 +138,18 @@ class InventoryManagementRepository {
         const inventory = this.knex(this.resource);
 
         // Get the urrent amount in stock
-        const getAmount = inventory.select('amount_in_stock').where({pid: productId});
+        const getAmount = inventory.select('amount_in_stock').where({ pid: productId });
         this.logger.debug(`\tQuery: ${getAmount}`);
 
         const { amount_in_stock: currentAmount } = (await getAmount)[0];
         this.logger.debug(`\tResult: ${JSON.stringify(currentAmount)}`);
 
         // Calculate the new amount
-        const newAmount = currentAmount-amount;
+        const newAmount = currentAmount - amount;
 
         // Create the query
-        const query = inventory.where({pid: productId}).update({amount_in_stock: newAmount}, ['pid', 'amount_in_stock']);
+        const query = inventory.where({ pid: productId })
+            .update({ amount_in_stock: newAmount }, ['pid', 'amount_in_stock']);
         this.logger.debug(`\tQuery: ${query}`);
 
         // Try to subtract the amount
@@ -157,7 +158,7 @@ class InventoryManagementRepository {
             this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
             return res[0];
         }
-        catch(err) {
+        catch (err) {
             // Error handling if it fails because of a constraint check on the amount in stock.
             //    Note: these checks could also be done beforehand, once the current amount in stock is known.
             //    The reason I opted to do it this way is because we can use the generated database error object
@@ -195,17 +196,18 @@ class InventoryManagementRepository {
         const inventory = this.knex(this.resource);
 
         // Get the current amount in stock
-        const getAmount = inventory.select('amount_in_stock').where({pid: productId});
+        const getAmount = inventory.select('amount_in_stock').where({ pid: productId });
         this.logger.debug(`\tQuery: ${getAmount}`);
 
         const { amount_in_stock: currentAmount } = (await getAmount)[0];
         this.logger.debug(`\tResult: ${JSON.stringify(currentAmount)}`);
 
         // Calculate the new amount in stock
-        const newAmount = parseInt(currentAmount)+parseInt(amount);
+        const newAmount = parseInt(currentAmount) + parseInt(amount);
 
         // Update the database
-        const query = inventory.where({pid: productId}).update({amount_in_stock: newAmount}, ['pid', 'amount_in_stock']);
+        const query = inventory.where({ pid: productId })
+            .update({ amount_in_stock: newAmount }, ['pid', 'amount_in_stock']);
         this.logger.debug(`\tQuery: ${query}`);
 
         const res = await query;
