@@ -3,6 +3,10 @@ const chai = require("chai");
 const { expect } = chai;
 const cartURL = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`; // URL for GraphQL API Gateway
 const requestCart = require("supertest")(cartURL);
+const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
+const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
+const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
+const requestGateway = require("supertest")(urlGateway);
 
 describe("Cart REST API", () => {
   let product, cartId, cart, productsInCart, sample_products, sample_users;
