@@ -25,6 +25,11 @@ class CartModel {
     return this.repository.deleteAll();
   }
 
+  /**
+   * Update the cart's modified time field in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async modified(cartId) {
     return this.repository.modified(cartId);
   }

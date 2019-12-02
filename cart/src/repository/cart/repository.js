@@ -124,6 +124,11 @@ class ShoppingCartRepository {
     return removed;
   }
 
+  /**
+   * Update the modified timestamp for the cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async modified(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.where({cart_id: cartId}).update({ date_modified: this.postgresDateStr() }, ['cart_id']);
@@ -134,6 +139,11 @@ class ShoppingCartRepository {
     return rows;
   }
 
+  /**
+   * Lock the cart's row in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async lockCart(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.where({cart_id: cartId}).update({locked: true}, ['cart_id', 'locked'])
@@ -144,6 +154,11 @@ class ShoppingCartRepository {
     return rows;
   }
 
+  /**
+   * Unlock the cart's row in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async unlockCart(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.where({cart_id: cartId}).update({locked: false}, ['cart_id', 'locked'])
@@ -154,6 +169,11 @@ class ShoppingCartRepository {
     return rows;
   }
 
+  /**
+   * Retrieve the locked status of the cart's row
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async isLocked(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.select('locked').where({cart_id: cartId});
@@ -169,6 +189,12 @@ class ShoppingCartRepository {
 
     return result[0].locked;
   }
+
+  /**
+   * Update the checkout timestamp of a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async updateCheckoutTime(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.where({cart_id: cartId}).update({date_checkout: this.postgresDateStr()});
@@ -179,6 +205,11 @@ class ShoppingCartRepository {
     return result;
   }
 
+  /**
+   * Set a cart's checkout time to NULL
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
   async clearCheckoutTime(cartId) {
     const carts = this.knex(this.resource);
     const query = carts.where({cart_id: cartId}).update({date_checkout: null});
@@ -187,7 +218,6 @@ class ShoppingCartRepository {
     const result = await query;
     this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
     return result;
-
   }
 }
 

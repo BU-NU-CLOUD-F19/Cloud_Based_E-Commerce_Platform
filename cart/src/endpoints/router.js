@@ -264,6 +264,7 @@ class Router {
       }
     })
   }
+
   /**
    * Actually adds the routes to the server
    * @param {Hapi.server} server - the Hapi server

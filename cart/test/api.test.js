@@ -59,6 +59,7 @@ describe("Cart REST API", () => {
     await cart.repository.knex('users').insert(sample_users);
   }
 
+  // Initialize the models needed for tests
   async function initModels() {
     try {
       await require('../src/configs/config');
@@ -74,7 +75,7 @@ describe("Cart REST API", () => {
     }
   }
 
-  // Runs before all tests
+  // Things to do before *all* tests
   before(function before() {
 
     // Load the config and wait for it to load
@@ -99,13 +100,13 @@ describe("Cart REST API", () => {
     })
   })
 
-  // Before each test, clear out the cart data
+  // Things to do before *every* test
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
     await productsInCart.deleteAll();
   })
 
-  // Authd user
+  // Authenticated user functionality
   it("authd: lists products", async () => {
     const user = { uid: sample_users[0].uid, password: sample_users[0].password };
 
@@ -214,7 +215,6 @@ describe("Cart REST API", () => {
     expect(isLocked.body.data.locked).to.equal(false);
   })
 
-
   it("authd: can start and end a checkout", async () => {
     const user = { uid: sample_users[0].uid, password: sample_users[0].password };
 
@@ -249,7 +249,6 @@ describe("Cart REST API", () => {
     await requestCart.put(`/${cartId}/checkout`).query(user).expect(403);
   })
 
-
   it("authd: can't end a checkout if there is none", async () => {
     const user = { uid: sample_users[0].uid, password: sample_users[0].password };
 
@@ -260,6 +259,30 @@ describe("Cart REST API", () => {
     await requestCart.delete(`/${cartId}/checkout`).query(user).expect(400);
   })
 
+  it ("authd: does not modify a locked cart", async () => {
+    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+
+    // Add a product
+    let product2 = {
+      "pid": 2,
+      "amount_in_cart": 5
+    }
+    await requestCart.post(`/${cartId}`).send(product).query(user).expect(201);
+
+    // Lock the cart
+    await requestCart.put(`/${cartId}/lock`).query(user).expect(200);
+
+    // Adding a product should fail
+    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(403);
+
+    // Unlock the cart
+    await requestCart.delete(`/${cartId}/lock`).query(user).expect(200);
+
+    // Now the product should be added
+    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(201);
+  })
+
+  // Guest user functionality
   it("guest: allows a guest cart", async () => {
     const { body: { auth: guestAuth } } = await requestCart.post(`/${cartId}`).send(product).expect(201);
     expect(guestAuth.as).to.equal("guest");
@@ -321,29 +344,8 @@ describe("Cart REST API", () => {
     expect(isLocked.body.data.locked).to.equal(false);
   })
 
-  it ("authd: does not modify a locked cart", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
 
-    // Add a product
-    let product2 = {
-      "pid": 2,
-      "amount_in_cart": 5
-    }
-    await requestCart.post(`/${cartId}`).send(product).query(user).expect(201);
-
-    // Lock the cart
-    await requestCart.put(`/${cartId}/lock`).query(user).expect(200);
-
-    // Adding a product should fail
-    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(403);
-
-    // Unlock the cart
-    await requestCart.delete(`/${cartId}/lock`).query(user).expect(200);
-
-    // Now the product should be added
-    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(201);
-  })
-
+  // Error handling tests
   it("rejects a malformed remove request", async () => {
     const user = { uid: sample_users[0].uid, password: sample_users[0].password };
 
@@ -373,8 +375,8 @@ describe("Cart REST API", () => {
     await requestCart.delete(`/${cartId}`).query({ sid }).expect(403);
     await requestCart.delete(`/${cartId+1}`).query(user).expect(403);
   })
-  // Tests for API Gateway
 
+  // Tests for API Gateway
   it("Gateway lists products in cart", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
@@ -527,7 +529,7 @@ describe("Cart REST API", () => {
     expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
   });
 
-  // Clean up after all tests are done
+  // Things to do after all tests
   after(async function after() {
     // Remove carts and products in cart
     // await cart.deleteAll();

@@ -8,6 +8,8 @@
 const logger = require('../utils/logger');
 const ProductsInCart = require('../models/').ProductsInCart;
 const Carts = require('../models/').Cart;
+
+// Package used for generating guest user IDs
 const shortid = require('shortid');
 
 /**
@@ -112,6 +114,7 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -140,7 +143,7 @@ class Handlers {
       const res = await this.productsInCart.addProduct(id, payload);
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
-
+      // Update the modified time for the cart
       await this.carts.modified(id);
 
       // Return what was added
@@ -199,6 +202,7 @@ class Handlers {
       return rep.response({message: `${isValid.missing} not specified.`}).code(400);
     }
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -266,6 +270,7 @@ class Handlers {
       return rep.response({message: "Amount must be greater than 0."}).code(400);
     }
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -318,6 +323,7 @@ class Handlers {
     this.logger.logRequest(req);
     const { params: { id }, query } = req;
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -364,6 +370,7 @@ class Handlers {
     const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -417,6 +424,7 @@ class Handlers {
     const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -436,10 +444,17 @@ class Handlers {
     }
   }
 
+  /**
+   * Lock a cart, preventing further changes
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
   async lockCart(req, rep) {
     const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -460,10 +475,17 @@ class Handlers {
     }
   }
 
+  /**
+   * Unlock a cart, allowing further changes.
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
   async unlockCart(req, rep) {
     const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -484,10 +506,17 @@ class Handlers {
 
   }
 
+  /**
+   * Check if a cart is locked.
+   * @async
+   * @param {Hapi.request} req - the request object
+   * @param {object} rep - the response toolkit (Hapi.h)
+   */
   async isLocked(req, rep) {
     const { params: { id }, query } = req;
     this.logger.logRequest(req);
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -514,7 +543,7 @@ class Handlers {
   }
 
   /**
-   * Start the checkout for a cart (lock and update its begin checkout field to the current time)
+   * Start the checkout for a cart (lock it, and update its begin checkout field to the current time)
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -522,6 +551,7 @@ class Handlers {
   async startCheckout(req, rep) {
     const { params: { id }, query } = req;
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
@@ -551,7 +581,7 @@ class Handlers {
 
 
   /**
-   * End the checkout for a cart (unlock and clear its checkout time field)
+   * End the checkout for a cart (unlock it and clear its checkout time field)
    * @async
    * @param {Hapi.request} req - the request object
    * @param {object} rep - the response toolkit (Hapi.h)
@@ -559,13 +589,13 @@ class Handlers {
   async endCheckout(req, rep) {
     const { params: { id }, query } = req;
 
+    // Check if the user is authorized to perform the action
     this.logger.debug(`\tChecking authorization...`);
     const auth = await this.isAuthorized(query, id);
     if (!auth.authorized) {
       this.logger.debug(`\tNot authorized: ${auth.why}`);
       return rep.response({ message: auth.why }).code(403);
     }
-
 
     try {
       if (!(await this.carts.isLocked(id))) {
