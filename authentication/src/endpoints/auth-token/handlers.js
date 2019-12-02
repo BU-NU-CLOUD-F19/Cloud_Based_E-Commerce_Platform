@@ -41,7 +41,8 @@ class Handlers {
       await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
 
       // TODO: get the auth token here and send it in the result. Look in `auth.js` file
-      
+      // This part goes in Front-end which handles sign-in via email link
+      // and then gets user from database.
       // window.localStorage.setItem('emailForSignIn', email);
       
       return rep.response({message: "Email link sent."}).code(200);
