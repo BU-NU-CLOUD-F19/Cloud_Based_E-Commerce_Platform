@@ -30,7 +30,7 @@ services:
     # Mount local directories on the container filesystem
     volumes:
       # A place to store postgres data
-      - ./db/db-data:/var/lib/postgresql/data
+      - ./db/db-data:/var/lib/postgresql
       # Script to initialize a test database
       - ./db/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
@@ -54,6 +54,8 @@ services:
   inventory-management:
     build: ./inventory-management
     container_name: "${INVENTORY_HOST}"
+    env_file:
+      - .env
     # Forward ports, format 'container:host'
     ports:
       - ${INVENTORY_PORT}:${INVENTORY_PORT}
@@ -98,34 +100,59 @@ services:
   api-gateway:
     build: ./graphql-api-gateway-poc
     container_name: "${API_GW_HOST}"
+    env_file:
+      - .env
     volumes:
       - ./graphql-api-gateway-poc/src:/usr/app/src
       - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
       - ./graphql-api-gateway-poc/log:/usr/app/log
-    links:
-      - members-graphql-service
+    depends_on:
+      - ${INVENTORY_GQL_HOST}
+      - ${CART_GQL_HOST}
     expose:
       - ${API_GW_PORT}
     ports:
       - ${API_GW_PORT}:${API_GW_PORT}
+    environment:
+      INVENTORY_GRAPHQL_SERVICE: ${INVENTORY_GQL_HOST}
+      CART_GRAPHQL_SERVICE: ${CART_GQL_HOST}
+  inventory-management-graphql-service:
+    build: ./inventory-management/graphql-service
+    container_name: "${INVENTORY_GQL_HOST}"
     env_file:
       - .env
-
-  members-graphql-service:
-    build: ./members-graphql-service
-    container_name: "${MEMBERS_GQL_HOST}"
     volumes:
-      - ./members-graphql-service/index.js:/usr/app/index.js
-      - ./members-graphql-service/datasource.js:/usr/app/datasource.js
-      - ./members-graphql-service/process.json:/usr/app/process.json
-      - ./members-graphql-service/src:/usr/app/src
-      - ./members-graphql-service/log:/usr/app/log
+      - ./inventory-management/graphql-service/index.js:/usr/app/index.js
+      - ./inventory-management/graphql-service/datasource.js:/usr/app/datasource.js
+      - ./inventory-management/graphql-service/process.json:/usr/app/process.json
+      - ./inventory-management/graphql-service/src:/usr/app/src
+      - ./inventory-management/graphql-service/log:/usr/app/log
     expose:
-      - ${MEMBERS_GQL_PORT}
+      - ${INVENTORY_GQL_PORT}
     ports:
-      - ${MEMBERS_GQL_PORT}:${MEMBERS_GQL_PORT}
+      - ${INVENTORY_GQL_PORT}:${INVENTORY_GQL_PORT}
+    environment:
+      INVENTORY_SERVICE: inventory-management
+
+  cart-graphql-service:
+    build: ./cart/graphql-service
+    container_name: "${CART_GQL_HOST}"
     env_file:
       - .env
+    volumes:
+      - ./cart/graphql-service/index.js:/usr/app/index.js
+      - ./cart/graphql-service/datasource.js:/usr/app/datasource.js
+      - ./cart/graphql-service/process.json:/usr/app/process.json
+      - ./cart/graphql-service/src:/usr/app/src
+      - ./cart/graphql-service/log:/usr/app/log
+    expose:
+      - ${CART_GQL_PORT}
+    ports:
+      - ${CART_GQL_PORT}:${CART_GQL_PORT}
+    restart: unless-stopped
+    environment:
+      BOILERPLATE_SERVICE: boilerplate
+      CART_SERVICE: cart
 
   checkout:
     build: ./checkout
@@ -151,4 +178,23 @@ services:
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
 
+    restart: unless-stopped
+
+  authentication:
+    build: ./authentication
+    container_name: "auth-service"
+    volumes:
+      - ./authentication/src:/usr/app/src
+      - ./authentication/app.js:/usr/app/app.js
+      - ./authentication/process.json:/usr/app/process.json
+      - ./authentication/registrations.js:/usr/app/registrations.js
+      - ./authentication/.authenticationrc:/usr/app/.authenticationrc
+      - ./authentication/log:/usr/app/log
+      - ./authentication/auth.js:/usr/app/auth.js
+      - ./authentication/serviceAccountKey.json:/usr/app/serviceAccountKey.json
+      - ./authentication/firebase-client.js:/usr/app/firebase-client.js
+    expose:
+      - 4050
+    ports:
+      - 4050:4050
     restart: unless-stopped

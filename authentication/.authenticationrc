@@ -1,0 +1,19 @@
+{
+  "persistence": {
+    "postgres": {
+      "connection": {
+        "host": "postgres",
+        "user": "postgres",
+        "password": "northeastern",
+        "database": "cloud_ecommerce"
+      },
+      "pool": {
+        "min": "2",
+        "max": "7"
+      }
+    }
+  },
+  "firebase": {
+    "databaseURL": "https://cloud-based-ecommerce-pl-47e01.firebaseio.com/"
+  }
+}

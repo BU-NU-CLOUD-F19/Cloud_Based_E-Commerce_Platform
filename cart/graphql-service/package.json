@@ -1,0 +1,20 @@
+{
+  "name": "cart-graphql-service",
+  "version": "1.0.0",
+  "description": "This is the graphql service for the cart microservice used to connect the gateway with the REST API of the microservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/federation": "^0.9.4",
+    "apollo-datasource-rest": "^0.6.4",
+    "apollo-server": "^2.9.3",
+    "eslint": "^6.5.1",
+    "graphql": "^14.5.6",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.1.0"
+  }
+}

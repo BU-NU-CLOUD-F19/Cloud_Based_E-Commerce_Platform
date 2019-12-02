@@ -1,10 +1,16 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-const host = "localhost";
-const port = 3020;
-const inventoryUrl = `http://${host}:${port}/inventory`; // URL for inventory management service
+const inventoryHost = `${process.env.INVENTORY_HOST}` || "localhost";
+const inventoryPort = `${process.env.INVENTORY_PORT}` || "3020";
+const inventoryUrl = `http://${inventoryHost}:${inventoryPort}/inventory`; // URL for inventory management service
 const requestInventory = require("supertest")(inventoryUrl);
+
+
+const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
+const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
+const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
+const requestGateway = require("supertest")(urlGateway);
 
 describe("Inventory management REST API", () => {
     let product, productId, sample_products, inventory;
@@ -42,6 +48,7 @@ describe("Inventory management REST API", () => {
 
         // Kind of a hack to access the other tables, replace this with models eventually
         await inventory.repository.knex('products').insert(sample_products);
+        console.log("Inserted records");
     }
 
     async function initModels() {
@@ -97,12 +104,24 @@ describe("Inventory management REST API", () => {
         // Check if product listing is possible
         const res = await requestInventory.get('').expect(200);
         expect(res.body.data).to.eql([{
-            products:
-                '(1,ABC123,42.5,XYZ,10,Something,"This is something very interesting that you want to buy.",en_US)'
+            pid: 1,
+            pcode: "ABC123",
+            price: 42.5,
+            sku: "XYZ",
+            amount_in_stock: 10,
+            pname: "Something",
+            description: "This is something very interesting that you want to buy.",
+            lang: "en_US"
         },
         {
-            products:
-                '(2,FD2,99.99,QWOP,100,Speedos,"I\'m too lazy to write a description",en_US)'
+            pid: 2,
+            pcode: "FD2",
+            price: 99.99,
+            sku: "QWOP",
+            amount_in_stock: 100,
+            pname: "Speedos",
+            description: "I'm too lazy to write a description",
+            lang: "en_US"
         }]);
     });
 
@@ -188,7 +207,14 @@ describe("Inventory management REST API", () => {
         // Remove it from the inventory and check response
         let res = await requestInventory.get(`/${product.pid}`).expect(200);
         expect(res.body.data).to.eql([{
-            "products": "(3,PQR123,100,LMN,20,Watch,\"This is a Tissot classic watch.\",en_US)"
+            pid: 3,
+            pcode: "PQR123",
+            price: 100,
+            sku: "LMN",
+            amount_in_stock: 20,
+            pname: "Watch",
+            description: "This is a Tissot classic watch.",
+            lang: "en_US"
         }
         ]);
     });
@@ -200,6 +226,148 @@ describe("Inventory management REST API", () => {
         await requestInventory.get(`/2`).expect(400);
     });
 
+    // Tests for API Gateway
+
+    it("Gateway lists all products", async () => {
+        // Add sample products
+        await requestInventory.post('').send(sample_products[0]).expect(201);
+        await requestInventory.post('').send(sample_products[1]).expect(201);
+
+        // Make request to Gateway
+        const res = await requestGateway.post('').send({ query: "{ products{ pid, pname }}" }).expect(200);
+
+        expect(res.body.data.products[0]).to.have.property("pname");
+        expect(res.body.data.products[0].pname).to.equal("Something");
+        expect(res.body.data.products[1]).to.have.property("pid");
+        expect(res.body.data.products[1].pid).to.equal(2);
+    });
+
+    it("Gateway lists product with given ID", async () => {
+        // Add sample product
+        await requestInventory.post('').send(sample_products[0]).expect(201);
+
+        // Make request to Gateway
+        const res = await requestGateway.post('').send({ query: "{ product(id: 1){ pid, pname }}" }).expect(200);
+
+        expect(res.body.data.product).to.have.property("pname");
+        expect(res.body.data.product.pname).to.equal("Something");
+    });
+
+    it("Gateway doesn't retrieve product that doesn't exist", async () => {
+        // Send request for product with ID 1 when no products exist
+        const res = await requestGateway.post('').send({ query: "{ product(id: 1){ pid, pname }}" }).expect(200);
+
+        // Check that the response contains errors with a specific error message
+        expect(res.body).to.have.property("errors");
+        expect(res.body.errors[0].extensions.response.body).to.have.property("message");
+        expect(res.body.errors[0].extensions.response.body.message).to.equal("Product with id 1 not in inventory.");
+    });
+
+    it("Gateway adds a product", async () => {
+        const newProduct = `{
+            pid: 5 
+            pcode: "XYZ999" 
+            price: 500 
+            sku: "PQR" 
+            amount_in_stock: 500 
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
+
+        // Add a product with ID 5
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` })
+            .expect(200);
+
+        expect(res.body.data.addProduct).to.have.property("pname");
+        expect(res.body.data.addProduct).to.have.property("pid");
+        expect(res.body.data.addProduct).to.have.property("description");
+        expect(res.body.data.addProduct.pname).to.equal("Da Vinci Code");
+    });
+
+    it("Gateway doesn't allow to add a product if ID already exists", async () => {
+        // Add a product with ID 1
+        await requestInventory.post('').send(sample_products[0]).expect(201);
+
+        const newProduct = `{
+            pid: 1
+            pcode: "XYZ999" 
+            price: 500 
+            sku: "PQR" 
+            amount_in_stock: 500 
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
+
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { addProduct(input: ${newProduct}) {pid pname description}}` });
+
+        // Check that the response contains errors with a specific error message
+        expect(res.body).to.have.property("errors");
+        expect(res.body.errors[0].extensions.response.body).to.have.property("message");
+        expect(res.body.errors[0].extensions.response.body.message).to.equal("Product already present in inventory.");
+    });
+
+    it("Gateway updates a product", async () => {
+        // Add a product with ID 1
+        await requestInventory.post('').send(sample_products[0]).expect(201);
+
+        const updateProduct = `{
+            pid: 1
+            pcode: "XYZ999" 
+            price: 500 
+            sku: "PQR" 
+            amount_in_stock: 500 
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
+
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` })
+            .expect(200);
+
+        expect(res.body.data.updateProduct).to.have.property("pname");
+        expect(res.body.data.updateProduct).to.have.property("pid");
+        expect(res.body.data.updateProduct).to.have.property("description");
+        expect(res.body.data.updateProduct.pname).to.equal("Da Vinci Code");
+    });
+
+    it("Gateway doesn't allow to update a product that doesn't exist", async () => {
+        const updateProduct = `{
+            pid: 1
+            pcode: "XYZ999" 
+            price: 500 
+            sku: "PQR" 
+            amount_in_stock: 500 
+            pname: "Da Vinci Code" 
+            description: "This is a book by Dan Brown" 
+            lang: "en_US"}`;
+        const res = await requestGateway.post('')
+            .send({ query: `mutation { updateProduct(id: 1 input: ${updateProduct}) {pid pname description}}` });
+
+        // Check that the response contains errors with a specific error message
+        expect(res.body).to.have.property("errors");
+        expect(res.body.errors[0].extensions.response.body).to.have.property("message");
+        expect(res.body.errors[0].extensions.response.body.message).to.equal("No such product in inventory.");
+    });
+
+    it("Gateway deletes a product", async () => {
+        // Add a product with ID 1
+        await requestInventory.post('').send(sample_products[0]).expect(201);
+
+        const res = await requestGateway.post('').send({ query: ` mutation { deleteProduct(id: 1)}` }).expect(200);
+
+        expect(res.body.data).to.have.property("deleteProduct");
+    });
+
+    it("Gateway doesn't delete a product that doesn't exist", async () => {
+        const res = await requestGateway.post('').send({ query: ` mutation { deleteProduct(id: 1)}` }).expect(200);
+
+        // Check that the response contains errors with a specific error message
+        expect(res.body).to.have.property("errors");
+        expect(res.body.errors[0].extensions.response.body).to.have.property("message");
+        expect(res.body.errors[0].extensions.response.body.message).to.equal("No such product in inventory.");
+    });
     it("decrements the amount of a product in the inventory", async () => {
         // Add product
         await requestInventory.post('').send(product).expect(201);
@@ -249,7 +417,7 @@ describe("Inventory management REST API", () => {
         await requestInventory.post('').send(product).expect(201);
 
         // Try to remove more than is in stock, expect an error
-        const toRemove = product.amount_in_stock+1;
+        const toRemove = product.amount_in_stock + 1;
         await requestInventory.delete(`/${product.pid}/${toRemove}`).expect(400);
 
         // Check that the database didn't change
@@ -311,3 +479,4 @@ describe("Inventory management REST API", () => {
     })
 
 })
+
