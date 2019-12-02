@@ -20,6 +20,10 @@ class Router {
     this.handlers = new Handlers();
   }
 
+  /**
+   * POST begin checkout on a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeBeginCheckout(server) {
     server.route({
       method: 'POST',
@@ -38,6 +42,10 @@ class Router {
     });
   }
 
+  /**
+   * DELETE abort a checkout on a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeAbortCheckout(server) {
     server.route({
       method: 'DELETE',
@@ -56,6 +64,10 @@ class Router {
     });
   }
 
+  /**
+   * PUT finalize a checkout
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
   routeBuy(server) {
     server.route({
       method: 'PUT',

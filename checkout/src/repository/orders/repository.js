@@ -41,6 +41,11 @@ class OrdersRepository {
     return this.knex.raw(`to_timestamp(${Date.now()} / 1000.0)`);
   }
 
+  /**
+   * Create an order in the database
+   * @async
+   * @param {object} details - order details passed from the checkout handler
+   */
   async createOrder(details) {
     const orders = this.knex(this.resource);
 
@@ -58,10 +63,7 @@ class OrdersRepository {
     this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
 
     return result[0];
-
   }
-
-
 }
 
 module.exports = OrdersRepository;
