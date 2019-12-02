@@ -51,6 +51,7 @@ services:
       # port 5050 for the web interface (port 80 in the container).
       - "${PGADMIN_PORT}:80"
     restart: unless-stopped
+
   inventory-management:
     build: ./inventory-management
     container_name: "${INVENTORY_HOST}"
@@ -115,6 +116,7 @@ services:
     environment:
       INVENTORY_GRAPHQL_SERVICE: ${INVENTORY_GQL_HOST}
       CART_GRAPHQL_SERVICE: ${CART_GQL_HOST}
+
   inventory-management-graphql-service:
     build: ./inventory-management/graphql-service
     container_name: "${INVENTORY_GQL_HOST}"
@@ -132,6 +134,7 @@ services:
       - ${INVENTORY_GQL_PORT}:${INVENTORY_GQL_PORT}
     environment:
       INVENTORY_SERVICE: inventory-management
+
   cart-graphql-service:
     build: ./cart/graphql-service
     container_name: "${CART_GQL_HOST}"
@@ -164,6 +167,7 @@ services:
       - ./authentication/log:/usr/app/log
       - ./authentication/auth.js:/usr/app/auth.js
       - ./authentication/serviceAccountKey.json:/usr/app/serviceAccountKey.json
+      - ./authentication/firebase-config.json:/usr/app/firebase-config.json
       - ./authentication/firebase-client.js:/usr/app/firebase-client.js
     expose:
       - 4050
