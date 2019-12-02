@@ -52,7 +52,6 @@ class ShoppingCartRepository {
       const query = this.knex.raw(`TRUNCATE TABLE ${this.resource} CASCADE`);
       const result = await query;
 
-      this.logger.debug("Successfully truncated the table.");
       return result;
     }
     catch (err) {
@@ -80,20 +79,26 @@ class ShoppingCartRepository {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartId) {
+  async createCart(cartId, as) {
     const carts = this.knex(this.resource);
-
     const cartData = {
       cart_id: cartId,
       date_created: this.postgresDateStr(),
-      uid: 'user1' // TODO: this shouldn't be hardcoded
+      locked: false,
+    }
+
+    if (as.uid) {
+      cartData.uid = as.uid;
+    }
+    else {
+      cartData.sid = as.sid;
     }
 
     const createCart = carts.insert(cartData).returning('*');
     this.logger.debug(`\tQuery: ${createCart}`);
 
     const created = await createCart;
-    this.logger.debug(`\tResult: ${created}`);
+    this.logger.debug(`\tResult: ${JSON.stringify(created)}`);
     return created;
   }
 
@@ -117,6 +122,102 @@ class ShoppingCartRepository {
     const removed = await query;
     this.logger.debug(`\tResult: ${removed}`);
     return removed;
+  }
+
+  /**
+   * Update the modified timestamp for the cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async modified(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({ date_modified: this.postgresDateStr() }, ['cart_id']);
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  /**
+   * Lock the cart's row in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async lockCart(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({locked: true}, ['cart_id', 'locked'])
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  /**
+   * Unlock the cart's row in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async unlockCart(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({locked: false}, ['cart_id', 'locked'])
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const rows = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  /**
+   * Retrieve the locked status of the cart's row
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async isLocked(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.select('locked').where({cart_id: cartId});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+
+    if (result.length == 0) {
+      throw {message: `Cart ${cartId} does not exist.`, what: "cart_does_not_exist"};
+    }
+
+
+    return result[0].locked;
+  }
+
+  /**
+   * Update the checkout timestamp of a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async updateCheckoutTime(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({date_checkout: this.postgresDateStr()});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+    return result;
+  }
+
+  /**
+   * Set a cart's checkout time to NULL
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async clearCheckoutTime(cartId) {
+    const carts = this.knex(this.resource);
+    const query = carts.where({cart_id: cartId}).update({date_checkout: null});
+    this.logger.debug(`\tQuery: ${query}`);
+
+    const result = await query;
+    this.logger.debug(`\tResult: ${JSON.stringify(result)}`);
+    return result;
   }
 }
 

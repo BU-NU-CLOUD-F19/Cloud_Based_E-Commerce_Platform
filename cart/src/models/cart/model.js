@@ -26,6 +26,15 @@ class CartModel {
   }
 
   /**
+   * Update the cart's modified time field in the database
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async modified(cartId) {
+    return this.repository.modified(cartId);
+  }
+
+  /**
    * Delete a cart, also removing all products in it.
    * @async
    * @param {number} cartId - the id associated with a cart
@@ -39,8 +48,8 @@ class CartModel {
    * @async
    * @param {number} cartId - the id associated with a cart
    */
-  async createCart(cartId) {
-    return this.repository.createCart(cartId);
+  async createCart(cartId, as) {
+    return this.repository.createCart(cartId, as);
   }
 
   /**
@@ -50,6 +59,53 @@ class CartModel {
    */
   async getCart(cartId) {
     return this.repository.getCart(cartId);
+  }
+
+  /**
+   * Lock a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async lockCart(cartId) {
+    return this.repository.lockCart(cartId);
+  }
+
+  /**
+   * Unlock a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async unlockCart(cartId) {
+    return this.repository.unlockCart(cartId);
+  }
+
+  /**
+   * Check if a cart is locked
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async isLocked(cartId) {
+    return this.repository.isLocked(cartId);
+  }
+
+  /**
+   * Start the checkout for a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async beginCheckout(cartId) {
+    await this.repository.updateCheckoutTime(cartId);
+    return this.repository.lockCart(cartId);
+  }
+
+  /**
+   * End the checkout process for a cart
+   * @async
+   * @param {number} cartId - the id associated with a cart
+   */
+  async endCheckout(cartId) {
+    await this.repository.unlockCart(cartId);
+    return this.repository.clearCheckoutTime(cartId);
   }
 
 }

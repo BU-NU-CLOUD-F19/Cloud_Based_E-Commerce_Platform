@@ -1,22 +1,27 @@
 # TODO: the actual usernames/passwords shouldn't be stored in this file. We need
 # a way to put those somewhere that's not in version control.
 #
+# Environment variables come from .env
+# https://docs.docker.com/compose/compose-file/#variable-substitution
+#
 # Use docker-compose file version 3
 version: "3"
 services:
   # Database service
   postgres:
-    # Image based on Alpine is smaller
-    image: "postgres:12-alpine"
+    # Build a custom image with pg_cron
+    build: ./db
+    image: postgres_cron
+
+    # Use a custom config file for postgres to include pg_cron
+    command:
+      - "postgres"
+      - "-c"
+      - "config_file=/etc/postgresql/postgresql.conf"
+
     container_name: "${POSTGRES_HOST}"
     env_file:
       - .env
-    environment:
-      # The password for the database, can be changed to whatever.
-      # Default username is 'postgres', can be changed with POSTGRES_USER.
-      # Another useful variable is POSTGRES_DB, the name of the database.
-      # Ref: https://hub.docker.com/_/postgres
-      POSTGRES_PASSWORD: northeastern
 
     # Forward ports, format 'container:host'
     ports:
@@ -27,7 +32,7 @@ services:
       # A place to store postgres data
       - ./db/db-data:/var/lib/postgresql
       # Script to initialize a test database
-      - ./db/test-db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./db/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
 
   # Pgadmin service (web interface)
@@ -40,17 +45,12 @@ services:
     container_name: "${PGADMIN_HOST}"
     env_file:
       - .env
-    environment:
-      # Credentials used to sign in to the web interface
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     volumes:
       - ./db/pgadmin:/var/lib/pgadmin
     ports:
-      # Use the value of an environment variable if it's set. If not, use local
-      # port 5050 for the web interface (port 80 in the container).
       - "${PGADMIN_PORT}:80"
     restart: unless-stopped
+
   inventory-management:
     build: ./inventory-management
     container_name: "${INVENTORY_HOST}"
@@ -74,12 +74,13 @@ services:
   cart:
     build: ./cart
     container_name: "${CART_HOST}"
-    env_file:
-      - .env
 
     # Forward ports, format 'container:host'
     ports:
       - ${CART_PORT}:${CART_PORT}
+
+    env_file:
+      - .env
 
     # Mount local directories on the container filesystem.
     # Should not happen in production.
@@ -132,6 +133,7 @@ services:
       - ${INVENTORY_GQL_PORT}:${INVENTORY_GQL_PORT}
     environment:
       INVENTORY_SERVICE: inventory-management
+
   cart-graphql-service:
     build: ./cart/graphql-service
     container_name: "${CART_GQL_HOST}"
@@ -151,6 +153,32 @@ services:
     environment:
       BOILERPLATE_SERVICE: boilerplate
       CART_SERVICE: cart
+
+  checkout:
+    build: ./checkout
+    container_name: "${CHECKOUT_HOST}"
+
+    # Forward ports, format 'container:host'
+    ports:
+      - ${CHECKOUT_PORT}:${CHECKOUT_PORT}
+
+    env_file:
+      - .env
+
+    # Mount local directories on the container filesystem.
+    # Should not happen in production.
+    volumes:
+      - ./checkout/src:/usr/app/src
+      - ./checkout/app.js:/usr/app/app.js
+      - ./checkout/process.json:/usr/app/process.json
+      - ./checkout/registrations.js:/usr/app/registrations.js
+      - ./checkout/.checkoutrc:/usr/app/.checkoutrc
+      - ./checkout/log:/usr/app/log
+      - ./checkout/test:/usr/app/test
+      # The above line takes care of making the log dir accessible, but should be
+      #   handled differently in production.
+
+    restart: unless-stopped
 
   authentication:
     build: ./authentication
