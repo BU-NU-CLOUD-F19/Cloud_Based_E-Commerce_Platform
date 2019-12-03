@@ -21,8 +21,7 @@ describe("Cart REST API", () => {
         "lname": "Doe",
         "address": "Some Street 22",
         "phone": 1111111111,
-        "email": "john@doe.com",
-        "password": "whatever"
+        "email": "john@doe.com"
       }
     ]
 
@@ -108,7 +107,7 @@ describe("Cart REST API", () => {
 
   // Authenticated user functionality
   it("authd: lists products", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Check if product listing is possible
     const res = await requestCart.get(`/${cartId}`).send(user).expect(200)
@@ -116,7 +115,7 @@ describe("Cart REST API", () => {
   });
 
   it("authd: adds a product to a cart", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
     // Add it to the cart, and check response
     let res = await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
     expect(res.body.data).to.eql([product])
@@ -126,7 +125,7 @@ describe("Cart REST API", () => {
   });
 
   it("authd: removes a product from a cart", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
     // Add it to the cart
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201)
 
@@ -140,7 +139,7 @@ describe("Cart REST API", () => {
   });
 
   it("authd: responds to an empty-cart request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
     //
     // Insert a few products into the cart
     for (let i = 1; i <= 2; i++) {
@@ -161,7 +160,7 @@ describe("Cart REST API", () => {
   })
 
   it("authd: responds to a change request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Define a new product
     let new_product = {
@@ -181,7 +180,7 @@ describe("Cart REST API", () => {
   });
 
   it("authd: responds to a delete request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
@@ -195,7 +194,7 @@ describe("Cart REST API", () => {
   })
 
   it("authd: locks and unlocks correctly", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
@@ -216,7 +215,7 @@ describe("Cart REST API", () => {
   })
 
   it("authd: can start and end a checkout", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
@@ -237,7 +236,7 @@ describe("Cart REST API", () => {
   })
 
   it("authd: does not allow checking out a cart that's being checked out", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).query(user).expect(201);
@@ -250,7 +249,7 @@ describe("Cart REST API", () => {
   })
 
   it("authd: can't end a checkout if there is none", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
@@ -260,7 +259,7 @@ describe("Cart REST API", () => {
   })
 
   it ("authd: does not modify a locked cart", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     // Add a product
     let product2 = {
@@ -347,25 +346,25 @@ describe("Cart REST API", () => {
 
   // Error handling tests
   it("rejects a malformed remove request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     await requestCart.put(`/${cartId}/remove`).query(user).expect(400)
   });
 
   it("rejects a malformed add request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     await requestCart.post(`/${cartId}`).query(user).expect(400)
   });
 
   it("rejects a malformed change request", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
 
     await requestCart.put(`/${cartId}`).query(user).expect(400)
   });
 
   it("does not allow users to modify each other's carts", async () => {
-    const user = { uid: sample_users[0].uid, password: sample_users[0].password };
+    const user = { uid: sample_users[0].uid };
     await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
 
     // Create a guest cart
@@ -377,6 +376,7 @@ describe("Cart REST API", () => {
   })
 
   // Tests for API Gateway
+  /*
   it("Gateway lists products in cart", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
@@ -528,18 +528,18 @@ describe("Cart REST API", () => {
 
     expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
   });
-
+  */
   // Things to do after all tests
   after(async function after() {
     // Remove carts and products in cart
-    // await cart.deleteAll();
+    await cart.deleteAll();
     await productsInCart.deleteAll();
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
-    // for (let user of sample_users) {
-    //   await cart.repository.knex('users').where({ uid: user.uid }).del();
-    // }
+    for (let user of sample_users) {
+      await cart.repository.knex('users').where({ uid: user.uid }).del();
+    }
     for (let prod of sample_products) {
       await cart.repository.knex('products').where({ pid: prod.pid }).del();
     }

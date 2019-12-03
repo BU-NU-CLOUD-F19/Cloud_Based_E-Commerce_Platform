@@ -5,10 +5,12 @@
 
 'use strict';
 
+const fetch = require('node-fetch');
 const logger = require('../utils/logger');
 const ProductsInCart = require('../models/').ProductsInCart;
 const Carts = require('../models/').Cart;
-
+const authUrl = `http://${process.env.AUTH_HOST}:${process.env.AUTH_PORT}`;
+const { URL } = require('url');
 // Package used for generating guest user IDs
 const shortid = require('shortid');
 
@@ -53,20 +55,21 @@ class Handlers {
    * @async
    * @param {string} uid - a user id, if the user is registered
    * @param {string} sid - a session id, if it's a guest
-   * @param {string} password - the password for the user. placeholder for actual auth.
    * @param {number} cartId - the number identifying the cart
    */
-  async isAuthorized({ uid, sid, password }, cartId) {
+  async isAuthorized({ uid, sid }, cartId) {
     let as;
     if (uid) {
-      if (!password) {
-        return { authorized: false, why: "Password not provided" }
-      }
-      else {
-        // TODO: verify uid-pass paid with auth, or verify in some other way
-        //  uid = uid;
+        const authRes = await fetch(`${authUrl}/users/${uid}`);
+        if (!authRes.ok) {
+          return { authorized: false, why: `Cannot contact authentication service for verification.` }
+        }
+        const userData = await authRes.json();
+        if (!userData) {
+          return { authorized: false, why: `No user data returned from authentication service.` }
+        }
+        uid = uid;
         as = 'reguser';
-      }
     }
     else if (sid) {
       // TODO: maybe verify guest user with auth?
@@ -74,7 +77,6 @@ class Handlers {
       as = 'guest';
     }
     else {
-      // TODO: contact auth for new guest id, not generate here
       uid = shortid.generate(); // new guest session
       as = 'guest';
     }

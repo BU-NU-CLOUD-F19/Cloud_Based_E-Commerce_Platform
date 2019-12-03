@@ -39,7 +39,6 @@ CREATE TABLE Users (
   address VARCHAR(50) NOT NULL,
   phone NUMERIC(10) NOT NULL, -- 10 digits
   email VARCHAR(50) NOT NULL,
-  password VARCHAR(100) -- can be NULL if the user is not registered
 );
 
 CREATE TABLE Carts (
