@@ -376,7 +376,6 @@ describe("Cart REST API", () => {
   })
 
   // Tests for API Gateway
-  /*
   it("Gateway lists products in cart", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
@@ -528,7 +527,7 @@ describe("Cart REST API", () => {
 
     expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
   });
-  */
+
   // Things to do after all tests
   after(async function after() {
     // Remove carts and products in cart

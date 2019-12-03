@@ -11,7 +11,7 @@ const checkoutUrl = `http://${process.env.CHECKOUT_HOST}:${process.env.CHECKOUT_
 const requestCheckout = require("supertest")(checkoutUrl);
 
 describe("Checkout REST API", () => {
-  let orders, sample_users, sample_products, sample_guest_cart;
+  let orders, sample_users, sample_products, sample_guest_cart, sample_reg_cart;
   let guestId;
 
   // Utility function to initialize data
@@ -142,7 +142,10 @@ describe("Checkout REST API", () => {
     console.log(`\tAdding products to guest cart...`);
     for (let i in sample_guest_cart.products) {
       if (i == 0) {
-        let resp = await requestCart.post(`/${sample_guest_cart.cartId}`).send(sample_guest_cart.products[i]).expect(201);
+        let resp = await requestCart.post(`/${sample_guest_cart.cartId}`)
+                    .send(sample_guest_cart.products[i])
+                    .expect(201);
+
         guestId = resp.body.auth.uid;
       }
       else {
@@ -154,13 +157,20 @@ describe("Checkout REST API", () => {
 
     console.log(`\tAdding products to registered user cart...`);
     for (let i in sample_reg_cart.products) {
-      await requestCart.post(`/${sample_reg_cart.cartId}`).send(sample_reg_cart.products[i]).query({ uid: sample_users[0].uid }).expect(201);
+      await requestCart.post(`/${sample_reg_cart.cartId}`)
+            .send(sample_reg_cart.products[i])
+            .query({ uid: sample_users[0].uid })
+            .expect(201);
     }
 
     console.log(`\tChecking consistency...`);
-    const { body: guestBody } = await requestCart.get(`/${sample_guest_cart.cartId}`).query({ sid: guestId }).expect(200);
+    const { body: guestBody } = await requestCart.get(`/${sample_guest_cart.cartId}`)
+                                        .query({ sid: guestId })
+                                        .expect(200);
     expect(guestBody.data.length).to.equal(2);
-    const { body: regBody } = await requestCart.get(`/${sample_reg_cart.cartId}`).query({ uid: sample_users[0].uid }).expect(200);
+    const { body: regBody } = await requestCart.get(`/${sample_reg_cart.cartId}`)
+                                        .query({ uid: sample_users[0].uid })
+                                        .expect(200);
     expect(regBody.data.length).to.equal(2);
 
   })
@@ -174,7 +184,9 @@ describe("Checkout REST API", () => {
     const authDetails = { sid: guestId }
     await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
 
-    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`).send(authDetails).expect(201);
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`)
+                                                          .send(authDetails)
+                                                          .expect(201);
 
     expect(order.uid).to.equal(guestId);
     expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
@@ -195,7 +207,9 @@ describe("Checkout REST API", () => {
     const authDetails = { uid: guestId }
     await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
 
-    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`).send(authDetails).expect(201);
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`)
+                                                          .send(authDetails)
+                                                          .expect(201);
 
     expect(order.uid).to.equal(guestId);
     expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);

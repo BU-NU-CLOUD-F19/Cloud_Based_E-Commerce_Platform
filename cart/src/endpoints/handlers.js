@@ -10,7 +10,6 @@ const logger = require('../utils/logger');
 const ProductsInCart = require('../models/').ProductsInCart;
 const Carts = require('../models/').Cart;
 const authUrl = `http://${process.env.AUTH_HOST}:${process.env.AUTH_PORT}`;
-const { URL } = require('url');
 // Package used for generating guest user IDs
 const shortid = require('shortid');
 
@@ -68,7 +67,6 @@ class Handlers {
         if (!userData) {
           return { authorized: false, why: `No user data returned from authentication service.` }
         }
-        uid = uid;
         as = 'reguser';
     }
     else if (sid) {
