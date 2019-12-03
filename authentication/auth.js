@@ -9,10 +9,12 @@ const admin = require('firebase-admin');
 // Goto Service Accounts tab and Generate a new private key
 const serviceAccount = require('./serviceAccountKey.json');
 
+const firebaseConfig = require('./firebase-config.json');
+
 // use the existing firebase admin 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://cloud-based-ecommerce-pl-47e01.firebaseio.com/'
+  databaseURL: firebaseConfig.databaseURL
 });
 
 module.exports = {

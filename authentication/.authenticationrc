@@ -13,7 +13,4 @@
       }
     }
   },
-  "firebase": {
-    "databaseURL": "https://cloud-based-ecommerce-pl-47e01.firebaseio.com/"
-  }
 }

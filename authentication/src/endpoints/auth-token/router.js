@@ -34,12 +34,9 @@ class Router {
         tags: ['auth-token'],
         validate: {
           payload: Joi.object().keys({
-            userId : Joi.string()
+            email : Joi.string()
                     .required()
-                    .description('The user id whose membership is to be retrieved'),
-            storeId : Joi.string()
-              .required()
-              .description('The store id for which the membership is to be retrieved'),
+                    .description('The email of user who needs to be signed in.')
             }),
         }
      },
