@@ -19,6 +19,13 @@ kubectl apply -f deployment.yaml
 
 kubectl apply -f service.yaml
 
+kubectl get svc
+
+
+tag inventory management image
+gcloud docker -- push gcr.io/cloud-ecommerce/<Tag Name>
+
+
 
 ```
 
