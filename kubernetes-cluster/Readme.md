@@ -15,6 +15,11 @@ gcloud container clusters create cloud-ecommerce    --num-nodes 1    --enable-ba
 
 gcloud builds submit --tag gcr.io/cloud-ecommerce/postgres-gke:v1.1 .
 
+kubectl apply -f deployment.yaml
+
+kubectl apply -f service.yaml
+
+
 ```
 
 
