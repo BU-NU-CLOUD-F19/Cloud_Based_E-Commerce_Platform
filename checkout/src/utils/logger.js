@@ -23,7 +23,7 @@ const wrappers = {
     * @param {Hapi.request} req - the request object
     */
     logRequest: (req) => {
-      logger.log('info', `HTTP ${req.method} ${req.path}?${JSON.stringify(req.query)}`);
+      logger.log('info', `HTTP ${req.method} ${req.path}`);
     }
 };
 

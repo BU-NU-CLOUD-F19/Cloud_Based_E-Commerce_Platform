@@ -27,7 +27,11 @@ create table carts (
   cart_id varchar(50) primary key,
   date_created timestamptz not null,
   date_modified timestamptz, -- could be null if not modified
-  uid varchar(20) references users(uid) not null
+  date_checkout timestamptz,
+  locked boolean not null,
+  uid varchar(20) references users(uid), -- can be null if user not logged in
+  sid varchar(20),
+  constraint is_associated check (uid is not null or sid is not null)
 );
 
 create table products_in_cart (
@@ -39,12 +43,12 @@ create table products_in_cart (
 );
 
 create table orders (
-  oid int primary key,
+  oid serial primary key,
   total_price float(2) not null check (total_price >= 0),
   date timestamptz not null,
   destination varchar(50) not null,
   shipping float(2) not null check (shipping >= 0), -- shipping price
-  uid varchar(20) references users(uid)
+  uid varchar(20)  -- would be nice to add 'references users(uid)', but have to handle guest user orders
 );
 
 create table products_in_order (
@@ -83,3 +87,10 @@ create table user_security_groups (
   security_group_id varchar references security_groups(id),
   date_created timestamptz
 );
+
+\connect postgres
+create extension pg_cron;
+\set current_port `echo $POSTGRES_PORT`
+\set sweep_command 'UPDATE carts SET locked = false, date_checkout = NULL WHERE locked = true AND DATE_PART(\'minutes\', AGE(NOW(), date_checkout)) > 10;'
+insert into cron.job (schedule, command, database, nodeport)
+    values ('* * * * *', :'sweep_command', 'cloud_ecommerce', :'current_port');

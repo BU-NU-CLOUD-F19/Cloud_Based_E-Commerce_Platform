@@ -155,6 +155,117 @@ class Router {
 
 
   /**
+   * PUT lock a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeLockCart(server) {
+    server.route({
+      method: 'PUT',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.lockCart.bind(this.handlers),
+      config: {
+        description: 'Lock the cart (prevent further changes).',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart locked' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * DELETE unlock a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeUnlockCart(server) {
+    server.route({
+      method: 'DELETE',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.unlockCart.bind(this.handlers),
+      config: {
+        description: 'Unlock the cart',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart unlocked' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * GET check if a cart is locked
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeIsLocked(server) {
+    server.route({
+      method: 'GET',
+      path: '/cart/{id}/lock',
+      handler: this.handlers.isLocked.bind(this.handlers),
+      config: {
+        description: 'Check if a cart is locked',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart status retrieved' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * PUT start the checkout for a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeStartCheckout(server) {
+    server.route({
+      method: 'PUT',
+      path: '/cart/{id}/checkout',
+      handler: this.handlers.startCheckout.bind(this.handlers),
+      config: {
+        description: 'Lock a cart and add the checkout time',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart checkout started' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+
+  /**
+   * DELETE end the checkout for a cart
+   * @param {Hapi.server} server - the Hapi server to which to add the route
+   */
+  routeEndCheckout(server) {
+    server.route({
+      method: 'DELETE',
+      path: '/cart/{id}/checkout',
+      handler: this.handlers.endCheckout.bind(this.handlers),
+      config: {
+        description: 'Unlock a cart and remove the checkout time',
+        tags: ['api', 'cart'],
+        plugins: {
+          'hapi-swagger': {
+            200: { description: 'Cart checkout started' },
+            400: { desription: 'Bad request' }
+          }
+        }
+      }
+    })
+  }
+
+  /**
    * Actually adds the routes to the server
    * @param {Hapi.server} server - the Hapi server
    */
@@ -165,6 +276,11 @@ class Router {
     this.routeChangeAmount(server);
     this.routeGetProducts(server);
     this.routeDeleteCart(server);
+    this.routeLockCart(server);
+    this.routeUnlockCart(server);
+    this.routeIsLocked(server);
+    this.routeStartCheckout(server);
+    this.routeEndCheckout(server);
   }
 }
 

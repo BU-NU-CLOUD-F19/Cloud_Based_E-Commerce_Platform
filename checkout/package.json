@@ -8,15 +8,15 @@
   "homepage": "https://github.com/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform",
   "bugs": "",
   "config": {
-    "appName": "cart"
+    "appName": "checkout"
   },
   "scripts": {
     "dev": "nodemon",
     "start": "node app.js",
     "start-dev": "export NODE_ENV=development || set NODE_ENV=development && node app.js",
     "lint": "eslint -f unix -c ../.eslintrc.js .",
-    "test": "mocha test/*.test.js",
-    "doc": "jsdoc -d ../docs/cart -r src/"
+    "test": "export NODE_ENV=test || set NODE_ENV=test && mocha test/*.test.js",
+    "doc": "jsdoc -d ../docs/checkout -r src/"
   },
   "dependencies": {
     "@hapi/glue": "^6.2.0",
@@ -28,12 +28,11 @@
     "kibbutz": "^2.0.0",
     "kibbutz-rc": "^1.0.0",
     "knex": "^0.19.5",
-    "node-fetch": "^2.6.0",
     "pg": "^7.12.1",
-    "shortid": "^2.2.15",
     "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.1.0"
-
+    "winston-daily-rotate-file": "^4.1.0",
+    "node-fetch": "^2.6.0",
+    "shortid": "^2.2.15"
   },
   "devDependencies": {
     "eslint": "^6.4.0",
