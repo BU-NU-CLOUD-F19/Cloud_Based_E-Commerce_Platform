@@ -183,7 +183,7 @@ services:
 
   authentication:
     build: ./authentication
-    container_name: ${AUTH_HOST}
+    container_name: "${AUTH_HOST}"
     volumes:
       - ./authentication/src:/usr/app/src
       - ./authentication/app.js:/usr/app/app.js
