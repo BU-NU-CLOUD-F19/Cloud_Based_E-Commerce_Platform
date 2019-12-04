@@ -65,3 +65,11 @@ kubectl edit deployments
 kubectl get pods
 ````
 
+## References:
+
+1. https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+2. https://cloud.google.com/sdk/docs/quickstarts
+
+
+
