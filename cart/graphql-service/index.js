@@ -23,26 +23,45 @@ const typeDefs = gql`
     pid: Int
     amount_in_cart: Int
   }
+  type AuthDetails {
+    authorized: Boolean
+    uid: String
+    as: String
+  }
   type RemoveProductSuccess{
     message: String
     data: Int
+    auth: AuthDetails
   }
   type GetProductSuccess {
     message: String
     data: [ProductInfo]
+    auth: AuthDetails
+  }
+  type LockStatus {
+    locked: Boolean
+  }
+  type GetLockStatus{
+    message: String
+    data: LockStatus
+    auth: AuthDetails
   }
   type DeleteCartSuccess {
     message: String
+    auth: AuthDetails
   }
   type Query {
-    getProducts(id: Int!): GetProductSuccess
+    getProducts(id: Int!, sid: String, uid: String, password: String): GetProductSuccess
+    getLockStatus(id: Int!, sid: String, uid: String, password: String): GetLockStatus
   }
   type Mutation {
-    addProductToCart(id: Int!, input: ProductInCart): GetProductSuccess
-    removeProduct(id: Int!, input: ProductID): RemoveProductSuccess
-    emptyCart(id: Int!): RemoveProductSuccess
-    changeAmount(id: Int!, input: ProductInCart): GetProductSuccess
-    deleteCart(id: Int!): DeleteCartSuccess
+    addProductToCart(id: Int!, input: ProductInCart, sid: String, uid: String, password: String): GetProductSuccess
+    removeProduct(id: Int!, input: ProductID, sid: String, uid: String, password: String): RemoveProductSuccess
+    emptyCart(id: Int!, sid: String, uid: String, password: String): RemoveProductSuccess
+    changeAmount(id: Int!, input: ProductInCart, sid: String, uid: String, password: String): GetProductSuccess
+    deleteCart(id: Int!, sid: String, uid: String, password: String): DeleteCartSuccess
+    lockCart(id: Int!, sid: String, uid: String, password: String): DeleteCartSuccess
+    unlockCart(id: Int!, sid: String, uid: String, password: String): DeleteCartSuccess
   }
 `;
 
@@ -50,33 +69,46 @@ const typeDefs = gql`
 const resolvers = {
     // Query and Mutations are root types that will be executed by the GraphQL server
     Query: {
-        getProducts: (root, { id }, { dataSources }) => {
-            return dataSources.cartAPI.getProductsInCart(id);
-        }
+        getProducts: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.getProductsInCart(id, sid, uid, password);
+        },
+        getLockStatus: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.getLockStatus(id, sid, uid, password);
+        },
     },
     Mutation: {
-        addProductToCart: (root, { id, input }, { dataSources }) => {
-            return dataSources.cartAPI.addProductToCart(id, input).then(result => {
+        addProductToCart: (root, { id, input, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.addProductToCart(id, input, sid, uid, password).then(result => {
                 return result;
             });
         },
-        removeProduct: (root, { id, input }, { dataSources }) => {
-            return dataSources.cartAPI.removeProductFromCart(id, input).then(result => {
+        removeProduct: (root, { id, input, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.removeProductFromCart(id, input, sid, uid, password).then(result => {
                 return result;
             });
         },
-        emptyCart: (root, { id }, { dataSources }) => {
-            return dataSources.cartAPI.emptyCart(id).then(result => {
+        emptyCart: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.emptyCart(id, sid, uid, password).then(result => {
                 return result;
             });
         },
-        changeAmount: (root, { id, input }, { dataSources }) => {
-            return dataSources.cartAPI.changeAmountOfProduct(id, input).then(result => {
+        changeAmount: (root, { id, input, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.changeAmountOfProduct(id, input, sid, uid, password).then(result => {
                 return result;
             });
         },
-        deleteCart: (root, { id }, { dataSources }) => {
-            return dataSources.cartAPI.deleteCart(id).then(result => {
+        deleteCart: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.deleteCart(id, sid, uid, password).then(result => {
+                return result;
+            });
+        },
+        lockCart: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.lockCart(id, sid, uid, password).then(result => {
+                return result;
+            });
+        },
+        unlockCart: (root, { id, sid, uid, password }, { dataSources }) => {
+            return dataSources.cartAPI.unlockCart(id, sid, uid, password).then(result => {
                 return result;
             });
         }

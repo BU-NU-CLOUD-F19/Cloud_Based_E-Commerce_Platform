@@ -1,13 +1,8 @@
 /* eslint-env mocha */
 const chai = require("chai");
 const { expect } = chai;
-
-const cartHost = `${process.env.CART_HOST}` || "localhost";
-const cartPort = `${process.env.CART_PORT}` || "3000";
-const cartUrl = `http://${cartHost}:${cartPort}/cart`; // URL for cart service
-const requestCart = require("supertest")(cartUrl);
-
-
+const cartURL = `http://${process.env.CART_HOST}:${process.env.CART_PORT}/cart`; // URL for GraphQL API Gateway
+const requestCart = require("supertest")(cartURL);
 const gatewayHost = `${process.env.API_GW_HOST}` || "localhost";
 const gatewayPort = `${process.env.API_GW_PORT}` || "3050";
 const urlGateway = `http://${gatewayHost}:${gatewayPort}/`; // URL for GraphQL API Gateway
@@ -63,6 +58,7 @@ describe("Cart REST API", () => {
     await cart.repository.knex('users').insert(sample_users);
   }
 
+  // Initialize the models needed for tests
   async function initModels() {
     try {
       await require('../src/configs/config');
@@ -78,7 +74,7 @@ describe("Cart REST API", () => {
     }
   }
 
-  // Runs before all tests
+  // Things to do before *all* tests
   before(function before() {
 
     // Load the config and wait for it to load
@@ -103,61 +99,69 @@ describe("Cart REST API", () => {
     })
   })
 
-  // Before each test, clear out the cart data
+  // Things to do before *every* test
   beforeEach(async function beforeEach() {
     await cart.deleteAll();
     await productsInCart.deleteAll();
   })
 
-  // Test API functionality
-  it("lists products", async () => {
+  // Authenticated user functionality
+  it("authd: lists products", async () => {
+    const user = { uid: sample_users[0].uid };
+
     // Check if product listing is possible
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).send(user).expect(200)
     expect(res.body.data).to.eql([]);
   });
 
-  it("adds a product to a cart", async () => {
+  it("authd: adds a product to a cart", async () => {
+    const user = { uid: sample_users[0].uid };
     // Add it to the cart, and check response
-    let res = await requestCart.post(`/${cartId}`).send(product).expect(201)
+    let res = await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
     expect(res.body.data).to.eql([product])
 
-    res = await requestCart.get(`/${cartId}`).expect(200)
+    res = await requestCart.get(`/${cartId}`).query(user).expect(200)
     expect(res.body.data).to.eql([product]);
   });
 
-  it("removes a product from a cart", async () => {
+  it("authd: removes a product from a cart", async () => {
+    const user = { uid: sample_users[0].uid };
     // Add it to the cart
-    await requestCart.post(`/${cartId}`).send(product).expect(201)
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201)
 
     // Remove it from the cart
-    await requestCart.put(`/${cartId}/remove`).send({ pid: product.pid }).expect(200)
+    await requestCart.put(`/${cartId}/remove`).query(user).send({ pid: product.pid }).expect(200)
 
 
     // List the products, expecting none to be present
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).query(user).expect(200)
     expect(res.body.data).to.eql([]);
   });
 
-  it("responds to an empty-cart request", async () => {
+  it("authd: responds to an empty-cart request", async () => {
+    const user = { uid: sample_users[0].uid };
+    //
     // Insert a few products into the cart
     for (let i = 1; i <= 2; i++) {
-      await requestCart.post(`/${cartId}`).send({ pid: i, amount_in_cart: i }).expect(201);
+      await requestCart.post(`/${cartId}`).query(user).send({ pid: i, amount_in_cart: i }).expect(201);
     }
 
     // Check that the cart contains 3 products
-    let res = await requestCart.get(`/${cartId}`).expect(200);
+    let res = await requestCart.get(`/${cartId}`).query(user).expect(200);
     expect(res.body.data.length).to.eql(2)
 
     // Empty the cart
-    res = await requestCart.put(`/${cartId}/empty`).expect(200);
+    res = await requestCart.put(`/${cartId}/empty`).query(user).expect(200);
     expect(res.body.data).to.eql(2);  // rows deleted
 
     // Check that the cart is empty
-    res = await requestCart.get(`/${cartId}`).expect(200);
+    res = await requestCart.get(`/${cartId}`).query(user).expect(200);
     expect(res.body.data).to.eql([])
   })
 
-  it("responds to a change request", async () => {
+  it("authd: responds to a change request", async () => {
+    const user = { uid: sample_users[0].uid };
+
     // Define a new product
     let new_product = {
       pid: product.pid,
@@ -165,43 +169,213 @@ describe("Cart REST API", () => {
     }
 
     // Add a product
-    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
 
     // Change the product
-    await requestCart.put(`/${cartId}`).send(new_product).expect(200);
+    await requestCart.put(`/${cartId}`).query(user).send(new_product).expect(200);
 
     // Check that the amount has been updated
-    const res = await requestCart.get(`/${cartId}`).expect(200)
+    const res = await requestCart.get(`/${cartId}`).query(user).expect(200)
     expect(res.body.data[0].amount_in_cart).to.eql(new_product.amount_in_cart)
   });
 
-  it("responds to a delete request", async () => {
+  it("authd: responds to a delete request", async () => {
+    const user = { uid: sample_users[0].uid };
+
     // Add a product
-    await requestCart.post(`/${cartId}`).send(product).expect(201);
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
 
     // Delete the cart
-    await requestCart.delete(`/${cartId}`).expect(200);
+    await requestCart.delete(`/${cartId}`).query(user).expect(200);
 
     // Check that the product is gone
-    const res = await requestCart.get(`/${cartId}`).expect(200);
+    const res = await requestCart.get(`/${cartId}`).query(user).expect(200);
     expect(res.body.data).to.eql([]);
   })
 
-  // Check API error handling
-  it("Rejects a malformed remove request", async () => {
-    await requestCart.put(`/${cartId}/remove`).expect(400)
+  it("authd: locks and unlocks correctly", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    // Add a product
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
+
+    // Lock the cart
+    await requestCart.put(`/${cartId}/lock`).query(user).expect(200);
+
+    // Get the locked status
+    let isLocked = await requestCart.get(`/${cartId}/lock`).query(user).expect(200);
+    expect(isLocked.body.data.locked).to.equal(true);
+
+    // Unlock the cart
+    await requestCart.delete(`/${cartId}/lock`).query(user).expect(200);
+
+    // Get the locked status
+    isLocked = await requestCart.get(`/${cartId}/lock`).query(user).expect(200);
+    expect(isLocked.body.data.locked).to.equal(false);
+  })
+
+  it("authd: can start and end a checkout", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    // Add a product
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
+
+    // Begin checkout
+    await requestCart.put(`/${cartId}/checkout`).query(user).expect(200);
+
+    // Cart should be locked
+    let isLocked = await requestCart.get(`/${cartId}/lock`).query(user).expect(200);
+    expect(isLocked.body.data.locked).to.equal(true);
+
+    // End checkout
+    await requestCart.delete(`/${cartId}/checkout`).query(user).expect(200);
+
+    // Cart should be unlocked
+    isLocked = await requestCart.get(`/${cartId}/lock`).query(user).expect(200);
+    expect(isLocked.body.data.locked).to.equal(false);
+  })
+
+  it("authd: does not allow checking out a cart that's being checked out", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    // Add a product
+    await requestCart.post(`/${cartId}`).send(product).query(user).expect(201);
+
+    // Begin checkout
+    await requestCart.put(`/${cartId}/checkout`).query(user).expect(200);
+
+    // Don't allow a second checkout
+    await requestCart.put(`/${cartId}/checkout`).query(user).expect(403);
+  })
+
+  it("authd: can't end a checkout if there is none", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    // Add a product
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
+
+    // Can't end a nonexisting checkout process
+    await requestCart.delete(`/${cartId}/checkout`).query(user).expect(400);
+  })
+
+  it ("authd: does not modify a locked cart", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    // Add a product
+    let product2 = {
+      "pid": 2,
+      "amount_in_cart": 5
+    }
+    await requestCart.post(`/${cartId}`).send(product).query(user).expect(201);
+
+    // Lock the cart
+    await requestCart.put(`/${cartId}/lock`).query(user).expect(200);
+
+    // Adding a product should fail
+    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(403);
+
+    // Unlock the cart
+    await requestCart.delete(`/${cartId}/lock`).query(user).expect(200);
+
+    // Now the product should be added
+    await requestCart.post(`/${cartId}`).send(product2).query(user).expect(201);
+  })
+
+  // Guest user functionality
+  it("guest: allows a guest cart", async () => {
+    const { body: { auth: guestAuth } } = await requestCart.post(`/${cartId}`).send(product).expect(201);
+    expect(guestAuth.as).to.equal("guest");
+    expect(guestAuth.uid);
+  })
+
+  it("guest: lets a guest modify their cart", async () => {
+    // Define a new product
+    let new_product = {
+      pid: product.pid,
+      amount_in_cart: product.amount_in_cart+5
+    }
+
+    // Add a product
+    const { body: { auth: { uid: sid } } } = await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Change the product
+    await requestCart.put(`/${cartId}`).query({ sid }).send(new_product).expect(200);
+
+    // Check that the amount has been updated
+    let res = await requestCart.get(`/${cartId}`).query({ sid }).expect(200);
+    expect(res.body.data[0].amount_in_cart).to.eql(new_product.amount_in_cart);
+
+    // Remove it from the cart
+    await requestCart.put(`/${cartId}/remove`).query({ sid }).send({ pid: new_product.pid }).expect(200)
+
+    // List the products, expecting none to be present
+    res = await requestCart.get(`/${cartId}`).query({ sid }).expect(200)
+    expect(res.body.data).to.eql([]);
+
+    // Re-add a product
+    await requestCart.post(`/${cartId}`).query({ sid }).send(product).expect(201);
+
+    // Empty the cart
+    res = await requestCart.put(`/${cartId}/empty`).query({ sid }).expect(200);
+    expect(res.body.data).to.eql(1);  // rows deleted
+
+    // Check that the cart is empty
+    res = await requestCart.get(`/${cartId}`).query({ sid }).expect(200);
+    expect(res.body.data).to.eql([])
+  })
+
+  it("guest: can start and end a checkout", async () => {
+    // Add a product
+    const { body: { auth: { uid: sid } } } = await requestCart.post(`/${cartId}`).send(product).expect(201);
+
+    // Begin checkout
+    await requestCart.put(`/${cartId}/checkout`).query({ sid }).expect(200);
+
+    // Cart should be locked
+    let isLocked = await requestCart.get(`/${cartId}/lock`).query({ sid }).expect(200);
+    expect(isLocked.body.data.locked).to.equal(true);
+
+    // End checkout
+    await requestCart.delete(`/${cartId}/checkout`).query({ sid }).expect(200);
+
+    // Cart should be unlocked
+    isLocked = await requestCart.get(`/${cartId}/lock`).query({ sid }).expect(200);
+    expect(isLocked.body.data.locked).to.equal(false);
+  })
+
+
+  // Error handling tests
+  it("rejects a malformed remove request", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    await requestCart.put(`/${cartId}/remove`).query(user).expect(400)
   });
 
-  it("Rejects a malformed add request", async () => {
-    await requestCart.post(`/${cartId}`).expect(400)
+  it("rejects a malformed add request", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    await requestCart.post(`/${cartId}`).query(user).expect(400)
   });
 
-  it("Rejects a malformed change request", async () => {
-    await requestCart.put(`/${cartId}`).expect(400)
+  it("rejects a malformed change request", async () => {
+    const user = { uid: sample_users[0].uid };
+
+    await requestCart.put(`/${cartId}`).query(user).expect(400)
   });
+
+  it("does not allow users to modify each other's carts", async () => {
+    const user = { uid: sample_users[0].uid };
+    await requestCart.post(`/${cartId}`).query(user).send(product).expect(201);
+
+    // Create a guest cart
+    await requestCart.post(`/${cartId}`).send(product).expect(403);
+    const { body: { auth: { uid: sid } } } = await requestCart.post(`/${cartId+1}`).send(product).expect(201);
+    // Try to delete the carts in an unauthorized way
+    await requestCart.delete(`/${cartId}`).query({ sid }).expect(403);
+    await requestCart.delete(`/${cartId+1}`).query(user).expect(403);
+  })
 
   // Tests for API Gateway
-
   it("Gateway lists products in cart", async () => {
     // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
@@ -247,7 +421,7 @@ describe("Cart REST API", () => {
         pid: 1
       }){
         message,
-        data 
+        data
       }
     }` }).expect(200);
 
@@ -256,7 +430,7 @@ describe("Cart REST API", () => {
   });
 
   it("Gateway responds to an empty-cart request", async () => {
-    // Add a product 
+    // Add a product
     await requestCart.post(`/${cartId}`).send(product).expect(201);
 
     // Empty the cart
@@ -264,7 +438,7 @@ describe("Cart REST API", () => {
       query: `mutation {
       emptyCart(id: ${cartId}){
         message,
-        data 
+        data
       }
     }` }).expect(200);
 
@@ -303,7 +477,7 @@ describe("Cart REST API", () => {
       query: `mutation {
       removeProduct(id: ${cartId}){
         message,
-        data 
+        data
       }
     }` });
     expect(res.body).to.have.property("errors");
@@ -354,17 +528,17 @@ describe("Cart REST API", () => {
     expect(res.body.data.deleteCart.message).to.equal("Cart deleted.");
   });
 
-  // Clean up after all tests are done
+  // Things to do after all tests
   after(async function after() {
     // Remove carts and products in cart
-    // await cart.deleteAll();
+    await cart.deleteAll();
     await productsInCart.deleteAll();
 
     // Remove the sample data created in before()
     console.log("Removing sample data");
-    // for (let user of sample_users) {
-    //   await cart.repository.knex('users').where({ uid: user.uid }).del();
-    // }
+    for (let user of sample_users) {
+      await cart.repository.knex('users').where({ uid: user.uid }).del();
+    }
     for (let prod of sample_products) {
       await cart.repository.knex('products').where({ pid: prod.pid }).del();
     }

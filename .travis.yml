@@ -16,7 +16,7 @@ matrix:
   include:
     - stage: "Setup & Lint"
       before_script:
-        - cd graphql-api-gateway-poc/
+        - cd api-gateway/
         - npm install
       name: "GraphQL"
       script: npm run lint
@@ -26,21 +26,10 @@ matrix:
       script: npm run lint
       name: "Cart"
     - before_script:
-        - cd members-graphql-service/
-        - npm install
-      script: npm run lint
-      name: "Members GraphQL Service"
-    - before_script:
       - cd authentication/
       - npm install
       script: npm run lint
       name: "Authentication"
-      # Tests
-    - before_script:
-        - cd tests/
-        - npm install
-      script: npm run lint
-      name: "Tests"
     # - stage: "Test"
     #   before_script:
     #     - cd cart/
