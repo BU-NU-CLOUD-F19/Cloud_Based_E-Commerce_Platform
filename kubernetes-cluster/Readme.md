@@ -54,8 +54,14 @@ example:
         "port": 80 // Exposed public port
       },
 ````
+To upgrade/downgrade cluster on the go (with zero-downtime):
+1. Run `kubectl edit deployments`
+2. update the image version for the target cluster
+3. Save and close the file.
+4. Run `kubectl get pods` and you'll see the pods updating one after another.
 
-Some important debugging commands.
+
+Some helpful debugging commands.
 
 ````
 kubectl get deployments
