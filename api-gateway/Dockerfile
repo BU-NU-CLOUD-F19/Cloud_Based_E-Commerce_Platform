@@ -18,7 +18,7 @@ RUN npm install -g pm2@3.5.1
 # eg: COPY "." "$APP_DIR"
 # See here https://hackernoon.com/how-to-move-code-into-a-docker-container-ab28edcc2901
 
-COPY package*.json ./
+COPY "." "$APP_DIR"
 RUN npm install
 
 # Setup ports

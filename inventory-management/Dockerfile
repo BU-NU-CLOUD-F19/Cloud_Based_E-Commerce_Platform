@@ -22,8 +22,8 @@ COPY "." "$APP_DIR"
 RUN npm install
 
 # Setup ports
-ENV API_PORT 3020
-EXPOSE $API_PORT
+ENV INVENTORY_PORT 3020
+EXPOSE $INVENTORY_PORT
 
 # Run it
 # Start PM2 as PID 1 process

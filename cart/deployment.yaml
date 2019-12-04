@@ -1,0 +1,25 @@
+# This file configures the hello-world app which serves public web traffic.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cart-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      containers:
+        - name: cart-app
+          # Replace $GCLOUD_PROJECT with your project ID
+          image: gcr.io/cloud-ecommerce/cart:v1.0
+          # This app listens on port 8080 for web traffic by default.
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3020"
