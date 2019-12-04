@@ -25,6 +25,7 @@ cd into kubernetes-cluster directory and submit the image to google container re
 
 While submitting a new image on GCP if you are a first time user you have to enable the google container image registry
 
+Also please replace the image name in deployment yaml and run the following commands.
 ```
 gcloud builds submit --tag gcr.io/<project-id>/postgres-gke:v1.1 .
 
