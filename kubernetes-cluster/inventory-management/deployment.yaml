@@ -2,19 +2,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: nodejs-gke
+  name: inventory-gke
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nodejs
+      app: inventory
   template:
     metadata:
       labels:
-        app: nodejs
+        app: inventory
     spec:
       containers:
-        - name: nodejs-app
+        - name: inventory-app
           # Replace $GCLOUD_PROJECT with your project ID
           image: gcr.io/cloud-ecommerce/cloud_based_e-commerce_platform_inventory-management:v1.1
           # This app listens on port 8080 for web traffic by default.
