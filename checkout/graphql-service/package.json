@@ -1,11 +1,10 @@
 {
-  "name": "graphql-service",
+  "name": "checkout-graphql-service",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is the graphql service for the checkout microservice used to connect the gateway with the REST API of the microservice",
   "main": "index.js",
   "scripts": {
-    "start-graphql-service": "nodemon index.js",
-    "lint": "eslint -f unix -c ../.eslintrc.js ."
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",

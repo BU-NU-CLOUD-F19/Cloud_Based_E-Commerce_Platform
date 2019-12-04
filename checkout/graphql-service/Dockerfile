@@ -22,7 +22,7 @@ COPY package*.json ./
 RUN npm install
 
 # Setup ports
-ENV SERVICE_PORT 5000
+ENV SERVICE_PORT 7000
 EXPOSE $SERVICE_PORT
 
 # Run it
