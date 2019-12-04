@@ -18,12 +18,12 @@ RUN npm install -g pm2@3.5.1
 # eg: COPY "." "$APP_DIR"
 # See here https://hackernoon.com/how-to-move-code-into-a-docker-container-ab28edcc2901
 
-COPY package*.json ./
+COPY "." "$APP_DIR"
 RUN npm install
 
 # Setup ports
-ENV API_PORT 4050
-EXPOSE $API_PORT
+ENV AUTH_PORT 4050
+EXPOSE $AUTH_PORT
 
 # Run it
 # Start PM2 as PID 1 process
