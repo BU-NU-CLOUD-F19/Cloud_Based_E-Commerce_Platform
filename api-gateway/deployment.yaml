@@ -1,0 +1,25 @@
+# This file configures the hello-world app which serves public web traffic.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api-gateway-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway-app
+          # Replace $GCLOUD_PROJECT with your project ID
+          image: gcr.io/cloud-ecommerce/api-gateway:v1.0
+          # This app listens on port 8080 for web traffic by default.
+          ports:
+            - containerPort: 3050
+          env:
+            - name: GATEWAY_PORT
+              value: "3020"

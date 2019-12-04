@@ -15,7 +15,7 @@ module.exports = function registrations(config) {
     swagger: '2.0',
     info: {
             version: pkg.version,
-            title: 'Cart API Documentation',
+            title: 'Checkout API Documentation',
         },
     };
   return {

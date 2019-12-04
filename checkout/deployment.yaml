@@ -1,0 +1,25 @@
+# This file configures the hello-world app which serves public web traffic.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: checkout-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checkout
+  template:
+    metadata:
+      labels:
+        app: checkout
+    spec:
+      containers:
+        - name: checkout-app
+          # Replace $GCLOUD_PROJECT with your project ID
+          image: gcr.io/cloud-ecommerce/cloud_based_e-commerce_platform_checkout-management:v1.1
+          # This app listens on port 8080 for web traffic by default.
+          ports:
+            - containerPort: 3010
+          env:
+            - name: PORT
+              value: "3020"
