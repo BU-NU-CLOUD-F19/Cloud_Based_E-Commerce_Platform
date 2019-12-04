@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
+body {
+  margin: 4vh 2vw;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+}
+#products {
+  max-width: 80vw;
+}
+#products td {
+  min-width: 15vw;
+}
+table {
+  text-align: left;
+}
+table input {
+ background: #f4f4f4;
+}
+button {
+  background: #eeeeee;
+  border: 0px;
+  font-size: 1em;
+}
+button:active {
+  background: #dddddd;
+  outline: none;
+}
+button:focus {
+  outline: none;
+}
+
+table button {
+  margin-left: 1em;
+}
+div#cart-display {
+  float: right;
+  max-width: 15vw;
+  text-align: left;
+}
+div#cart-display button {
+  margin: 0;
+}

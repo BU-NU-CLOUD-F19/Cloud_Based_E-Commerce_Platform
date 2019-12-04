@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>Product listing</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="script.js?v=1"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="cart-display">
+      <table id="cart-contents">
+        <tr><th>Shopping Cart</th></tr>
+        <tr>
+          <td>
+            Items in cart: <span id="items-in-cart">0</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ul id="cart-listing">
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button id="checkout">Check out</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button id="empty">Empty cart</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h1>Product Listing</h1>
+    <table id="products">
+      <tr>
+        <th>Product ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+    </table>
+  </body>
+</html>
