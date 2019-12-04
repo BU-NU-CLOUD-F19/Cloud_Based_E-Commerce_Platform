@@ -1,0 +1,25 @@
+# This file configures the hello-world app which serves public web traffic.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: inventory-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+        - name: inventory-app
+          # Replace $GCLOUD_PROJECT with your project ID
+          image: gcr.io/cloud-ecommerce/cloud_based_e-commerce_platform_inventory-management:v1.1
+          # This app listens on port 8080 for web traffic by default.
+          ports:
+            - containerPort: 3020
+          env:
+            - name: PORT
+              value: "3020"
