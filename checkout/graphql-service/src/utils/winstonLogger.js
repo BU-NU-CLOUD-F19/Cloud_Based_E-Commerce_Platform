@@ -20,7 +20,7 @@ const logDir = 'log';
 
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
+  fs.mkdirSync(logDir);
 }
 
 const filename = path.join(logDir, 'results.log');
