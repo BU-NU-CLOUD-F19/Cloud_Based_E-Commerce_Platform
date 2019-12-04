@@ -19,13 +19,13 @@ Create cluster in the active GCP project directory
 ````
 gcloud container clusters create <project-name>    --num-nodes 1    --enable-basic-auth    --issue-client-certificate    --zone us-east1
 ````
-###Build and push the postgres image on GCP
+###Build and push and push any microservice image on GCP
 
-cd into kubernetes-cluster directory and submit the image to google container registry. 
+cd into the respective microservice directory and submit the image to google container registry. 
 
-While submitting a new image on GCP if you are a first time user you have to enable the google container image registry
+If its your first time make sure you have kubectl installed on your system. Also, While submitting a new image on GCP make sure you have to enable the google container image registry API.
 
-Also please replace the image name in deployment yaml and run the following commands.
+Now simply replace the image name in deployment yaml and run the following commands.
 ```
 gcloud builds submit --tag gcr.io/<project-id>/postgres-gke:v1.1 .
 
@@ -34,12 +34,15 @@ kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 ```
 
-Once you have the postgres image running get the external cluster ip for the deployment using the following command
+Once you have the image running get all clusters external ip for communication with each deployed microservice using the following command
 ````
 kubectl get svc
 ````
+Use the external ip to verify the deployment is done right by going to <external-ip>/documentation
 
-Update the inventory management service rc file and replace the connection details
+Update the service dependency ip in the respective .<microservice-name>rc's to establish communication.
+
+Example: `.inventory-managementrc` file and replace the connection details
 ````
 example:
 
@@ -50,15 +53,6 @@ example:
         "port": 80
       },
 ````
-
-Build the inventory management image or any other image service that you want to build tag the image and submit it to the GCP container registry.
-````
-
-tag inventory management image
-gcloud docker -- push gcr.io/<project-id>/<Tag Name>
-
-````
-once the image is build and pushed navigate to respective kubernetes configuration directory and deploy the deployment and service yamls.
 
 Some important debugging commands.
 
