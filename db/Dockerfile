@@ -14,4 +14,7 @@ RUN set -ex \
 
 # Copy the postgresql.conf file modified for pg_cron
 COPY ./postgresql.conf /etc/postgresql/postgresql.conf
+
+EXPOSE 5432
+
 RUN chown -R postgres:postgres /etc/postgresql && chmod 0700 /etc/postgresql
