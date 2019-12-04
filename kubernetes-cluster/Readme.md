@@ -19,11 +19,11 @@ Create cluster in the active GCP project directory
 ````
 gcloud container clusters create <project-name>    --num-nodes 1    --enable-basic-auth    --issue-client-certificate    --zone us-east1
 ````
-###Build and push and push any microservice image on GCP
+###How to build and push any microservice image on GCP
 
 cd into the respective microservice directory and submit the image to google container registry. 
 
-If its your first time make sure you have kubectl installed on your system. Also, While submitting a new image on GCP make sure you have to enable the google container image registry API.
+Make sure you have kubectl installed on your system. Also, While submitting a new image on GCP make sure you have to enable the google container image registry API.
 
 Now simply replace the image name in deployment yaml and run the following commands.
 ```
@@ -38,7 +38,7 @@ Once you have the image running get all clusters external ip for communication w
 ````
 kubectl get svc
 ````
-Use the external ip to verify the deployment is done right by going to <external-ip>/documentation
+Use the external ip to verify the deployment is done right by hitting `http://<external-ip>/documentation` on browser
 
 Update the service dependency ip in the respective .<microservice-name>rc's to establish communication.
 
