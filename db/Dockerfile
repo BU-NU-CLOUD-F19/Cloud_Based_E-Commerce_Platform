@@ -4,7 +4,7 @@ FROM postgres:12-alpine
 # Install pg_cron
 RUN set -ex \
       && PG_CRON_VERSION=1.2.0 \
-      && apk add --no-cache --virtual .build-deps build-base ca-certificates openssl tar \
+      && apk add --no-cache --virtual .build-deps build-base ca-certificates openssl tar clang llvm8 \
       && wget -O /pg_cron.tgz https://github.com/citusdata/pg_cron/archive/v$PG_CRON_VERSION.tar.gz \
       && tar xvzf /pg_cron.tgz && cd pg_cron-$PG_CRON_VERSION \
       && sed -i.bak -e 's/-Werror//g' Makefile \
