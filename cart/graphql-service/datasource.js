@@ -50,8 +50,11 @@ module.exports = class InventoryAPI extends RESTDataSource {
         if (sid) {
             requestUrl = `cart/${id}?sid=${sid}`;
         }
-        else {
+        else if (uid && password) {
             requestUrl = `cart/${id}?uid=${uid}&password=${password}`;
+        }
+        else {
+            requestUrl = `cart/${id}`;
         }
         product = JSON.stringify(product);
         const result = await this.post(
