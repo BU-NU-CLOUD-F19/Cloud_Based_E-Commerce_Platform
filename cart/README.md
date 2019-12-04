@@ -20,7 +20,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 
 #### Request body
@@ -91,7 +90,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 A JSON object containing
@@ -152,7 +150,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 Empty.
@@ -203,7 +200,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 A JSON object containing
@@ -273,7 +269,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 Empty.
@@ -326,7 +321,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.
@@ -375,7 +369,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.
@@ -425,7 +418,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.
@@ -469,7 +461,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.
@@ -513,7 +504,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.
@@ -562,7 +552,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 
 #### Request body
@@ -606,7 +595,6 @@ For a guest cart:
 For a registered user's cart:
 
 * `uid`: the registered user's ID
-* `password`: the password associated with the ID
 
 #### Request body
 None.

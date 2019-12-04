@@ -15,7 +15,6 @@ A JSON object containing
   * `sid`: the guest session ID
 * for a registered user checkout:
   * `uid`: the user's ID
-  * `password`: the user's password
 
 Example:
 
@@ -56,7 +55,6 @@ A JSON object containing
   * `sid`: the guest session ID
 * for a registered user checkout:
   * `uid`: the user's ID
-  * `password`: the user's password
 
 Example:
 
@@ -112,7 +110,6 @@ A JSON object containing
   * `sid`: the guest session ID
 * for a registered user checkout:
   * `uid`: the user's ID
-  * `password`: the user's password
 
 Example:
 

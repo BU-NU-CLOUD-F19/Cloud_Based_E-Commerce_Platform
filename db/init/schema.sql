@@ -19,7 +19,6 @@ create table users (
   phone varchar(10) not null, -- 10 digits
   email varchar(50) not null,
   date_created timestamptz,
-  -- password varchar(100), -- can be null if the user is not registered
   constraint valid_phone check (phone ~* '^[0-9]{10}$')
 );
 

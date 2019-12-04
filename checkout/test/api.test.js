@@ -11,7 +11,7 @@ const checkoutUrl = `http://${process.env.CHECKOUT_HOST}:${process.env.CHECKOUT_
 const requestCheckout = require("supertest")(checkoutUrl);
 
 describe("Checkout REST API", () => {
-  let orders, sample_users, sample_products, sample_cart;
+  let orders, sample_users, sample_products, sample_guest_cart, sample_reg_cart;
   let guestId;
 
   // Utility function to initialize data
@@ -51,7 +51,7 @@ describe("Checkout REST API", () => {
       }
     ]
 
-    sample_cart = {
+    sample_guest_cart = {
       "cartId": 1,
       "products": [
         {
@@ -65,6 +65,19 @@ describe("Checkout REST API", () => {
       ]
     }
 
+    sample_reg_cart = {
+      "cartId": 7,
+      "products": [
+        {
+          "pid": 2,
+          "amount_in_cart": 1
+        },
+        {
+          "pid": 1,
+          "amount_in_cart": 1
+        }
+      ]
+    }
 
     // Create the records in the database
     console.log(`Inserting sample records`);
@@ -109,8 +122,10 @@ describe("Checkout REST API", () => {
   beforeEach(async function beforeEach() {
     console.log(`Setting up test data`)
     console.log(`\tClearing previous inventory and cart...`);
-    await requestCart.delete(`/${sample_cart.cartId}/lock`).query({ sid: guestId });
-    await requestCart.delete(`/${sample_cart.cartId}`).query({ sid: guestId });
+    await requestCart.delete(`/${sample_guest_cart.cartId}/lock`).query({ sid: guestId });
+    await requestCart.delete(`/${sample_guest_cart.cartId}`).query({ sid: guestId });
+    await requestCart.delete(`/${sample_reg_cart.cartId}/lock`).query({ uid: sample_users[0].uid });
+    await requestCart.delete(`/${sample_reg_cart.cartId}`).query({ uid: sample_users[0].uid });
 
     console.log(`\tClearing orders...`);
     await orders.repository.knex.raw("truncate table orders cascade");
@@ -124,35 +139,54 @@ describe("Checkout REST API", () => {
       await requestInv.post('').send(prod).expect(201);
     }
 
-    console.log(`\tAdding products to cart...`);
-    for (let i in sample_cart.products) {
+    console.log(`\tAdding products to guest cart...`);
+    for (let i in sample_guest_cart.products) {
       if (i == 0) {
-        let resp = await requestCart.post(`/${sample_cart.cartId}`).send(sample_cart.products[i]).expect(201);
+        let resp = await requestCart.post(`/${sample_guest_cart.cartId}`)
+                    .send(sample_guest_cart.products[i])
+                    .expect(201);
+
         guestId = resp.body.auth.uid;
       }
       else {
-        await requestCart.post(`/${sample_cart.cartId}`)
-          .send(sample_cart.products[i]).query({ sid: guestId })
+        await requestCart.post(`/${sample_guest_cart.cartId}`)
+          .send(sample_guest_cart.products[i]).query({ sid: guestId })
           .expect(201);
       }
     }
 
+    console.log(`\tAdding products to registered user cart...`);
+    for (let i in sample_reg_cart.products) {
+      await requestCart.post(`/${sample_reg_cart.cartId}`)
+            .send(sample_reg_cart.products[i])
+            .query({ uid: sample_users[0].uid })
+            .expect(201);
+    }
+
     console.log(`\tChecking consistency...`);
-    const { body } = await requestCart.get(`/${sample_cart.cartId}`).query({ sid: guestId }).expect(200);
-    expect(body.data.length).to.equal(2);
+    const { body: guestBody } = await requestCart.get(`/${sample_guest_cart.cartId}`)
+                                        .query({ sid: guestId })
+                                        .expect(200);
+    expect(guestBody.data.length).to.equal(2);
+    const { body: regBody } = await requestCart.get(`/${sample_reg_cart.cartId}`)
+                                        .query({ uid: sample_users[0].uid })
+                                        .expect(200);
+    expect(regBody.data.length).to.equal(2);
 
   })
 
   it("guest initiates a checkout", async () => {
     const authDetails = { sid: guestId }
-    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
+    await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
   })
 
   it("guest completes the checkout flow", async () => {
     const authDetails = { sid: guestId }
-    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
+    await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
 
-    const { body: { data: order} } = await requestCheckout.put(`/${sample_cart.cartId}`).send(authDetails).expect(201);
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`)
+                                                          .send(authDetails)
+                                                          .expect(201);
 
     expect(order.uid).to.equal(guestId);
     expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
@@ -160,17 +194,42 @@ describe("Checkout REST API", () => {
 
   it("guest aborts a checkout", async () => {
     const authDetails = { sid: guestId };
-    await requestCheckout.post(`/${sample_cart.cartId}`).send(authDetails).expect(200);
-    requestCheckout.delete(`/${sample_cart.cartId}`).send(authDetails).expect(200);
+    await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
+    requestCheckout.delete(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
+  })
+
+  it("authd initiates a checkout", async () => {
+    const authDetails = { uid: sample_users[0].uid }
+    await requestCheckout.post(`/${sample_reg_cart.cartId}`).send(authDetails).expect(200);
+  })
+
+  it("authd completes the checkout flow", async () => {
+    const authDetails = { uid: guestId }
+    await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
+
+    const { body: { data: order} } = await requestCheckout.put(`/${sample_guest_cart.cartId}`)
+                                                          .send(authDetails)
+                                                          .expect(201);
+
+    expect(order.uid).to.equal(guestId);
+    expect(Object.keys(order)).to.eql(["oid", "total_price", "date", "destination", "shipping", "uid"]);
+  })
+
+  it("authd aborts a checkout", async () => {
+    const authDetails = { sid: guestId };
+    await requestCheckout.post(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
+    requestCheckout.delete(`/${sample_guest_cart.cartId}`).send(authDetails).expect(200);
   })
 
   // Clean up after all tests are done
   after(async function after() {
     // Remove carts and products in cart
     console.log(`Clearing test data...`);
-    console.log(`\tDeleting products and cart...`);
-    await requestCart.delete(`/${sample_cart.cartId}/lock`).query({ sid: guestId }).expect(200);
-    await requestCart.delete(`/${sample_cart.cartId}`).query({ sid: guestId }).expect(200);
+    console.log(`\tDeleting products and carts...`);
+    await requestCart.delete(`/${sample_guest_cart.cartId}/lock`).query({ sid: guestId }).expect(200);
+    await requestCart.delete(`/${sample_guest_cart.cartId}`).query({ sid: guestId }).expect(200);
+    await requestCart.delete(`/${sample_reg_cart.cartId}/lock`).query({ uid: sample_users[0].uid }).expect(200);
+    await requestCart.delete(`/${sample_reg_cart.cartId}`).query({ uid: sample_users[0].uid }).expect(200);
 
     for (let prod of sample_products) {
       await requestInv.delete(`/${prod.pid}`).expect(200);

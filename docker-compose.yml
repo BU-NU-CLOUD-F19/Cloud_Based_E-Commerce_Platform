@@ -205,7 +205,7 @@ services:
 
   authentication:
     build: ./authentication
-    container_name: "auth-service"
+    container_name: "${AUTH_HOST}"
     volumes:
       - ./authentication/src:/usr/app/src
       - ./authentication/app.js:/usr/app/app.js
@@ -215,9 +215,12 @@ services:
       - ./authentication/log:/usr/app/log
       - ./authentication/auth.js:/usr/app/auth.js
       - ./authentication/serviceAccountKey.json:/usr/app/serviceAccountKey.json
+      - ./authentication/firebase-config.json:/usr/app/firebase-config.json
       - ./authentication/firebase-client.js:/usr/app/firebase-client.js
+    env_file:
+      - .env
     expose:
-      - 4050
+      - ${AUTH_PORT}
     ports:
-      - 4050:4050
+      - ${AUTH_PORT}:${AUTH_PORT}
     restart: unless-stopped

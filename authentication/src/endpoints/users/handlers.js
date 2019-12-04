@@ -7,6 +7,7 @@
 
 const logger = require('../../utils/logger');
 const { Users } = require('../../models/');
+// const admin = require('firebase-admin');
 
 /**
  * The handler functions for all endpoints defined for the users
@@ -59,12 +60,21 @@ class Handlers {
     try {
 
       const res = await this.users.createUser(payload);
+  
+      /** TODO: this should be done in front end, once you get a successful user creation request
+          because front-end initialized firebase app will have user management methods
+      */
+      // await admin.auth().createUser({
+      //   uid: res.uid,
+      //   email: res.email,
+      //   phoneNumber: res.phoneNumber
+      // });
+
       this.logger.debug(`\tResult: ${JSON.stringify(res)}`);
 
       // Return what was added
       return rep.response({message: "User created.", data: res}).code(201);
     }
-
     catch (err) {
       this.logger.error(JSON.stringify(err));
       throw err;

@@ -10,10 +10,13 @@ This package plays role of user-authenticator to be built for the `Cloud based E
 Prerequisites:
 
 1. Create an project on Google Firebase.
-2. Download credentials for that project. (should be a json file)
-3. Replace the appropriate firebase database url.
-4. Use a token generator to get a firebase token. Use this as Bearer Token when making requests
-5. Edit `schema.sql` if required in future. Have Postgres docker container up and running ( run `docker-compose up -d`)
+2. Download credentials for that project. (should be a json file) (Re-name it to `serviceAccountKey.json`)
+3. Go to your Firebase Console on Web -> select the project -> select the app.
+   1. Copy the initialization snippet i.e. the json config.
+   2. Save it to a file. Name it `firebase-config.json`.
+4. Replace the appropriate firebase database url.
+5. Use a token generator to get a firebase token. Use this as Bearer Token when making requests
+6. Edit `schema.sql` if required in future. Have Postgres docker container up and running ( run `docker-compose up -d`)
 
 To start this service, use the docker-compose file in the root of the repository:
 
