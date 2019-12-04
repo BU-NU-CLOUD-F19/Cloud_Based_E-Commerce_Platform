@@ -98,17 +98,18 @@ services:
     restart: unless-stopped
 
   api-gateway:
-    build: ./graphql-api-gateway-poc
+    build: ./api-gateway
     container_name: "${API_GW_HOST}"
     env_file:
       - .env
     volumes:
-      - ./graphql-api-gateway-poc/src:/usr/app/src
-      - ./graphql-api-gateway-poc/process.json:/usr/app/process.json
-      - ./graphql-api-gateway-poc/log:/usr/app/log
+      - ./api-gateway/src:/usr/app/src
+      - ./api-gateway/process.json:/usr/app/process.json
+      - ./api-gateway/log:/usr/app/log
     depends_on:
       - ${INVENTORY_GQL_HOST}
       - ${CART_GQL_HOST}
+      - ${CHECKOUT_GQL_HOST}
     expose:
       - ${API_GW_PORT}
     ports:
@@ -116,6 +117,8 @@ services:
     environment:
       INVENTORY_GRAPHQL_SERVICE: ${INVENTORY_GQL_HOST}
       CART_GRAPHQL_SERVICE: ${CART_GQL_HOST}
+      CHECKOUT_GRAPHQL_SERVICE: ${CHECKOUT_GQL_HOST}
+      
   inventory-management-graphql-service:
     build: ./inventory-management/graphql-service
     container_name: "${INVENTORY_GQL_HOST}"
@@ -153,6 +156,26 @@ services:
     environment:
       BOILERPLATE_SERVICE: boilerplate
       CART_SERVICE: cart
+
+  checkout-graphql-service:
+    build: ./checkout/graphql-service
+    container_name: "${CHECKOUT_GQL_HOST}"
+    env_file:
+      - .env
+    volumes:
+      - ./checkout/graphql-service/index.js:/usr/app/index.js
+      - ./checkout/graphql-service/datasource.js:/usr/app/datasource.js
+      - ./checkout/graphql-service/process.json:/usr/app/process.json
+      - ./checkout/graphql-service/src:/usr/app/src
+      - ./checkout/graphql-service/log:/usr/app/log
+    expose:
+      - ${CHECKOUT_GQL_PORT}
+    ports:
+      - ${CHECKOUT_GQL_PORT}:${CHECKOUT_GQL_PORT}
+    restart: unless-stopped
+    environment:
+      BOILERPLATE_SERVICE: boilerplate
+      CHECKOUT_SERVICE: checkout
 
   checkout:
     build: ./checkout
