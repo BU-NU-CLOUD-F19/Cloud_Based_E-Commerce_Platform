@@ -10,7 +10,7 @@ gcloud auth login
 ```
 Create your project on GCP and set it as active project.
 ```
-gcloud project create <project-id>
+gcloud projects create <project-id>
 
 gcloud config set project <project-id>
 
@@ -26,9 +26,10 @@ gcloud container clusters create <project-id>    --num-nodes 1    --enable-basic
 ````
 gcloud builds submit --tag gcr.io/<project-id>/<image-name>:<version-number> .
 ````
-Make sure you have <strong>kubectl</strong> installed on your system. Also, While submitting a new image on GCP make sure you have to enable the google container image registry API.
+Make sure you have <strong>kubectl</strong> installed on your system.
+Also, make sure you have `Google Container Registry API` enabled. Refer: https://semaphoreci.com/docs/docker/continuous-delivery-google-container-registry.html
 
-Now simply replace the image name in `deployment.yaml` and run the following commands.
+Next, replace the image name in `deployment.yaml` and run the following commands.
 ```
 kubectl apply -f deployment.yaml
 
@@ -39,9 +40,13 @@ Once you have the image running get all clusters external ip for communication w
 ````
 kubectl get svc
 ````
-Use the external ip to verify if the cluster is up hit `http://<external-ip>/documentation` on browser. You should be able to see swagger documentation.
+Health Check: 
+````
+1. Hit `http://<external-ip>/documentation` on browser. 
+2. You should be able to see swagger documentation.
+````
 
-Update the service dependency ip in the respective .<microservice-name>rc's to establish communication.
+Update the service dependency ip in the respective `.<microservice-name>rc` files to establish communication.
 
 Example: `.inventory-managementrc` file and replace the connection details
 ````
@@ -56,7 +61,7 @@ example:
 ````
 To upgrade/downgrade cluster on the go (with zero-downtime):
 1. Run `kubectl edit deployments`
-2. update the image version for the target cluster
+2. Update the image version for the target cluster
 3. Save and close the file.
 4. Run `kubectl get pods` and you'll see the pods updating one after another.
 
