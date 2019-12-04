@@ -10,24 +10,26 @@ gcloud auth login
 ```
 Create your project on GCP and set it as active project
 ```
-gcloud project create <project-name>
+gcloud project create <project-id>
 
-gcloud config set project <project-name>
+gcloud config set project <project-id>
 
 ```
 Create cluster in the active GCP project directory
 ````
-gcloud container clusters create <project-name>    --num-nodes 1    --enable-basic-auth    --issue-client-certificate    --zone us-east1
+gcloud container clusters create <project-id>    --num-nodes 1    --enable-basic-auth    --issue-client-certificate    --zone us-east1
 ````
-###How to build and push any microservice image on GCP
+### How to build and push any microservice image on GCP
 
 cd into the respective microservice directory and submit the image to google container registry. 
 
+````
+gcloud builds submit --tag gcr.io/<project-id>/<image-name>:<version-number> .
+````
 Make sure you have kubectl installed on your system. Also, While submitting a new image on GCP make sure you have to enable the google container image registry API.
 
 Now simply replace the image name in deployment yaml and run the following commands.
 ```
-gcloud builds submit --tag gcr.io/<project-id>/postgres-gke:v1.1 .
 
 kubectl apply -f deployment.yaml
 
