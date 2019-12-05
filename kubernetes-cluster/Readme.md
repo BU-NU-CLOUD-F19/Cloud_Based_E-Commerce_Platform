@@ -1,5 +1,7 @@
 # How to deploy the stack on GCP?
 
+> <strong>*NOTE:*</strong> If you haven't already please setup [GCP account](https://cloud.google.com/). You'll use this 'gloud' login for this deployment.
+
 #### Install Google Cloud CLI
 
 Once you have the CLI follow the steps as follow to deploy the stack on google cloud platform.
@@ -29,7 +31,7 @@ gcloud builds submit --tag gcr.io/<project-id>/<image-name>:<version-number> .
 Make sure you have <strong>kubectl</strong> installed on your system.
 Also, make sure you have `Google Container Registry API` enabled. Refer: https://semaphoreci.com/docs/docker/continuous-delivery-google-container-registry.html
 
-> NOTE: `deployment.yaml` and `service.yaml` file in each microservice folder were originally meant to be a very basic deployment configuration. This should be replaced by a single `deployment.yaml` and `service.yaml` config for all microservices in future.
+> <strong>__NOTE__</strong>: `deployment.yaml` and `service.yaml` file in each microservice folder were originally meant to be a very basic deployment configuration. This should be replaced by a single `deployment.yaml` and `service.yaml` config for all microservices in future.
 
 Next, replace the image name in `deployment.yaml` and run the following commands.
 ```
