@@ -1,6 +1,6 @@
 # How to deploy the stack on GCP?
 
-> **_NOTE_:** If you haven't already please setup [GCP account](https://cloud.google.com/). You'll use this 'gloud' login for this deployment.
+> **_NOTE_:** If you haven't already, please setup [GCP account](https://cloud.google.com/). You'll use this 'gloud' login for this deployment.
 
 #### Install Google Cloud CLI
 
