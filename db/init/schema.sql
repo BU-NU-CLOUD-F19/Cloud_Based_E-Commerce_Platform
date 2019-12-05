@@ -87,9 +87,15 @@ create table user_security_groups (
   date_created timestamptz
 );
 
+-- Setup for pg_cron
+-- Switch to the 'postgres' db, as that's defined as the db for pg_cronjobs in postgresql.conf
 \connect postgres
+-- Initialize the extension
 create extension pg_cron;
+-- Save the current port in a variable (from the env)
 \set current_port `echo $POSTGRES_PORT`
+-- Save the sweep command in a variable
 \set sweep_command 'UPDATE carts SET locked = false, date_checkout = NULL WHERE locked = true AND DATE_PART(\'minutes\', AGE(NOW(), date_checkout)) > 10;'
+-- Add the pg_cronjob into the database (for more info, see ../README.md)
 insert into cron.job (schedule, command, database, nodeport)
     values ('* * * * *', :'sweep_command', 'cloud_ecommerce', :'current_port');
