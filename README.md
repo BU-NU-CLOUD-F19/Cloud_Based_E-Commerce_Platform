@@ -18,6 +18,11 @@ This will start all of the microservices.
 Alternatively, you can run `docker-compose up -d [service_name]` to start only a specific service.
 Be aware that some services depend on each other, as specified in the Docker Compose file, so starting a single service may in fact bring up more than one container.
 
+The barebones user interface is not in a container, as it was only created for demonstration purposes.
+To 'run' it, it's enough to open the HTML file in your browser.
+Internet connection is required, as it uses jQuery from a remote CDN.
+
+
 ### How to test
 Every Node-based microservice has unit tests, which you can run with `docker exec -it [container_name] npm test`.
 
