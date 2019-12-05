@@ -118,7 +118,7 @@ services:
       INVENTORY_GRAPHQL_SERVICE: ${INVENTORY_GQL_HOST}
       CART_GRAPHQL_SERVICE: ${CART_GQL_HOST}
       CHECKOUT_GRAPHQL_SERVICE: ${CHECKOUT_GQL_HOST}
-      
+
   inventory-management-graphql-service:
     build: ./inventory-management/graphql-service
     container_name: "${INVENTORY_GQL_HOST}"
@@ -200,6 +200,11 @@ services:
       - ./checkout/test:/usr/app/test
       # The above line takes care of making the log dir accessible, but should be
       #   handled differently in production.
+
+    depends_on:
+      - inventory
+      - cart
+      - authentication
 
     restart: unless-stopped
 

@@ -11,13 +11,11 @@ package Microservices as services {
   rectangle "Shopping Cart" as cart
   rectangle "User Authentication" as auth
   rectangle "Checkout" as checkout
-  rectangle "Returns" as returns
 
   ' Hidden links for layout
   cart -[hidden]> inv
   checkout -[hidden]> cart
   auth -[hidden]> checkout
-  returns -[hidden]> auth
 }
 
 database "Postgres\nDatabase" as db
