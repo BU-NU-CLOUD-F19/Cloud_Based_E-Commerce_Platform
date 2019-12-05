@@ -9,6 +9,9 @@ Final video presentation: [YouTube](https://www.youtube.com/watch?v=JOQbcbfGPTE)
 We have developed a number of microservices, each with its own directory in this repository.
 
 ### How to run
+
+* __Run in Local Enviroment:__
+
 To bring up the stack locally, make sure you have [Docker](https://docker.io/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 Then, clone this repository.
 
@@ -21,6 +24,10 @@ Be aware that some services depend on each other, as specified in the Docker Com
 The barebones user interface is not in a container, as it was only created for demonstration purposes.
 To 'run' it, it's enough to open the HTML file in your browser.
 Internet connection is required, as it uses jQuery from a remote CDN.
+
+* __Deploy on Google Cloud Platform via Kubernetes:__
+
+Please follow the steps laid out in [Readme.md](kubernetes-cluster/Readme.md) in `kubernetes-cluster` folder.
 
 
 ### How to test
