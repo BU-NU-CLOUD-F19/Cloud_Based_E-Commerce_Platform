@@ -29,6 +29,8 @@ gcloud builds submit --tag gcr.io/<project-id>/<image-name>:<version-number> .
 Make sure you have <strong>kubectl</strong> installed on your system.
 Also, make sure you have `Google Container Registry API` enabled. Refer: https://semaphoreci.com/docs/docker/continuous-delivery-google-container-registry.html
 
+> NOTE: `deployment.yaml` and `service.yaml` file in each microservice folder were originally meant to be a very basic deployment configuration. This should be replaced by a single `deployment.yaml` and `service.yaml` config for all microservices in future.
+
 Next, replace the image name in `deployment.yaml` and run the following commands.
 ```
 kubectl apply -f deployment.yaml
