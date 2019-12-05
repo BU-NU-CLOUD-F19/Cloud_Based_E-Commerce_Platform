@@ -4,7 +4,7 @@ Cloud-Based E-Commerce Platform
 [![Build Status](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform.svg?branch=master)](https://travis-ci.org/BU-NU-CLOUD-F19/Cloud_Based_E-Commerce_Platform)
 
 ## Presentations
-Final video presentation: [Google Drive link](https://drive.google.com/open?id=1p4tRmXGq7TN64me3glDuFlAmBGuvHNKX) (Youtube didn't allow us to upload videos over 15 min.)
+Final video presentation: [YouTube](https://www.youtube.com/watch?v=JOQbcbfGPTE) and [Google Drive link](https://drive.google.com/open?id=1p4tRmXGq7TN64me3glDuFlAmBGuvHNKX)(backup)
 
 Previous demos:
 
