@@ -1,9 +1,6 @@
 # Shopping Cart Microservice
 This microservice provides REST API endpoints for a shopping cart, and integrates with the PostgreSQL database.
 
-## Class Documentation
-[Here is the online documentation.](/docs/cart)
-
 ## REST API
 ### POST /cart/{id}
 #### Purpose
