@@ -68,7 +68,11 @@ Finally, in the database initialization script, we run the commands `\connect po
 Every new job is inserted into the table `cron.job` in the `postgres` database.
 
 When inserting a new job, we specify four things - the schedule, command, database, and port.
+
 The schedule is in the format of a UNIX crontab schedule, so since we want this job to run every minute, the field would contain the string `'* * * * *'` (for more explanation of the crontab format, see e.g. [crontab.guru](https://crontab.guru/)).
+
 The command is the SQL command that we want to run, in this case one that unlocks every cart that's been in the checkout phase for over ten minutes, and sets its checkout date to NULL.
+
 The database is the name of the database that we want to affect, in our case `'cloud_ecommerce'`.
+
 Finally, the port is the port on which the PostgreSQL server is running, which is set from an environment variable, `$POSTGRES_PORT`.
