@@ -9,11 +9,9 @@ Main file: src/index.js
 
 The API Gateway runs on http://localhost:3050
 
-## Testing by making API requests
+## API Gateway queries
 
----
-
-Open up http://localhost:3050 on the browser to view the GraphQL playground for making API requests
+Open up http://localhost:3050 on the browser to view the GraphQL playground for making API requests.
 All possible queries and mutations for making requests to the gateway are as follows:
 
 ### Requests made to the `cart` microservice: 
@@ -46,3 +44,15 @@ All possible queries and mutations for making requests to the gateway are as fol
   * *addProduct(product)* - Adds a product to inventory
   * *updateProduct(id, product)* - Updates a product with given ID
   * *deleteProduct(id)* - Deletes a product with given ID
+
+## Microservice design for integration with gateway 
+
+The architecture developed closely follows [Apollo Federation](https://blog.apollographql.com/apollo-federation-f260cf525d21) which is the suggested architecture for building a microservices application with a GraphQL API Gateway.
+
+* Every microservice runs on an Apollo Server. A GraphQL schema is defined for each microservice along with resolvers that handle the client requests. In order to create an Apollo server for a microservice, a valid GraphQL schema and resolvers need to be provided to the server
+* The API Gateway interacts with the Apollo servers of the microservices. It maintains a list of the services that are running on the Apollo servers 
+* The GraphQL schemas that are a part of the Apollo servers are used by the gateway to figure out which client request needs to be directed to which microservice
+* Once the Apollo server of a microservice receives a request from the gateway, there are resolvers for each request that take in the request body and pass it on to the REST Datasource of the microservice. 
+* These REST datasources interact with the REST API of the microservice. The response from the REST API is sent back to the Apollo server of the microservice which is sent to the API Gateway and back to the client
+
+Using this architecture, true modularity is achieved with independent GraphQL services for each microservice and individual REST datasources for integration with the REST API of the microservices. 
