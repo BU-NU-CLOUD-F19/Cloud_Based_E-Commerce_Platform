@@ -172,5 +172,7 @@ Demos:
 
 * [Presentation - Demo 5](https://docs.google.com/presentation/d/1jZsAQxVgm-G43GMPc2j9_eFu9ijegDiACVId-v0h1X4/edit?usp=sharing)
 
+* [Presentation - Final demo](https://docs.google.com/presentation/d/1Iz1XJm7Du_r0WvnyBmxD1lEDWr31ZacSbZqIBmAwm98/edit?usp=sharing)
+
 Paper presentation: [Kafka](https://docs.google.com/presentation/d/1zpvOEwlpvICcFjsk3VjvMrjJyT14KJtdswHrt5g4bF8/edit?usp=sharing)
 
