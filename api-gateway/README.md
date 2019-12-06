@@ -56,3 +56,10 @@ The architecture developed closely follows [Apollo Federation](https://blog.apol
 * These REST datasources interact with the REST API of the microservice. The response from the REST API is sent back to the Apollo server of the microservice which is sent to the API Gateway and back to the client
 
 Using this architecture, true modularity is achieved with independent GraphQL services for each microservice and individual REST datasources for integration with the REST API of the microservices. 
+
+### Requirement of a separate Apollo server for each microservice
+
+* In order to implement a GraphQL API gateway with microservices accorrding to the architecture of [Apollo Federation](https://blog.apollographql.com/apollo-federation-f260cf525d21), federated services which are standalone GraphQL APIs are required by the API Gateway
+* The gateway utilises the GraphQL schema from these services to decide which request should be directed to which microservice. It crunches the schemas from all of these services into a single schema
+* These federated services are implemented to achieve true separation of concerns in a microservices architecture and are essential to build a complete schema to connect all data with a distributed architecture
+* In order to implement these federated services (GraphQL APIs), an Apollo server is utilized for each separate service
